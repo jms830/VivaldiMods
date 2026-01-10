@@ -1,22 +1,28 @@
 # JavaScript Mods
 
-Place JavaScript mods here. They will be loaded by VivaldiModManager's injection system.
+JS mods require VivaldiModManager (Windows only). Enable/disable via ModManager UI.
 
-## Recommended Mods (from Awesome-Vivaldi)
+## Included Mods
 
-Copy desired mods from https://github.com/PaRr0tBoY/Awesome-Vivaldi/tree/main/Javascripts
+| File | Description | Source |
+|------|-------------|--------|
+| `globalMediaControls.js` | Media playback panel with controls, volume, PiP | Tam710562 |
+| `mdNotes.js` | Markdown notes editor in sidebar | Tam710562 |
+| `elementCapture.js` | Screenshot/element capture tool | Tam710562 |
+| `activateTabOnHover.js` | Switch tabs on mouse hover | luetage |
+| `tabScroll.js` | Mouse wheel scrolling in tab bar | luetage |
+| `monochromeIcons.js` | Convert toolbar icons to monochrome | luetage |
 
-Popular options:
-- `tidyTabs.js` - AI-powered tab grouping (requires API key)
-- `globalMediaControls.js` - Media playback controls
-- `markdownNotes.js` - Markdown editor in sidebar
+## Additional Mods (Not Included)
 
-## Installation
+These require API keys or have extra dependencies:
 
-1. Copy `.js` files to this directory
-2. Use VivaldiModManager to enable/disable
-3. Restart Vivaldi
+- `tidyTabs.js` - AI-powered tab grouping (requires GLM API key)
+- `tidyTitles.js` - AI-powered tab title cleanup (requires GLM API key)
+- `colorTabs.js` - Color tabs by favicon (requires chroma.js)
 
-## Note
+Get them from: https://github.com/PaRr0tBoY/Awesome-Vivaldi/tree/main/Javascripts
 
-JS mods require VivaldiModManager for injection. CSS-only users can ignore this folder.
+## Credits
+
+All JS mods from [Awesome-Vivaldi](https://github.com/PaRr0tBoY/Awesome-Vivaldi) by @PaRr0tBoY and community contributors.

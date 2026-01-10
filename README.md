@@ -23,28 +23,41 @@ VivaldiModManager is Windows-only. Linux/macOS users get CSS mods via Vivaldi's 
 1. Download [VivaldiModManager v0.2.7](https://github.com/eximido/vivaldimodmanager/releases/download/0.2.7/vivaldimodsmanager-0.2.7.zip)
 2. Extract and run `VivaldiModManager.exe`
 3. Click "Add" and select this repo's `user_mods/` folder
-4. Enable desired mods (see list below)
+4. Enable mods (see tables below)
 5. Restart Vivaldi
 
 ## Available Mods
 
-In VivaldiModManager, you'll see these files to enable/disable individually:
+### CSS Mods
+
+| File | Description | Requires |
+|------|-------------|----------|
+| `core.css` | **Base Arc-style theme** | Nothing (enable first!) |
+| `mod-autohide-addressbar.css` | Hide address bar, show on hover | `core.css` |
+| `mod-autohide-bookmarks.css` | Hide bookmark bar, show on hover | `core.css` |
+| `mod-autohide-panel.css` | Collapse panel, expand on hover | `core.css` |
+| `mod-compact-mode.css` | Auto-collapse sidebar when not hovered | `core.css` |
+| `theme-arc-dark.css` | Dark color scheme | `core.css` |
+| `theme-arc-light.css` | Light color scheme | `core.css` |
+
+**Usage:** Enable `core.css` first (required base), then enable any `mod-*` or `theme-*` files you want.
+
+### JS Mods (Windows only)
 
 | File | Description |
 |------|-------------|
-| `core.css` | **Base theme** - Arc-style UI (required) |
-| `mod-autohide-addressbar.css` | Hide address bar, show on hover |
-| `mod-autohide-bookmarks.css` | Hide bookmark bar, show on hover |
-| `mod-autohide-panel.css` | Collapse panel, expand on hover |
-| `mod-compact-mode.css` | Auto-collapse sidebar when not hovered |
-| `theme-arc-dark.css` | Dark color scheme |
-| `theme-arc-light.css` | Light color scheme |
+| `globalMediaControls.js` | Media playback panel with controls, volume, PiP |
+| `mdNotes.js` | Markdown notes editor in sidebar |
+| `elementCapture.js` | Screenshot/element capture tool |
+| `activateTabOnHover.js` | Switch tabs on mouse hover |
+| `tabScroll.js` | Mouse wheel scrolling in tab bar |
+| `monochromeIcons.js` | Convert toolbar icons to monochrome |
 
-Enable `core.css` first, then add any mods/themes you want.
+JS mods work independently - enable any combination.
 
 ## Alternative: CSS-Only (No ModManager)
 
-If you only want CSS mods and don't need JS:
+For Linux/macOS or if you don't want ModManager:
 
 1. Open `vivaldi://experiments` in Vivaldi
 2. Enable "Allow for using CSS modifications"
@@ -53,7 +66,7 @@ If you only want CSS mods and don't need JS:
 5. Select the `user_mods/css/` folder
 6. Restart Vivaldi
 
-Note: This method loads ALL CSS files. To selectively enable mods, use VivaldiModManager.
+**Note:** This loads ALL CSS files at once. For selective control, use VivaldiModManager on Windows.
 
 ## Customization
 
@@ -72,38 +85,25 @@ Edit `user_mods/css/base/variables.css` to tweak values:
 ```
 user_mods/
 ├── css/
-│   ├── core.css                    # Base theme (VivalArc styling)
-│   ├── mod-*.css                   # Shims for individual modules
-│   ├── theme-*.css                 # Shims for themes
-│   ├── base/
-│   │   ├── variables.css           # Customizable CSS variables
-│   │   └── vivalarc-base.css       # Core Arc styling
-│   ├── modules/                    # Actual module implementations
-│   │   ├── autohide-addressbar.css
-│   │   ├── autohide-bookmarks.css
-│   │   ├── autohide-panel.css
-│   │   └── compact-mode.css
-│   └── themes/
-│       ├── arc-dark.css
-│       └── arc-light.css
-└── js/                             # Optional JS mods (ModManager only)
-    └── README.md
+│   ├── core.css                    # Base theme - ENABLE FIRST
+│   ├── mod-*.css                   # Optional feature modules
+│   ├── theme-*.css                 # Color scheme overrides
+│   ├── base/                       # Shared files (auto-imported)
+│   ├── modules/                    # Module implementations
+│   └── themes/                     # Theme implementations
+└── js/                             # JS mods (Windows/ModManager only)
+    ├── globalMediaControls.js
+    ├── mdNotes.js
+    ├── elementCapture.js
+    ├── activateTabOnHover.js
+    ├── tabScroll.js
+    └── monochromeIcons.js
 ```
-
-## Adding JS Mods
-
-JS mods require VivaldiModManager. Popular options from [Awesome-Vivaldi](https://github.com/PaRr0tBoY/Awesome-Vivaldi/tree/main/Javascripts):
-
-- `tidyTabs.js` - AI-powered tab grouping
-- `globalMediaControls.js` - Media playback controls
-- `markdownNotes.js` - Markdown editor in sidebar
-
-Copy `.js` files to `user_mods/js/`, then enable via ModManager.
 
 ## Credits
 
 - [VivalArc](https://github.com/tovifun/VivalArc) by @tovifun
-- [Awesome-Vivaldi](https://github.com/PaRr0tBoY/Awesome-Vivaldi) by @PaRr0tBoY
+- [Awesome-Vivaldi](https://github.com/PaRr0tBoY/Awesome-Vivaldi) by @PaRr0tBoY and community
 - [VivaldiModManager](https://github.com/eximido/vivaldimodmanager) by @eximido
 
 ## License
