@@ -1,0 +1,27 @@
+# VivaldiModManager (downloaded by setup.ps1)
+VivaldiModManager/
+VivaldiModManager.exe
+VivaldiModManager.xml
+VivaldiModManager.zip
+
+# Original source files (kept for reference locally)
+VivalArc-main/
+VivalArc-main.backup-*/
+
+# Legacy files
+vivalarc.css
+dialog.css
+dialog-window/
+ru/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
