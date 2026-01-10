@@ -1,0 +1,9 @@
+/* user_mods/css/themes/arc-light.css */
+/* Light theme override */
+
+:root {
+    --colorBg: #ffffff;
+    --colorFg: #1a1a1a;
+    --colorTabBar: #f5f5f5;
+    --colorAccentBg: #3d5afe;
+}

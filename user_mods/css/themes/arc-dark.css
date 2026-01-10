@@ -1,0 +1,9 @@
+/* user_mods/css/themes/arc-dark.css */
+/* Dark theme override */
+
+:root {
+    --colorBg: #1a1a1a;
+    --colorFg: #e0e0e0;
+    --colorTabBar: #242424;
+    --colorAccentBg: #3d5afe;
+}
