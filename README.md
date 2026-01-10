@@ -2,15 +2,23 @@
 
 Arc-style theming for Vivaldi Browser, combining VivalArc + Awesome-Vivaldi.
 
-## Quick Setup (Windows)
+## Quick Setup
 
-**One-click install:**
+### Windows (recommended - full CSS + JS support)
+
 ```powershell
-# Run in PowerShell - downloads VivaldiModManager and opens it
 .\setup.ps1
 ```
 
-Or manually:
+### Linux / macOS (CSS-only)
+
+```bash
+./setup.sh
+```
+
+VivaldiModManager is Windows-only. Linux/macOS users get CSS mods via Vivaldi's built-in support.
+
+### Manual Setup
 1. Download [VivaldiModManager v0.2.7](https://github.com/eximido/vivaldimodmanager/releases/download/0.2.7/vivaldimodsmanager-0.2.7.zip)
 2. Extract and run `VivaldiModManager.exe`
 3. Click "Add" and select this repo's `user_mods/` folder
