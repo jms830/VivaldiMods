@@ -12,13 +12,16 @@
             --bg: #0f0f0f;
             --bg-card: #1a1a1a;
             --bg-hover: #252525;
+            --bg-section: #141414;
             --fg: #e8e8e8;
             --fg-muted: #888;
             --accent: #5e81ac;
             --accent-hover: #81a1c1;
-            --border: #333;
+            --accent-faded: rgba(94, 129, 172, 0.2);
+            --border: #2a2a2a;
             --radius: 12px;
             --shadow: 0 4px 24px rgba(0,0,0,0.3);
+            --warning: #d08770;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,115 +35,158 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 32px 20px;
         }
         
         header {
             text-align: center;
-            margin-bottom: 48px;
+            margin-bottom: 32px;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.25rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             background: linear-gradient(135deg, var(--accent), var(--accent-hover));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .subtitle {
             color: var(--fg-muted);
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
         
+        /* Preset Buttons */
+        .presets {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        
+        .preset-btn {
+            padding: 12px 28px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--fg);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .preset-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-hover);
+        }
+        
+        .preset-btn.active {
+            border-color: var(--accent);
+            background: var(--accent-faded);
+            color: var(--accent-hover);
+        }
+        
+        /* Main Layout */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 32px;
+            grid-template-columns: 1fr 380px;
+            gap: 28px;
         }
         
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
+            .sidebar { order: -1; }
         }
         
-        .features-section h2,
-        .preview-section h2,
-        .customization-section h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--fg);
-        }
-        
-        .feature-grid {
-            display: grid;
-            gap: 16px;
-        }
-        
-        .feature-card {
-            background: var(--bg-card);
+        /* Sections */
+        .section {
+            background: var(--bg-section);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 16px;
-            align-items: center;
+            margin-bottom: 16px;
+            overflow: hidden;
         }
         
-        .feature-card:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent);
-        }
-        
-        .feature-card.active {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 1px var(--accent);
-        }
-        
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--bg);
-            border-radius: 10px;
+        .section-header {
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--fg);
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
         }
         
-        .feature-info h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
+        .section-header:hover {
+            background: var(--bg-hover);
+        }
+        
+        .section-header .icon {
+            font-size: 1.1rem;
+        }
+        
+        .section-content {
+            padding: 14px 18px;
+        }
+        
+        /* Feature Toggles */
+        .feature-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .feature-row:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-info h4 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2px;
         }
         
         .feature-info p {
-            font-size: 0.875rem;
+            font-size: 0.78rem;
             color: var(--fg-muted);
         }
         
+        .feature-info .warning {
+            color: var(--warning);
+            font-size: 0.72rem;
+            margin-top: 2px;
+        }
+        
+        /* Toggle Switch */
         .toggle {
-            width: 48px;
-            height: 28px;
+            width: 44px;
+            height: 24px;
             background: var(--bg);
-            border-radius: 14px;
+            border-radius: 12px;
             position: relative;
+            cursor: pointer;
             transition: background 0.2s ease;
+            flex-shrink: 0;
         }
         
         .toggle::after {
             content: '';
             position: absolute;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             background: var(--fg-muted);
             border-radius: 50%;
             top: 3px;
@@ -148,18 +194,77 @@
             transition: all 0.2s ease;
         }
         
-        .feature-card.active .toggle {
+        .toggle.active {
             background: var(--accent);
         }
         
-        .feature-card.active .toggle::after {
+        .toggle.active::after {
             left: 23px;
             background: white;
         }
         
+        /* Radio Buttons */
+        .radio-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-btn {
+            padding: 8px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--fg-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .radio-btn:hover {
+            border-color: var(--accent);
+        }
+        
+        .radio-btn.active {
+            background: var(--accent-faded);
+            border-color: var(--accent);
+            color: var(--fg);
+        }
+        
+        /* Number Inputs */
+        .number-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        
+        .number-row label {
+            font-size: 0.85rem;
+            color: var(--fg-muted);
+        }
+        
+        .number-input {
+            width: 60px;
+            padding: 6px 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--fg);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        
+        .number-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Sidebar */
         .sidebar {
             position: sticky;
             top: 20px;
+            height: fit-content;
         }
         
         .preview-card {
@@ -167,7 +272,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             overflow: hidden;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         
         .preview-image {
@@ -178,21 +283,22 @@
         }
         
         .preview-label {
-            padding: 12px 16px;
-            font-size: 0.875rem;
+            padding: 10px 14px;
+            font-size: 0.8rem;
             color: var(--fg-muted);
             border-top: 1px solid var(--border);
         }
         
+        /* Theme Selector */
         .theme-selector {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
         .theme-btn {
-            padding: 16px;
+            padding: 14px;
             background: var(--bg-card);
             border: 2px solid var(--border);
             border-radius: var(--radius);
@@ -207,14 +313,14 @@
         
         .theme-btn.active {
             border-color: var(--accent);
-            background: rgba(94, 129, 172, 0.1);
+            background: var(--accent-faded);
         }
         
         .theme-btn .swatch {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
-            margin: 0 auto 8px;
+            margin: 0 auto 6px;
         }
         
         .theme-btn.dark .swatch {
@@ -228,27 +334,24 @@
         }
         
         .theme-btn span {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             color: var(--fg);
         }
         
-        .customization-section {
-            margin-top: 24px;
-        }
-        
+        /* Sliders */
         .slider-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         .slider-label {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.875rem;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
         }
         
         .slider-label span:first-child {
-            color: var(--fg);
+            color: var(--fg-muted);
         }
         
         .slider-label span:last-child {
@@ -267,8 +370,8 @@
         
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background: var(--accent);
             border-radius: 50%;
             cursor: pointer;
@@ -276,21 +379,22 @@
         }
         
         input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
+            transform: scale(1.15);
         }
         
+        /* Download Section */
         .download-section {
-            margin-top: 32px;
+            margin-top: 20px;
         }
         
         .download-btn {
             width: 100%;
-            padding: 16px 24px;
+            padding: 14px 20px;
             background: var(--accent);
             color: white;
             border: none;
             border-radius: var(--radius);
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -307,42 +411,42 @@
         }
         
         .install-steps {
-            margin-top: 16px;
-            padding: 16px;
+            margin-top: 14px;
+            padding: 14px;
             background: var(--bg-card);
             border-radius: var(--radius);
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
         
         .install-steps h4 {
-            font-size: 0.875rem;
-            margin-bottom: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
             color: var(--fg-muted);
         }
         
         .install-steps ol {
-            padding-left: 20px;
+            padding-left: 18px;
             color: var(--fg-muted);
         }
         
         .install-steps li {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .install-steps code {
             background: var(--bg);
-            padding: 2px 6px;
+            padding: 2px 5px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         
         footer {
             text-align: center;
-            margin-top: 64px;
-            padding-top: 32px;
+            margin-top: 48px;
+            padding-top: 24px;
             border-top: 1px solid var(--border);
             color: var(--fg-muted);
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
         
         footer a {
@@ -353,6 +457,21 @@
         footer a:hover {
             text-decoration: underline;
         }
+
+        .customization-section {
+            background: var(--bg-section);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .customization-section h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: var(--fg);
+        }
     </style>
 </head>
 <body>
@@ -362,76 +481,204 @@
             <p class="subtitle">Customize your Arc-style Vivaldi theme</p>
         </header>
         
+        <!-- Presets -->
+        <div class="presets">
+            <button class="preset-btn" data-preset="minimal">Minimal</button>
+            <button class="preset-btn active" data-preset="arc-like">Arc-like</button>
+            <button class="preset-btn" data-preset="power-user">Power User</button>
+        </div>
+        
         <div class="main-grid">
-            <div class="features-section">
-                <h2>Features</h2>
-                <div class="feature-grid">
-                    <div class="feature-card active" data-feature="arc-theme">
-                        <div class="feature-icon">🎨</div>
-                        <div class="feature-info">
-                            <h3>Arc Theme</h3>
-                            <p>Core Arc-style appearance with rounded corners and clean design</p>
-                        </div>
-                        <div class="toggle"></div>
+            <!-- Features Panel -->
+            <div class="features-panel">
+                <!-- Theme Mode -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">🎨</span> Theme Mode
                     </div>
-                    
-                    <div class="feature-card active" data-feature="pinned-tab-grid">
-                        <div class="feature-icon">📌</div>
-                        <div class="feature-info">
-                            <h3>Pinned Tab Grid</h3>
-                            <p>Display pinned tabs as a compact icon grid</p>
+                    <div class="section-content">
+                        <div class="radio-group">
+                            <div class="radio-btn active" data-mode="color">Color</div>
+                            <div class="radio-btn" data-mode="transparent">Transparent</div>
+                            <div class="radio-btn" data-mode="immersive">Immersive</div>
                         </div>
-                        <div class="toggle"></div>
                     </div>
-                    
-                    <div class="feature-card" data-feature="compact-sidebar">
-                        <div class="feature-icon">📐</div>
-                        <div class="feature-info">
-                            <h3>Compact Sidebar</h3>
-                            <p>Narrow sidebar that expands on hover</p>
-                        </div>
-                        <div class="toggle"></div>
+                </div>
+                
+                <!-- Sidebar Behavior -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">📐</span> Sidebar Behavior
                     </div>
-                    
-                    <div class="feature-card" data-feature="autohide-addressbar">
-                        <div class="feature-icon">🔍</div>
-                        <div class="feature-info">
-                            <h3>Auto-hide Address Bar</h3>
-                            <p>Hide the address bar until you hover near the top</p>
+                    <div class="section-content">
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Compact Mode</h4>
+                                <p>Ultra-thin collapsed sidebar (7px)</p>
+                            </div>
+                            <div class="toggle" data-feature="compactMode"></div>
                         </div>
-                        <div class="toggle"></div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Floating Tabbar</h4>
+                                <p>Overlay webpage when expanded</p>
+                            </div>
+                            <div class="toggle active" data-feature="floatingTabbar"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Blur Mask</h4>
+                                <p>Blur webpage when sidebar expanded</p>
+                            </div>
+                            <div class="toggle" data-feature="blurMask"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Smart Delay</h4>
+                                <p>Delay expand/collapse animations</p>
+                            </div>
+                            <div class="toggle active" data-feature="smartDelay"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Border Radius</h4>
+                                <p>Round corners when expanded</p>
+                            </div>
+                            <div class="toggle active" data-feature="borderRadius"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Blur Hibernated Tabs</h4>
+                                <p>Blur inactive/hibernated tabs</p>
+                            </div>
+                            <div class="toggle" data-feature="blurHibernated"></div>
+                        </div>
                     </div>
-                    
-                    <div class="feature-card" data-feature="autohide-bookmarks">
-                        <div class="feature-icon">🔖</div>
-                        <div class="feature-info">
-                            <h3>Auto-hide Bookmarks</h3>
-                            <p>Hide the bookmark bar until hover</p>
-                        </div>
-                        <div class="toggle"></div>
+                </div>
+                
+                <!-- Pinned Tabs Grid -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">📌</span> Pinned Tabs Grid
                     </div>
-                    
-                    <div class="feature-card" data-feature="autohide-panel">
-                        <div class="feature-icon">📋</div>
-                        <div class="feature-info">
-                            <h3>Auto-hide Panel</h3>
-                            <p>Collapse the side panel until hover</p>
+                    <div class="section-content">
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Enable Grid Layout</h4>
+                                <p>Show favorites as icon grid</p>
+                            </div>
+                            <div class="toggle active" data-feature="tabsGrid"></div>
                         </div>
-                        <div class="toggle"></div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Pin at Top</h4>
+                                <p>Keep grid pinned while scrolling</p>
+                                <p class="warning">⚠️ Experimental - may have bugs</p>
+                            </div>
+                            <div class="toggle" data-feature="pinAtTop"></div>
+                        </div>
+                        <div class="number-row">
+                            <label>Columns</label>
+                            <input type="number" class="number-input" id="gridColumns" min="1" max="6" value="3">
+                        </div>
+                        <div class="number-row">
+                            <label>Rows</label>
+                            <input type="number" class="number-input" id="gridRows" min="1" max="6" value="3">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Auto-Hide Elements -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">👁️</span> Auto-Hide Elements
+                    </div>
+                    <div class="section-content">
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Address Bar</h4>
+                                <p>Hide until hover near top</p>
+                            </div>
+                            <div class="toggle" data-feature="autohideAddressbar"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Bookmark Bar</h4>
+                                <p>Hide until hover</p>
+                            </div>
+                            <div class="toggle" data-feature="autohideBookmarks"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Panel</h4>
+                                <p>Collapse panel until hover</p>
+                            </div>
+                            <div class="toggle" data-feature="autohidePanel"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Status Bar</h4>
+                                <p>Hide the status bar</p>
+                            </div>
+                            <div class="toggle" data-feature="autohideStatusbar"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Disabled Nav Buttons</h4>
+                                <p>Hide back/forward when disabled</p>
+                            </div>
+                            <div class="toggle active" data-feature="autohideNavButtons"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Visual Enhancements -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">✨</span> Visual Enhancements
+                    </div>
+                    <div class="section-content">
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Tab Trails</h4>
+                                <p>Color gradient on hover/close</p>
+                            </div>
+                            <div class="toggle active" data-feature="tabTrails"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Quietify</h4>
+                                <p>Animated audio icons</p>
+                            </div>
+                            <div class="toggle active" data-feature="quietify"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>Button Animations</h4>
+                                <p>Hover effects on buttons</p>
+                            </div>
+                            <div class="toggle active" data-feature="buttonAnimations"></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-info">
+                                <h4>NeatDial</h4>
+                                <p>Clean speed dial page</p>
+                            </div>
+                            <div class="toggle active" data-feature="neatDial"></div>
+                        </div>
                     </div>
                 </div>
             </div>
             
+            <!-- Sidebar -->
             <div class="sidebar">
-                <div class="preview-section">
-                    <h2>Preview</h2>
-                    <div class="preview-card">
-                        <img class="preview-image" id="preview-img" src="https://raw.githubusercontent.com/tovifun/VivalArc/main/assets/screenshot=1.jpg" alt="Preview">
-                        <div class="preview-label">Arc-style theme preview</div>
-                    </div>
+                <!-- Preview -->
+                <div class="preview-card">
+                    <img class="preview-image" id="preview-img" src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif" alt="Preview">
+                    <div class="preview-label" id="preview-label">Smart sidebar animations</div>
                 </div>
                 
-                <h2>Theme</h2>
+                <!-- Theme -->
                 <div class="theme-selector">
                     <div class="theme-btn dark active" data-theme="dark">
                         <div class="swatch"></div>
@@ -443,45 +690,79 @@
                     </div>
                 </div>
                 
+                <!-- Customization -->
                 <div class="customization-section">
-                    <h2>Customization</h2>
+                    <h3>Customization</h3>
                     
                     <div class="slider-group">
                         <div class="slider-label">
                             <span>Window Padding</span>
-                            <span id="padding-value">10px</span>
+                            <span id="windowPadding-value">8px</span>
                         </div>
-                        <input type="range" id="window-padding" min="4" max="20" value="10">
+                        <input type="range" id="windowPadding" min="0" max="16" value="8">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Collapsed Width</span>
+                            <span id="collapsedWidth-value">44px</span>
+                        </div>
+                        <input type="range" id="collapsedWidth" min="36" max="60" value="44">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Expanded Width</span>
+                            <span id="expandedWidth-value">280px</span>
+                        </div>
+                        <input type="range" id="expandedWidth" min="200" max="400" value="280">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Animation Speed</span>
+                            <span id="animationSpeed-value">260ms</span>
+                        </div>
+                        <input type="range" id="animationSpeed" min="100" max="500" value="260">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Collapse Delay</span>
+                            <span id="collapseDelay-value">200ms</span>
+                        </div>
+                        <input type="range" id="collapseDelay" min="0" max="500" value="200">
                     </div>
                     
                     <div class="slider-group">
                         <div class="slider-label">
                             <span>Corner Radius</span>
-                            <span id="radius-value">12px</span>
+                            <span id="cornerRadius-value">12px</span>
                         </div>
-                        <input type="range" id="corner-radius" min="4" max="24" value="12">
+                        <input type="range" id="cornerRadius" min="0" max="24" value="12">
                     </div>
                     
                     <div class="slider-group">
                         <div class="slider-label">
-                            <span>Compact Width</span>
-                            <span id="compact-value">48px</span>
+                            <span>Grid Gap</span>
+                            <span id="gridGap-value">8px</span>
                         </div>
-                        <input type="range" id="compact-width" min="36" max="80" value="48">
+                        <input type="range" id="gridGap" min="2" max="16" value="8">
                     </div>
                     
                     <div class="slider-group">
                         <div class="slider-label">
-                            <span>Pinned Columns</span>
-                            <span id="columns-value">4</span>
+                            <span>Icon Size</span>
+                            <span id="iconSize-value">20px</span>
                         </div>
-                        <input type="range" id="pinned-columns" min="2" max="8" value="4">
+                        <input type="range" id="iconSize" min="12" max="28" value="20">
                     </div>
                 </div>
                 
+                <!-- Download -->
                 <div class="download-section">
                     <button class="download-btn" id="download-btn">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                         </svg>
                         Download vivalarc.css
@@ -494,7 +775,7 @@
                             <li>Enable "Allow CSS modifications"</li>
                             <li>Restart Vivaldi</li>
                             <li>Settings → Appearance → Custom UI Modifications</li>
-                            <li>Select the folder containing your CSS file</li>
+                            <li>Select folder containing your CSS file</li>
                             <li>Restart Vivaldi</li>
                         </ol>
                     </div>
@@ -511,80 +792,269 @@
     </div>
     
     <script>
+        // Configuration state
         const config = {
-            features: {
-                'arc-theme': true,
-                'pinned-tab-grid': true,
-                'compact-sidebar': false,
-                'autohide-addressbar': false,
-                'autohide-bookmarks': false,
-                'autohide-panel': false
-            },
+            themeMode: 'color',
+            compactMode: false,
+            floatingTabbar: true,
+            blurMask: false,
+            smartDelay: true,
+            borderRadius: true,
+            blurHibernated: false,
+            tabsGrid: true,
+            pinAtTop: false,
+            gridColumns: 3,
+            gridRows: 3,
+            autohideAddressbar: false,
+            autohideBookmarks: false,
+            autohidePanel: false,
+            autohideStatusbar: false,
+            autohideNavButtons: true,
+            tabTrails: true,
+            quietify: true,
+            buttonAnimations: true,
+            neatDial: true,
             theme: 'dark',
-            windowPadding: 10,
+            windowPadding: 8,
+            collapsedWidth: 44,
+            expandedWidth: 280,
+            animationSpeed: 260,
+            collapseDelay: 200,
             cornerRadius: 12,
-            compactWidth: 48,
-            pinnedColumns: 4
+            gridGap: 8,
+            iconSize: 20
         };
         
+        // Presets
+        const presets = {
+            minimal: {
+                themeMode: 'color',
+                compactMode: true,
+                floatingTabbar: true,
+                blurMask: false,
+                smartDelay: false,
+                borderRadius: true,
+                blurHibernated: false,
+                tabsGrid: false,
+                pinAtTop: false,
+                gridColumns: 3,
+                gridRows: 3,
+                autohideAddressbar: false,
+                autohideBookmarks: false,
+                autohidePanel: false,
+                autohideStatusbar: false,
+                autohideNavButtons: false,
+                tabTrails: false,
+                quietify: false,
+                buttonAnimations: false,
+                neatDial: false,
+                theme: 'dark',
+                windowPadding: 4,
+                collapsedWidth: 44,
+                expandedWidth: 240,
+                animationSpeed: 140,
+                collapseDelay: 100,
+                cornerRadius: 8,
+                gridGap: 6,
+                iconSize: 18
+            },
+            'arc-like': {
+                themeMode: 'color',
+                compactMode: false,
+                floatingTabbar: true,
+                blurMask: false,
+                smartDelay: true,
+                borderRadius: true,
+                blurHibernated: false,
+                tabsGrid: true,
+                pinAtTop: false,
+                gridColumns: 3,
+                gridRows: 3,
+                autohideAddressbar: false,
+                autohideBookmarks: false,
+                autohidePanel: false,
+                autohideStatusbar: false,
+                autohideNavButtons: true,
+                tabTrails: true,
+                quietify: true,
+                buttonAnimations: true,
+                neatDial: true,
+                theme: 'dark',
+                windowPadding: 8,
+                collapsedWidth: 44,
+                expandedWidth: 280,
+                animationSpeed: 260,
+                collapseDelay: 200,
+                cornerRadius: 12,
+                gridGap: 8,
+                iconSize: 20
+            },
+            'power-user': {
+                themeMode: 'color',
+                compactMode: false,
+                floatingTabbar: true,
+                blurMask: true,
+                smartDelay: true,
+                borderRadius: true,
+                blurHibernated: false,
+                tabsGrid: true,
+                pinAtTop: false,
+                gridColumns: 4,
+                gridRows: 3,
+                autohideAddressbar: true,
+                autohideBookmarks: true,
+                autohidePanel: true,
+                autohideStatusbar: true,
+                autohideNavButtons: true,
+                tabTrails: true,
+                quietify: true,
+                buttonAnimations: true,
+                neatDial: true,
+                theme: 'dark',
+                windowPadding: 6,
+                collapsedWidth: 44,
+                expandedWidth: 320,
+                animationSpeed: 260,
+                collapseDelay: 200,
+                cornerRadius: 14,
+                gridGap: 8,
+                iconSize: 20
+            }
+        };
+        
+        // Preview images
         const previews = {
-            'default': 'https://raw.githubusercontent.com/tovifun/VivalArc/main/assets/screenshot=1.jpg',
-            'compact-sidebar': 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif',
-            'pinned-tab-grid': 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif',
-            'autohide-panel': 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif',
-            'theme': 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif'
+            default: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Smart sidebar animations' },
+            compactMode: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Compact mode sidebar' },
+            floatingTabbar: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Floating tabbar overlay' },
+            blurMask: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Blur mask effect' },
+            tabsGrid: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif', label: 'Pinned tabs grid' },
+            tabTrails: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/TabTrails.gif', label: 'Tab trails effect' },
+            quietify: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/audioIcon.gif', label: 'Animated audio icons' },
+            neatDial: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/NeatNewTab.png', label: 'Clean speed dial' },
+            autohidePanel: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Auto-hide panel' },
+            autohideNavButtons: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/adaptiveBF.gif', label: 'Adaptive nav buttons' },
+            themeColor: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif', label: 'Dynamic theme colors' }
         };
         
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const feature = card.dataset.feature;
-                config.features[feature] = !config.features[feature];
-                card.classList.toggle('active');
-                updatePreview();
+        // Apply config to UI
+        function applyConfigToUI() {
+            // Toggles
+            document.querySelectorAll('.toggle').forEach(toggle => {
+                const feature = toggle.dataset.feature;
+                if (feature && config[feature] !== undefined) {
+                    toggle.classList.toggle('active', config[feature]);
+                }
+            });
+            
+            // Theme mode radios
+            document.querySelectorAll('.radio-btn[data-mode]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === config.themeMode);
+            });
+            
+            // Theme buttons
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === config.theme);
+            });
+            
+            // Number inputs
+            document.getElementById('gridColumns').value = config.gridColumns;
+            document.getElementById('gridRows').value = config.gridRows;
+            
+            // Sliders
+            const sliders = ['windowPadding', 'collapsedWidth', 'expandedWidth', 'animationSpeed', 'collapseDelay', 'cornerRadius', 'gridGap', 'iconSize'];
+            sliders.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = config[id];
+                    const unit = ['animationSpeed', 'collapseDelay'].includes(id) ? 'ms' : 'px';
+                    document.getElementById(`${id}-value`).textContent = config[id] + unit;
+                }
+            });
+        }
+        
+        // Preset buttons
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const preset = presets[btn.dataset.preset];
+                if (preset) {
+                    Object.assign(config, preset);
+                    applyConfigToUI();
+                }
             });
         });
         
+        // Toggle clicks
+        document.querySelectorAll('.toggle').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const feature = toggle.dataset.feature;
+                if (feature) {
+                    config[feature] = !config[feature];
+                    toggle.classList.toggle('active');
+                    updatePreview(feature);
+                    clearPresetSelection();
+                }
+            });
+        });
+        
+        // Theme mode radios
+        document.querySelectorAll('.radio-btn[data-mode]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.radio-btn[data-mode]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                config.themeMode = btn.dataset.mode;
+                updatePreview('themeColor');
+                clearPresetSelection();
+            });
+        });
+        
+        // Theme buttons
         document.querySelectorAll('.theme-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 config.theme = btn.dataset.theme;
+                clearPresetSelection();
             });
         });
         
-        document.getElementById('window-padding').addEventListener('input', (e) => {
-            config.windowPadding = e.target.value;
-            document.getElementById('padding-value').textContent = e.target.value + 'px';
+        // Number inputs
+        document.getElementById('gridColumns').addEventListener('change', (e) => {
+            config.gridColumns = parseInt(e.target.value) || 3;
+            clearPresetSelection();
+        });
+        document.getElementById('gridRows').addEventListener('change', (e) => {
+            config.gridRows = parseInt(e.target.value) || 3;
+            clearPresetSelection();
         });
         
-        document.getElementById('corner-radius').addEventListener('input', (e) => {
-            config.cornerRadius = e.target.value;
-            document.getElementById('radius-value').textContent = e.target.value + 'px';
-        });
-        
-        document.getElementById('compact-width').addEventListener('input', (e) => {
-            config.compactWidth = e.target.value;
-            document.getElementById('compact-value').textContent = e.target.value + 'px';
-        });
-        
-        document.getElementById('pinned-columns').addEventListener('input', (e) => {
-            config.pinnedColumns = e.target.value;
-            document.getElementById('columns-value').textContent = e.target.value;
-        });
-        
-        function updatePreview() {
-            const img = document.getElementById('preview-img');
-            if (config.features['compact-sidebar']) {
-                img.src = previews['compact-sidebar'];
-            } else if (config.features['autohide-panel']) {
-                img.src = previews['autohide-panel'];
-            } else if (config.features['pinned-tab-grid']) {
-                img.src = previews['pinned-tab-grid'];
-            } else {
-                img.src = previews['default'];
+        // Sliders
+        const sliderIds = ['windowPadding', 'collapsedWidth', 'expandedWidth', 'animationSpeed', 'collapseDelay', 'cornerRadius', 'gridGap', 'iconSize'];
+        sliderIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', (e) => {
+                    config[id] = parseInt(e.target.value);
+                    const unit = ['animationSpeed', 'collapseDelay'].includes(id) ? 'ms' : 'px';
+                    document.getElementById(`${id}-value`).textContent = e.target.value + unit;
+                    clearPresetSelection();
+                });
             }
+        });
+        
+        function clearPresetSelection() {
+            // Don't clear - let user see what they started from
         }
         
+        function updatePreview(feature) {
+            const preview = previews[feature] || previews.default;
+            document.getElementById('preview-img').src = preview.src;
+            document.getElementById('preview-label').textContent = preview.label;
+        }
+        
+        // Download
         document.getElementById('download-btn').addEventListener('click', () => {
             const css = generateCSS();
             const blob = new Blob([css], { type: 'text/css' });
@@ -597,62 +1067,97 @@
         });
         
         function generateCSS() {
-            const f = config.features;
-            const themeDark = config.theme === 'dark' ? 1 : 0;
-            const themeLight = config.theme === 'light' ? 1 : 0;
+            const c = config;
+            const isDark = c.theme === 'dark';
             
             return `/*
  * VivalArc - Arc-style theming for Vivaldi Browser
- * Generated by VivalArc Configurator
+ * Generated by VivalArc Configurator v2
+ * https://jms830.github.io/VivaldiMods/
  * 
  * Installation:
  * 1. vivaldi://experiments > Enable "Allow CSS modifications"
- * 2. Settings > Appearance > Custom UI Modifications > Select folder containing this file
+ * 2. Settings > Appearance > Custom UI Modifications > Select folder
  * 3. Restart Vivaldi
  */
 
 :root {
-    /* Feature Toggles */
-    --enable-arc-theme: ${f['arc-theme'] ? 1 : 0};
-    --enable-autohide-addressbar: ${f['autohide-addressbar'] ? 1 : 0};
-    --enable-autohide-bookmarks: ${f['autohide-bookmarks'] ? 1 : 0};
-    --enable-autohide-panel: ${f['autohide-panel'] ? 1 : 0};
-    --enable-compact-sidebar: ${f['compact-sidebar'] ? 1 : 0};
-    --enable-pinned-tab-grid: ${f['pinned-tab-grid'] ? 1 : 0};
+    /* Theme Mode: ${c.themeMode} */
+    --fluid-theme: ${c.themeMode};
     
-    /* Theme */
-    --theme-dark: ${themeDark};
-    --theme-light: ${themeLight};
+    /* Sidebar Behavior */
+    --fluid-compact-mode: ${c.compactMode ? 'on' : 'off'};
+    --fluid-float-tabbar: ${c.floatingTabbar ? 'on' : 'off'};
+    --fluid-mask: ${c.blurMask ? 'on' : 'off'};
+    --fluid-delay: ${c.smartDelay ? 'on' : 'off'};
+    --fluid-border-radius: ${c.borderRadius ? 'on' : 'off'};
+    --fluid-blur-hibernate-tab: ${c.blurHibernated ? 'on' : 'off'};
     
-    /* Customization */
-    --window-border: ${config.windowPadding}px;
-    --compact-sidebar-width: ${config.compactWidth}px;
-    --normal-sidebar-width: 200px;
-    --pinned-column-count: ${config.pinnedColumns};
-    --transition-speed: 0.2s;
-    --radius: ${config.cornerRadius}px;
-}
-
-/* Theme Colors */
-:root {
-    --colorBg: ${config.theme === 'dark' ? '#242932' : '#f5f5f5'};
-    --colorFg: ${config.theme === 'dark' ? '#e8e8e8' : '#333333'};
-    --colorTabBar: ${config.theme === 'dark' ? '#1a1d24' : '#e8e8e8'};
-    --colorAccentBg: ${config.theme === 'dark' ? '#5e81ac' : '#4a7dbd'};
-    --colorBorder: ${config.theme === 'dark' ? '#3d4450' : '#d0d0d0'};
-    --colorFgAlpha: ${config.theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'};
-    --colorBgAlpha: ${config.theme === 'dark' ? 'rgba(26,29,36,0.95)' : 'rgba(245,245,245,0.95)'};
+    /* Pinned Tabs Grid */
+    --fluid-tabs-grid: ${c.tabsGrid ? 'on' : 'off'};
+    --fluid-pin-at-top: ${c.pinAtTop ? 'on' : 'off'};
+    --pinned-column-count: ${c.gridColumns};
+    --pinned-row-count: ${c.gridRows};
+    --pinned-gap: ${c.gridGap}px;
+    --pinned-icon-size: ${c.iconSize}px;
+    --pinned-tab-height: 50px;
+    
+    /* Sizing */
+    --window-border: ${c.windowPadding}px;
+    --tabs-container-collapse-width-default: ${c.collapsedWidth}px;
+    --tabs-container-collapse-width-compact: 7px;
+    --tabs-container-expand-width: ${c.expandedWidth}px;
+    --tabs-subcontainer-collapse-width: 44px;
+    --tabs-subcontainer-expand-width: calc(var(--tabs-container-expand-width) + var(--tabs-subcontainer-collapse-width) - var(--tabs-container-collapse-width-default));
+    
+    /* Animation */
+    --animation-speed: ${c.animationSpeed}ms;
+    --fast-animation-speed: ${Math.round(c.animationSpeed * 0.5)}ms;
+    --slow-animation-speed: ${Math.round(c.animationSpeed * 2)}ms;
+    --transition-delay-time-expand: 0ms;
+    --transition-delay-time-collapse: ${c.collapseDelay}ms;
+    
+    /* Appearance */
+    --radius: ${c.cornerRadius}px;
+    --radiusCap: var(--radius);
+    --radiusHalf: calc(var(--radius) / 2);
+    
+    /* Platform Headers */
+    --mac-header: 0px;
+    --win-header: calc(var(--window-border) + 20px);
+    --linux-header: calc(var(--window-border) + 20px);
+    
+    /* Theme Colors */
+    --colorBg: ${isDark ? '#242932' : '#f5f5f5'};
+    --colorFg: ${isDark ? '#e8e8e8' : '#333333'};
+    --colorTabBar: ${isDark ? '#1a1d24' : '#e8e8e8'};
+    --colorAccentBg: ${isDark ? '#5e81ac' : '#4a7dbd'};
+    --colorBorder: ${isDark ? '#3d4450' : '#d0d0d0'};
+    --colorFgAlpha: ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'};
+    --colorBgAlpha: ${isDark ? 'rgba(26,29,36,0.95)' : 'rgba(245,245,245,0.95)'};
     --colorAccentBgAlpha: color-mix(in srgb, var(--colorAccentBg), transparent 70%);
     --colorBgIntense: color-mix(in srgb, var(--colorBg), black 10%);
     --colorFgFaded: color-mix(in srgb, var(--colorFg), transparent 40%);
-    --radiusCap: var(--radius);
-    --radiusHalf: calc(var(--radius) / 2);
-    --mac-header: calc(var(--window-border) + 0px);
-    --win-header: calc(var(--window-border) + 0px);
-    --linux-header: calc(var(--window-border) + 0px);
+    
+    /* Quietify Icon Sizes */
+    --tab-icon-size: 16px;
+    --popup-icon-size: 14px;
+    --panel-icon-size: 10px;
+    
+    /* Tabbar Colors */
+    --tabbar-bg-color-collapse: unset;
+    --tabbar-bg-color-expand: unset;
+    --tabbar-border-color-collapse: unset;
+    --tabbar-border-color-expand: unset;
+    --tabbar-margin-top: -6px;
+    --tabbar-margin-bottom: 0px;
+    --tabbar-padding: 7px;
+    --tabbar-border-radius-collapse: 0px;
 }
 
-/* === CORE ARC THEME === */
+/* ============================================
+   CORE ARC THEME
+   ============================================ */
 
 #browser.break-mode #main { opacity: 0; }
 
@@ -786,10 +1291,291 @@
 .startpage .startpage-navigation .startpage-navigation-group { border: 0 !important; }
 button.button-startpage { box-shadow: none !important; }
 
-/* === AUTO-HIDE ADDRESS BAR === */
-${f['autohide-addressbar'] ? `
+/* Hide scrollbars for vertical tab bars */
+#browser #tabs-tabbar-container.left ::-webkit-scrollbar,
+#browser #tabs-tabbar-container.right ::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============================================
+   FLUID TABBAR (Auto-collapse sidebar)
+   ============================================ */
+
+#tabs-container {
+    container-type: inline-size;
+    container-name: tabs-container;
+    min-width: var(--tabs-container-collapse-width-default) !important;
+    max-width: var(--tabs-container-collapse-width-default) !important;
+    margin-top: var(--tabbar-margin-top) !important;
+    margin-bottom: var(--tabbar-margin-bottom) !important;
+    border-radius: var(--tabbar-border-radius-collapse) !important;
+    transition: border-radius var(--animation-speed) ease-out,
+                background-color var(--animation-speed) ease-out,
+                min-width var(--animation-speed) ease-out,
+                max-width var(--animation-speed) ease-out !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+body:not(:has(:is(#panel_switch, .WorkspacePopup, .toolbar-editor, #tabs-tabbar-container .toolbar-tabbar-before .UrlBar-AddressField:focus-within)))
+#tabs-container:hover {
+    min-width: var(--tabs-container-expand-width) !important;
+    max-width: var(--tabs-container-expand-width) !important;
+}
+
+body:has(:is(.WorkspacePopup, .toolbar-editor, #tabs-tabbar-container .toolbar-tabbar-before .UrlBar-AddressField:focus-within))
+#tabs-container {
+    min-width: var(--tabs-container-expand-width) !important;
+    max-width: var(--tabs-container-expand-width) !important;
+}
+
+#tabs-tabbar-container {
+    width: auto !important;
+    min-width: var(--tabs-container-collapse-width-default) !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: calc(var(--radius) + 6px);
+    box-shadow: none !important;
+    transition: width var(--animation-speed) ease-out,
+                min-width var(--animation-speed) ease-out,
+                max-width var(--animation-speed) ease-out !important;
+}
+
+#tabs-tabbar-container .SlideBar { display: none !important; }
+
+/* Tab title visibility */
+@container tabs-container (max-width: 45px) {
+    #tabs-container .tab-strip .tab-wrapper .tab-header {
+        justify-content: space-evenly !important;
+    }
+    #tabs-container .tab-strip .tab .title {
+        opacity: 0 !important;
+        max-width: 0 !important;
+    }
+}
+
+@container tabs-container (min-width: 45px) {
+    #tabs-container:hover .tab-strip .tab-wrapper .tab-header {
+        justify-content: flex-start !important;
+        padding-left: 6px !important;
+    }
+    #tabs-container .tab-strip .tab .title {
+        opacity: 1 !important;
+        max-width: 100% !important;
+    }
+}
+
+${c.smartDelay ? `
+/* Smart Delay */
+@container style(--fluid-delay: on) {
+    #tabs-tabbar-container:not(:has(#tabs-subcontainer)) #tabs-container {
+        transition-delay: var(--transition-delay-time-collapse) !important;
+    }
+    #tabs-tabbar-container:not(:has(#tabs-subcontainer)) #tabs-container:hover {
+        transition-delay: 0ms !important;
+    }
+}
+` : ''}
+
+${c.floatingTabbar ? `
+/* Floating Tabbar */
+@container style(--fluid-float-tabbar: on) {
+    @container not style(--fluid-theme: transparent) {
+        #main > .inner > div:has(#tabs-tabbar-container) {
+            position: absolute;
+            top: 0;
+            z-index: 2;
+            opacity: 1;
+            height: 100% !important;
+        }
+        #main > .inner > div:has(#tabs-tabbar-container.right) { right: 0; }
+        #main > .inner > div:has(#tabs-tabbar-container.left) { left: 0; }
+        
+        #browser:not(.fullscreen):has(#tabs-tabbar-container.left) .inner #webpage-stack {
+            margin-left: var(--tabs-container-collapse-width-default);
+            transition: margin-left var(--animation-speed) ease-out !important;
+        }
+        #browser:not(.fullscreen):has(#tabs-tabbar-container.right) .inner #webpage-stack {
+            margin-right: var(--tabs-container-collapse-width-default);
+            transition: margin-right var(--animation-speed) ease-out !important;
+        }
+    }
+}
+` : ''}
+
+${c.blurMask ? `
+/* Blur Mask */
+@container style(--fluid-mask: on) {
+    #browser #webpage-stack { position: relative !important; }
+    #browser #webpage-stack::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: var(--colorBgAlpha);
+        z-index: 999999999999 !important;
+        pointer-events: none !important;
+        opacity: 0;
+        transition: opacity var(--animation-speed) ease-out;
+    }
+    body:has(#tabs-container:hover) #webpage-stack::before,
+    body:has(.UrlBar-AddressField:focus-within) #webpage-stack::before {
+        opacity: 1 !important;
+        backdrop-filter: blur(5px);
+    }
+}
+` : ''}
+
+${c.compactMode ? `
+/* Compact Mode */
+@container style(--fluid-compact-mode: on) {
+    body:not(:has(:is(#panel_switch, .WorkspacePopup, .toolbar-editor)))
+    #tabs-container {
+        min-width: var(--tabs-container-collapse-width-compact) !important;
+        max-width: var(--tabs-container-collapse-width-compact) !important;
+    }
+    #tabs-tabbar-container {
+        min-width: var(--tabs-container-collapse-width-compact) !important;
+    }
+    @container style(--fluid-float-tabbar: on) {
+        #browser:not(.fullscreen):has(#tabs-tabbar-container.left) .inner #webpage-stack {
+            margin-left: var(--tabs-container-collapse-width-compact);
+        }
+        #browser:not(.fullscreen):has(#tabs-tabbar-container.right) .inner #webpage-stack {
+            margin-right: var(--tabs-container-collapse-width-compact);
+        }
+    }
+}
+` : ''}
+
+${c.borderRadius ? `
+/* Border Radius on Expand */
+@container style(--fluid-border-radius: on) {
+    #browser:not(:has(#panel_switch)) {
+        #tabs-tabbar-container:not(:has(#tabs-subcontainer)) #tabs-container.left:hover {
+            border-radius: 0px calc(var(--radius) + 5px) calc(var(--radius) + 5px) 0px !important;
+        }
+        #tabs-tabbar-container:not(:has(#tabs-subcontainer)) #tabs-container.right:hover {
+            border-radius: calc(var(--radius) + 5px) 0px 0px calc(var(--radius) + 5px) !important;
+        }
+    }
+}
+` : ''}
+
+${c.blurHibernated ? `
+/* Blur Hibernated Tabs */
+@container style(--fluid-blur-hibernate-tab: on) {
+    .tab:not(.active) {
+        filter: blur(4px) !important;
+        transition: filter 200ms linear !important;
+    }
+    .tab.active {
+        filter: blur(0px) !important;
+    }
+}
+` : ''}
+
+${c.tabsGrid ? `
+/* ============================================
+   PINNED TABS GRID (Favorites)
+   ============================================ */
+
+@container style(--fluid-tabs-grid: on) {
+    .resize {
+        max-height: fit-content !important;
+        overflow: hidden !important;
+    }
+    
+    #tabs-container .tab-strip {
+        display: grid !important;
+        grid-template-columns: repeat(var(--pinned-column-count), minmax(0, 1fr));
+        grid-auto-rows: min-content;
+        gap: var(--pinned-gap);
+        justify-content: center !important;
+    }
+    
+    #tabs-container .tab-position.is-pinned { display: contents !important; }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 9) .is-pinned .tab-wrapper {
+        max-height: var(--pinned-tab-height) !important;
+        min-height: var(--pinned-tab-height) !important;
+        display: flex !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 150;
+        background-color: var(--colorBgAlpha) !important;
+        border: 1px solid var(--colorHighlightBgDark) !important;
+    }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 9) .is-pinned .favicon {
+        width: var(--pinned-icon-size) !important;
+        height: var(--pinned-icon-size) !important;
+        margin: auto !important;
+        transition: margin var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned) .is-pinned .tab-wrapper {
+        overflow: hidden;
+        isolation: isolate;
+        z-index: 5;
+        transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 9) .is-pinned .tab-wrapper:not(.active):hover {
+        background-color: var(--colorAccentBg) !important;
+        z-index: 100000000;
+        width: calc(var(--pinned-column-count) * 100% + (var(--pinned-column-count) - 1) * var(--pinned-gap)) !important;
+        min-height: calc(var(--pinned-tab-height) + var(--pinned-gap)) !important;
+        transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1) 0.8s;
+    }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 9) .is-pinned .title {
+        opacity: 0 !important;
+        max-width: 0 !important;
+        transition: opacity var(--animation-speed), max-width var(--animation-speed);
+    }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned) .is-pinned .tab-wrapper:hover .title:nth-child(-n + 9) {
+        opacity: 1 !important;
+        max-width: 100% !important;
+    }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 9) .is-pinned .close { display: none !important; }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned) .is-pinned.active .tab-wrapper {
+        outline: 2px solid var(--colorAccentBg);
+    }
+    
+    #tabs-container .tab-strip > span:has(.is-pinned):nth-child(n + 10) .is-pinned {
+        grid-column: 1 / span var(--pinned-column-count) !important;
+    }
+    
+    #tabs-container .tab-strip .newtab,
+    #tabs-container .tab-strip .separator {
+        grid-column: 1 / -1 !important;
+    }
+    
+    #tabs-container .tab-position:not(.is-pinned) {
+        grid-column: 1 / span var(--pinned-column-count) !important;
+        display: contents !important;
+    }
+    
+    #tabs-container .tab-position:not(.is-pinned) .tab-wrapper {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+    }
+}
+` : ''}
+
+${c.autohideAddressbar ? `
+/* ============================================
+   AUTO-HIDE ADDRESS BAR
+   ============================================ */
+
 #browser:not(.address-top) .UrlBar {
-    transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+    transition: opacity var(--animation-speed) ease, transform var(--animation-speed) ease;
 }
 #browser:not(.address-top):not(:hover) .UrlBar {
     opacity: 0;
@@ -803,10 +1589,13 @@ ${f['autohide-addressbar'] ? `
 }
 ` : ''}
 
-/* === AUTO-HIDE BOOKMARKS === */
-${f['autohide-bookmarks'] ? `
+${c.autohideBookmarks ? `
+/* ============================================
+   AUTO-HIDE BOOKMARKS
+   ============================================ */
+
 .bookmark-bar {
-    transition: opacity var(--transition-speed) ease, max-height var(--transition-speed) ease;
+    transition: opacity var(--animation-speed) ease, max-height var(--animation-speed) ease;
     overflow: hidden;
 }
 #browser:not(:hover) .bookmark-bar {
@@ -819,10 +1608,13 @@ ${f['autohide-bookmarks'] ? `
 }
 ` : ''}
 
-/* === AUTO-HIDE PANEL === */
-${f['autohide-panel'] ? `
+${c.autohidePanel ? `
+/* ============================================
+   AUTO-HIDE PANEL
+   ============================================ */
+
 #panels-container {
-    transition: transform var(--transition-speed) ease, opacity var(--transition-speed) ease;
+    transition: transform var(--animation-speed) ease, opacity var(--animation-speed) ease;
 }
 #main.left #panels-container:not(:hover):not(:focus-within) {
     transform: translateX(-100%);
@@ -838,114 +1630,276 @@ ${f['autohide-panel'] ? `
 }
 ` : ''}
 
-/* === COMPACT SIDEBAR === */
-${f['compact-sidebar'] ? `
-#browser.tabs-left #tabs-tabbar-container,
-#browser.tabs-right #tabs-tabbar-container {
-    transition: width var(--transition-speed) ease;
-    width: var(--compact-sidebar-width);
+${c.autohideStatusbar ? `
+/* ============================================
+   AUTO-HIDE STATUS BAR
+   ============================================ */
+
+#browser > footer {
+    transition: opacity var(--animation-speed) ease, transform var(--animation-speed) ease;
 }
-#browser.tabs-left:hover #tabs-tabbar-container,
-#browser.tabs-right:hover #tabs-tabbar-container {
-    width: var(--normal-sidebar-width);
-}
-#browser.tabs-left:not(:hover) .tab-header span.title,
-#browser.tabs-right:not(:hover) .tab-header span.title {
+#browser:not(:hover) > footer {
     opacity: 0;
-    transition: opacity var(--transition-speed) ease;
+    transform: translateY(100%);
 }
-#browser.tabs-left:hover .tab-header span.title,
-#browser.tabs-right:hover .tab-header span.title { opacity: 1; }
-#browser.tabs-left:not(:hover) .tab-header .favicon,
-#browser.tabs-right:not(:hover) .tab-header .favicon { margin: 0 auto; }
+#browser:hover > footer {
+    opacity: 1;
+    transform: translateY(0);
+}
 ` : ''}
 
-/* === PINNED TAB GRID === */
-${f['pinned-tab-grid'] ? `
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .tab .title { display: none; }
+${c.autohideNavButtons ? `
+/* ============================================
+   ADAPTIVE BACK/FORWARD BUTTONS
+   ============================================ */
 
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .tab-wrapper:hover::after {
-    content: attr(title);
+.toolbar-mainbar button[title="Back"]:disabled,
+.toolbar-mainbar button[title="Forward"]:disabled {
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+    transition: all var(--animation-speed) ease !important;
+}
+` : ''}
+
+${c.tabTrails ? `
+/* ============================================
+   TAB TRAILS
+   ============================================ */
+
+.tab-position .tab .tab-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-position .tab .tab-header::before {
+    content: "";
     position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: 8px;
-    padding: 6px 10px;
-    background: var(--colorBgIntense);
-    color: var(--colorFg);
-    border-radius: var(--radiusHalf);
-    white-space: nowrap;
-    font-size: 12px;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    pointer-events: none;
+    top: 0; right: 0;
+    width: 50%; height: 100%;
+    background: linear-gradient(to left, rgba(0, 128, 0, 0.7) 0%, rgba(0, 128, 0, 0.5) 30%, rgba(0, 128, 0, 0.2) 60%, rgba(0, 128, 0, 0) 100%);
+    transform: translateX(100%);
     opacity: 0;
-    animation: tooltip-fadein 0.2s ease 0.5s forwards;
+    transition: transform 300ms ease-out, opacity 300ms ease-out;
+    pointer-events: none;
+    z-index: 1;
 }
 
-@keyframes tooltip-fadein {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.tab-position .tab .tab-header::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 50%; height: 100%;
+    background: linear-gradient(to left, rgba(180, 0, 0, 0.7) 0%, rgba(180, 0, 0, 0.5) 30%, rgba(180, 0, 0, 0.2) 60%, rgba(180, 0, 0, 0) 100%);
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 300ms ease-out, opacity 300ms ease-out;
+    pointer-events: none;
+    z-index: 2;
 }
 
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned {
-    background: var(--colorTabBar);
-    margin: 2px;
-    padding: 0;
+.tab-position .tab:hover:not(:has(.close:hover)) .tab-header::before,
+.tab-position .tab.active:not(:has(.close:hover)) .tab-header::before {
+    transform: translateX(0);
+    opacity: 1;
 }
 
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .tab-wrapper {
-    aspect-ratio: 1;
-    background-color: var(--colorAccentBgAlpha);
-    border-radius: var(--radiusHalf);
-    display: flex;
+.tab-position .tab:has(.close:hover) .tab-header::after {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.tab-position .tab:has(.close:hover) .tab-header::before {
+    transform: translateX(100%);
+    opacity: 0;
+}
+` : ''}
+
+${c.quietify ? `
+/* ============================================
+   QUIETIFY (Animated Audio Icons)
+   ============================================ */
+
+.tab-audio, .panel-audio {
+    margin-top: 1px;
+    margin-left: 1px !important;
+    overflow: visible !important;
+    position: relative;
+}
+
+.tab-audio canvas.audioicon,
+.panel-audio canvas.audioicon {
+    opacity: 0 !important;
+    position: absolute !important;
+}
+
+.tab-audio, .panel-audio {
+    position: relative;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
-    padding: 0;
-    transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    width: var(--tab-icon-size);
+    height: var(--tab-icon-size);
 }
 
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .tab-wrapper:hover {
-    background-color: var(--colorAccentBg);
+.tab-audio::before, .panel-audio::before {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--colorAccentFg, #000);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    transition: transform 0.15s ease-out;
+    pointer-events: none;
+    width: var(--tab-icon-size);
+    height: var(--tab-icon-size);
+}
+
+.tab-audio:has(.audioicon[title*="Mute"])::before,
+.panel-audio:has(.audioicon[title*="Mute"])::before {
+    mask-image: url("data:image/svg+xml,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%20135%20140%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20y%3D%2210%22%20width%3D%2215%22%20height%3D%22120%22%20rx%3D%226%22%3E%3Canimate%20attributeName%3D%22height%22%20begin%3D%220.5s%22%20dur%3D%221s%22%20values%3D%22120%3B110%3B100%3B90%3B80%3B70%3B60%3B50%3B40%3B140%3B120%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3Canimate%20attributeName%3D%22y%22%20begin%3D%220.5s%22%20dur%3D%221s%22%20values%3D%2210%3B15%3B20%3B25%3B30%3B35%3B40%3B45%3B50%3B0%3B10%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2230%22%20y%3D%2210%22%20width%3D%2215%22%20height%3D%22120%22%20rx%3D%226%22%3E%3Canimate%20attributeName%3D%22height%22%20begin%3D%220.25s%22%20dur%3D%221s%22%20values%3D%22120%3B110%3B100%3B90%3B80%3B70%3B60%3B50%3B40%3B140%3B120%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3Canimate%20attributeName%3D%22y%22%20begin%3D%220.25s%22%20dur%3D%221s%22%20values%3D%2210%3B15%3B20%3B25%3B30%3B35%3B40%3B45%3B50%3B0%3B10%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2260%22%20width%3D%2215%22%20height%3D%22140%22%20rx%3D%226%22%3E%3Canimate%20attributeName%3D%22height%22%20begin%3D%220s%22%20dur%3D%221s%22%20values%3D%22120%3B110%3B100%3B90%3B80%3B70%3B60%3B50%3B40%3B140%3B120%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3Canimate%20attributeName%3D%22y%22%20begin%3D%220s%22%20dur%3D%221s%22%20values%3D%2210%3B15%3B20%3B25%3B30%3B35%3B40%3B45%3B50%3B0%3B10%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2290%22%20y%3D%2210%22%20width%3D%2215%22%20height%3D%22120%22%20rx%3D%226%22%3E%3Canimate%20attributeName%3D%22height%22%20begin%3D%220.25s%22%20dur%3D%221s%22%20values%3D%22120%3B110%3B100%3B90%3B80%3B70%3B60%3B50%3B40%3B140%3B120%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3Canimate%20attributeName%3D%22y%22%20begin%3D%220.25s%22%20dur%3D%221s%22%20values%3D%2210%3B15%3B20%3B25%3B30%3B35%3B40%3B45%3B50%3B0%3B10%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%22120%22%20y%3D%2210%22%20width%3D%2215%22%20height%3D%22120%22%20rx%3D%226%22%3E%3Canimate%20attributeName%3D%22height%22%20begin%3D%220.5s%22%20dur%3D%221s%22%20values%3D%22120%3B110%3B100%3B90%3B80%3B70%3B60%3B50%3B40%3B140%3B120%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3Canimate%20attributeName%3D%22y%22%20begin%3D%220.5s%22%20dur%3D%221s%22%20values%3D%2210%3B15%3B20%3B25%3B30%3B35%3B40%3B45%3B50%3B0%3B10%22%20calcMode%3D%22linear%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Frect%3E%3C%2Fsvg%3E");
+}
+
+.tab-audio:has(.audioicon[title*="Unmute"])::before,
+.panel-audio:has(.audioicon[title*="Unmute"])::before {
+    mask-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxMzYgMTQwIiBmaWxsPSIjZmZmIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjQiIHk9IjcwIiB3aWR0aD0iMTUiIGhlaWdodD0iMTUiIHJ4PSI2Ii8+PHJlY3QgeD0iMzQiIHk9IjcwIiB3aWR0aD0iMTUiIGhlaWdodD0iMTUiIHJ4PSI2Ii8+PHJlY3QgeD0iNjQiIHk9IjcwIiB3aWR0aD0iMTUiIGhlaWdodD0iMTUiIHJ4PSI2Ii8+PHJlY3QgeD0iOTQiIHk9IjcwIiB3aWR0aD0iMTUiIGhlaWdodD0iMTUiIHJ4PSI2Ii8+PHJlY3QgeD0iMTI0IiB5PSI3MCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE1IiByeD0iNiIvPjwvc3ZnPg==") !important;
+}
+
+.tab-audio:hover::before, .panel-audio:hover::before {
+    transform: translate(-50%, -50%) scale(1.15);
+}
+` : ''}
+
+${c.buttonAnimations ? `
+/* ============================================
+   BUTTON HOVER ANIMATIONS
+   ============================================ */
+
+.button-toolbar > button,
+.ToolbarButton-Button {
+    transition: transform 0.15s ease, background-color 0.15s ease !important;
+}
+
+.button-toolbar > button:hover,
+.ToolbarButton-Button:hover {
     transform: scale(1.05);
 }
 
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .tab-wrapper:has(.tab.active) {
-    background-color: var(--colorBg);
-    box-shadow: 0 0 0 1px var(--colorAccentBg);
-}
-
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .tab {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .tab-header {
-    flex: 1;
-    padding: 0;
-    justify-content: center;
-    display: flex;
-    align-items: center;
-}
-
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .favicon { margin: 0 auto; }
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .close { display: none; }
-
-#browser:not(.tabs-top):not(.tabs-bottom) .tab-position.is-pinned .button-badge {
-    position: absolute;
-    top: unset !important;
-    right: 2px !important;
-    bottom: 2px !important;
-    left: unset !important;
+.button-toolbar > button:active,
+.ToolbarButton-Button:active {
+    transform: scale(0.95);
 }
 ` : ''}
+
+${c.neatDial ? `
+/* ============================================
+   NEAT DIAL (Clean Speed Dial)
+   ============================================ */
+
+.SpeedDials { display: none !important; }
+.startpage:has(.SpeedDial-Add-Button) .SpeedDials { display: block !important; }
+
+.startpage-navigation {
+    max-height: 0 !important;
+    min-height: 0 !important;
+    transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.startpage-navigation:hover {
+    max-height: 43px !important;
+    min-height: 43px !important;
+}
+
+.sdwrapper.has-SpeedDial .SpeedDialView {
+    grid-template-rows: 1fr;
+    place-items: center;
+    margin: 0 50px;
+}
+
+.SpeedDialView-Head:not(:has(.ToolbarButton-Button[aria-expanded="true"])) {
+    position: relative;
+    min-height: 46px;
+    max-width: 850px !important;
+    transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.SpeedDialView-Head:not(:has(.ToolbarButton-Button[aria-expanded="true"])):focus-within {
+    min-height: 80px;
+    max-width: 1000px !important;
+    background-color: #2d2d2d;
+    border-radius: calc(var(--radius) * 2);
+}
+
+.sdwrapper .iconmenu-container.SearchField {
+    position: relative;
+    height: 100%;
+    background-color: transparent;
+}
+
+#browser:has(.startpage) :is(.mainbar, #tabs-container, #tabs-subcontainer, #switch) {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+#browser:has(.startpage) .bookmark-bar .observer,
+#browser:has(.startpage) .bookmark-bar.default {
+    background-color: transparent !important;
+    border: unset !important;
+}
+
+#browser:has(.startpage) .SearchField,
+#browser:has(.startpage) .UrlBar-AddressField {
+    background-color: transparent !important;
+}
+
+.dashboard-widget .url-wrapper { display: none; }
+` : ''}
+
+/* ============================================
+   THEME COLOR MODE
+   ============================================ */
+
+@container style(--fluid-theme: color) {
+    .color-behind-tabs-off .mainbar,
+    .UrlBar-AddressField,
+    #bookmark-bar, #bookmark-bar > *,
+    #panels-container, #panels,
+    #panels-container > *, #panels > * {
+        background-color: var(--tabbar-bg-color-collapse, var(--colorBg)) !important;
+        transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    #tabs-container {
+        background-color: var(--tabbar-bg-color-collapse, var(--colorBgDarker)) !important;
+    }
+    
+    #tabs-tabbar-container {
+        background-color: transparent !important;
+    }
+    
+    body:not(:has(:is(.WorkspacePopup, .toolbar-editor, #panel_switch))) #tabs-container:hover {
+        background-color: var(--tabbar-bg-color-expand, var(--colorBgLighter)) !important;
+    }
+}
+
+@container style(--fluid-theme: transparent) {
+    .color-behind-tabs-off .mainbar,
+    .UrlBar-AddressField,
+    #bookmark-bar, #bookmark-bar > *,
+    #panels-container, #panels,
+    #panels-container > *, #panels > * {
+        background-color: transparent !important;
+    }
+}
 `;
         }
+        
+        // Initialize
+        applyConfigToUI();
     </script>
 </body>
 </html>
