@@ -2,8 +2,7 @@
 	'use strict';
 
 	// ==================== Configuration ====================
-	// Settings are saved to localStorage and can be configured via the settings UI
-	// Right-click the TidyTabs button and select "Settings" to configure
+	// Right-click the TidyTabs button → Settings to configure API provider and key
 	
 	const STORAGE_KEY = 'tidyTabs_config';
 	
@@ -707,7 +706,7 @@ Avoid the following:
 		
 		if (!apiConfig.key) {
 			console.error('API key not configured');
-			showNotification('API Key not configured. Click TidyTabs button with Ctrl to open settings.');
+			showNotification('API Key not configured. Right-click TidyTabs button → Settings to add one.');
 			return null;
 		}
 		
@@ -992,9 +991,92 @@ Avoid the following:
 
 			button.addEventListener('click', function(e) {
 				e.stopPropagation();
-				tidyTabsBelow(separator);
+				if (e.ctrlKey || e.metaKey) {
+					showSettingsDialog();
+				} else {
+					tidyTabsBelow(separator);
+				}
+			});
+			
+			button.addEventListener('contextmenu', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				showContextMenu(e.clientX, e.clientY, separator);
 			});
 		});
+	};
+	
+	const showContextMenu = (x, y, separator) => {
+		const existing = document.getElementById('tidytabs-context-menu');
+		if (existing) existing.remove();
+		
+		const menu = document.createElement('div');
+		menu.id = 'tidytabs-context-menu';
+		menu.innerHTML = `
+			<style>
+				#tidytabs-context-menu {
+					position: fixed;
+					background: var(--colorBg, #252525);
+					border: 1px solid var(--colorBorder, #444);
+					border-radius: 6px;
+					padding: 4px 0;
+					z-index: 999999;
+					min-width: 160px;
+					box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+					font-family: system-ui, -apple-system, sans-serif;
+					font-size: 13px;
+				}
+				#tidytabs-context-menu .menu-item {
+					padding: 8px 12px;
+					cursor: pointer;
+					color: var(--colorFg, #fff);
+					display: flex;
+					align-items: center;
+					gap: 8px;
+				}
+				#tidytabs-context-menu .menu-item:hover {
+					background: var(--colorHighlightBg, #3d3d3d);
+				}
+				#tidytabs-context-menu .menu-item .icon {
+					width: 16px;
+					text-align: center;
+				}
+				#tidytabs-context-menu .separator {
+					height: 1px;
+					background: var(--colorBorder, #444);
+					margin: 4px 0;
+				}
+			</style>
+			<div class="menu-item" data-action="tidy"><span class="icon">📑</span> Tidy Tabs Below</div>
+			<div class="menu-item" data-action="tidy-ai"><span class="icon">✨</span> Tidy with AI</div>
+			<div class="separator"></div>
+			<div class="menu-item" data-action="settings"><span class="icon">⚙️</span> Settings...</div>
+		`;
+		
+		menu.style.left = `${x}px`;
+		menu.style.top = `${y}px`;
+		document.body.appendChild(menu);
+		
+		const closeMenu = () => menu.remove();
+		
+		menu.querySelectorAll('.menu-item').forEach(item => {
+			item.addEventListener('click', () => {
+				const action = item.dataset.action;
+				closeMenu();
+				
+				if (action === 'tidy') {
+					tidyTabsBelow(separator, false);
+				} else if (action === 'tidy-ai') {
+					tidyTabsBelow(separator, true);
+				} else if (action === 'settings') {
+					showSettingsDialog();
+				}
+			});
+		});
+		
+		setTimeout(() => {
+			document.addEventListener('click', closeMenu, { once: true });
+		}, 0);
 	};
 
 	// ==================== Core Functionality ====================
@@ -1037,8 +1119,7 @@ Avoid the following:
 		console.log('Auto-stacking completed!');
 	};
 
-	// Manually tidy tabs below separator
-	const tidyTabsBelow = async (separator) => {
+	const tidyTabsBelow = async (separator, forceAI = null) => {
 		const existingStacks = await detectExistingStacks(separator.nextElementSibling);
 		const tabsInfo = collectTabsFromSeparator(separator);
 
@@ -1065,8 +1146,9 @@ Avoid the following:
 			}
 
 			let groups;
+			const useAI = forceAI !== null ? forceAI : (CONFIG.enableAIGrouping && getApiConfig().key);
 			
-			if (CONFIG.enableAIGrouping && getApiConfig().key) {
+			if (useAI && getApiConfig().key) {
 				console.log('Using AI grouping...');
 				groups = await getAIGrouping(validTabs, existingStacks);
 				
@@ -1074,6 +1156,9 @@ Avoid the following:
 					console.log('AI grouping failed, falling back to domain grouping');
 					groups = groupByDomain(validTabs);
 				}
+			} else if (useAI && !getApiConfig().key) {
+				showNotification('AI requested but no API key configured. Right-click → Settings to add one.');
+				groups = groupByDomain(validTabs);
 			} else {
 				console.log('Using domain grouping...');
 				groups = groupByDomain(validTabs);
