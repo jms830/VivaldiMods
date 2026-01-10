@@ -1,27 +1,80 @@
-# VivaldiModManager (downloaded by setup.ps1)
+# ===================
+# SECURITY - SECRETS
+# ===================
+# Environment files (may contain API keys)
+.env
+.env.*
+!.env.example
+
+# Credentials and keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+credentials.json
+secrets.json
+*_secret*
+*_key*
+*.credentials
+
+# ===================
+# VIVALDI MOD MANAGER
+# ===================
+# Downloaded by setup.ps1 - not part of modpack
 VivaldiModManager/
 VivaldiModManager.exe
 VivaldiModManager.xml
 VivaldiModManager.zip
 
-# Original source files (kept for reference locally)
+# ===================
+# SOURCE REFERENCES
+# ===================
+# Original repos kept locally for reference
 VivalArc-main/
 VivalArc-main.backup-*/
+Awesome-Vivaldi/
 
-# Legacy files
+# Legacy files from previous structure
 vivalarc.css
 dialog.css
 dialog-window/
 ru/
 
-# OS files
+# ===================
+# OS FILES
+# ===================
 .DS_Store
 Thumbs.db
 desktop.ini
+ehthumbs.db
+*.lnk
 
-# Editor files
+# ===================
+# EDITOR / IDE
+# ===================
 *.swp
 *.swo
 *~
 .vscode/
 .idea/
+*.sublime-*
+*.code-workspace
+
+# ===================
+# LOGS & TEMP
+# ===================
+*.log
+*.tmp
+*.temp
+*.bak
+*.cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===================
+# SESSION EXPORTS
+# ===================
+# OpenCode session exports
+ses_*.md
