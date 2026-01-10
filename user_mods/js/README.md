@@ -12,16 +12,29 @@ JS mods require VivaldiModManager (Windows only). Enable/disable via ModManager 
 | `activateTabOnHover.js` | Switch tabs on mouse hover | luetage |
 | `tabScroll.js` | Mouse wheel scrolling in tab bar | luetage |
 | `monochromeIcons.js` | Convert toolbar icons to monochrome | luetage |
+| `colorTabs.js` | Color tab borders based on favicon | aminought |
+| `chroma.min.js` | Color library (required by colorTabs) | - |
+| `tidyTabs.js` | AI-powered tab grouping | PaRr0tBoY (modified) |
 
-## Additional Mods (Not Included)
+## AI Tab Grouping (tidyTabs.js)
 
-These require API keys or have extra dependencies:
+**Setup:**
+1. Enable `tidyTabs.js` in ModManager
+2. Restart Vivaldi
+3. Ctrl+Click the TidyTabs button OR run `tidyTabsSettings()` in DevTools console
+4. Select your AI provider and enter API key
+5. Click Save
 
-- `tidyTabs.js` - AI-powered tab grouping (requires GLM API key)
-- `tidyTitles.js` - AI-powered tab title cleanup (requires GLM API key)
-- `colorTabs.js` - Color tabs by favicon (requires chroma.js)
+**Supported Providers:**
+| Provider | Free Tier | Get API Key |
+|----------|-----------|-------------|
+| Google Gemini | Yes (generous) | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+| OpenRouter | Yes (limited) | [openrouter.ai/keys](https://openrouter.ai/keys) |
+| OpenAI | No | [platform.openai.com](https://platform.openai.com) |
+| GLM (Zhipu) | Yes | [open.bigmodel.cn](https://open.bigmodel.cn) |
+| Custom | - | Any OpenAI-compatible API |
 
-Get them from: https://github.com/PaRr0tBoY/Awesome-Vivaldi/tree/main/Javascripts
+Settings are saved to localStorage and persist across restarts.
 
 ## Credits
 

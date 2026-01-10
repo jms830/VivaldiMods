@@ -46,6 +46,8 @@ VivaldiModManager is Windows-only. Linux/macOS users get CSS mods via Vivaldi's 
 
 | File | Description |
 |------|-------------|
+| `tidyTabs.js` | **AI-powered tab grouping** (Gemini, OpenAI, etc.) |
+| `colorTabs.js` | Color tab borders based on favicon |
 | `globalMediaControls.js` | Media playback panel with controls, volume, PiP |
 | `mdNotes.js` | Markdown notes editor in sidebar |
 | `elementCapture.js` | Screenshot/element capture tool |
@@ -53,7 +55,7 @@ VivaldiModManager is Windows-only. Linux/macOS users get CSS mods via Vivaldi's 
 | `tabScroll.js` | Mouse wheel scrolling in tab bar |
 | `monochromeIcons.js` | Convert toolbar icons to monochrome |
 
-JS mods work independently - enable any combination.
+JS mods work independently. For `tidyTabs.js`, Ctrl+Click the button to configure your AI provider (free Gemini API key works great).
 
 ## Alternative: CSS-Only (No ModManager)
 
@@ -92,6 +94,8 @@ user_mods/
 │   ├── modules/                    # Module implementations
 │   └── themes/                     # Theme implementations
 └── js/                             # JS mods (Windows/ModManager only)
+    ├── tidyTabs.js                 # AI tab grouping (multi-provider)
+    ├── colorTabs.js + chroma.min.js
     ├── globalMediaControls.js
     ├── mdNotes.js
     ├── elementCapture.js
