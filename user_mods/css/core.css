@@ -1,0 +1,25 @@
+/* user_mods/css/core.css */
+/* Unified Vivaldi Modpack - Main Entry Point */
+/* version: 2.0.0 */
+/* 
+ * Point VivaldiModManager or Vivaldi's Custom UI Modifications to this folder.
+ * Toggle features by commenting/uncommenting @import lines below.
+ */
+
+/* === BASE (required) === */
+@import url('base/variables.css');
+@import url('base/vivalarc-base.css');
+
+/* === MODULES (optional - uncomment to enable) === */
+/* @import url('modules/autohide-addressbar.css'); */
+/* @import url('modules/autohide-panel.css'); */
+/* @import url('modules/autohide-bookmarks.css'); */
+/* @import url('modules/compact-mode.css'); */
+/* @import url('modules/arc-peek.css'); */
+/* @import url('modules/colorful-tabs.css'); */
+/* @import url('modules/clean-newtab.css'); */
+
+/* === THEMES (pick one) === */
+/* @import url('themes/arc-light.css'); */
+/* @import url('themes/arc-dark.css'); */
+/* @import url('themes/reflect-purple.css'); */
