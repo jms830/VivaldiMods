@@ -1,0 +1,16 @@
+/* user_mods/css/modules/autohide-panel.css */
+/* Auto-hide panel - expands on hover */
+
+#panels-container {
+    transition: width var(--compact-transition-speed) ease;
+}
+
+#panels-container:not(:hover):not(:focus-within) {
+    width: 0 !important;
+    overflow: hidden;
+}
+
+#panels-container:hover,
+#panels-container:focus-within {
+    width: auto !important;
+}

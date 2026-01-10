@@ -1,0 +1,19 @@
+/* user_mods/css/modules/autohide-addressbar.css */
+/* Auto-hide address bar - shows on hover */
+
+#browser:not(.address-top) .UrlBar {
+    transition: opacity var(--compact-transition-speed) ease,
+                transform var(--compact-transition-speed) ease;
+}
+
+#browser:not(.address-top):not(:hover) .UrlBar {
+    opacity: 0;
+    transform: translateY(-100%);
+    pointer-events: none;
+}
+
+#browser:not(.address-top):hover .UrlBar {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
