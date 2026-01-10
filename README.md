@@ -4,7 +4,7 @@ Arc-style theming for Vivaldi Browser, combining VivalArc + Awesome-Vivaldi.
 
 ## Easiest Setup: Web Configurator
 
-**[Open VivalArc Configurator](https://YOUR-USERNAME.github.io/VivaldiMods/)** - Pick features, customize, download your CSS.
+**[Open VivalArc Configurator](https://jms830.github.io/VivaldiMods/)** - Pick features, customize, download your CSS.
 
 1. Toggle the features you want
 2. Adjust colors and sizing
@@ -78,7 +78,7 @@ For Linux/macOS or if you don't want ModManager:
 6. Restart Vivaldi
 
 ### Option A: Use the Configurator (Recommended)
-Use the [Web Configurator](https://YOUR-USERNAME.github.io/VivaldiMods/) to generate a single customized CSS file.
+Use the [Web Configurator](https://jms830.github.io/VivaldiMods/) to generate a single customized CSS file.
 
 ### Option B: Use the Full Modpack
 Point Vivaldi to `user_mods/css/` - but note this loads ALL CSS files at once. For selective control, use VivaldiModManager on Windows or rename files you don't want to `.css.disabled`.
