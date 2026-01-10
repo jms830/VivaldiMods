@@ -19,11 +19,28 @@ Arc-style theming for Vivaldi Browser, combining VivalArc + Awesome-Vivaldi.
 VivaldiModManager is Windows-only. Linux/macOS users get CSS mods via Vivaldi's built-in support.
 
 ### Manual Setup
+
 1. Download [VivaldiModManager v0.2.7](https://github.com/eximido/vivaldimodmanager/releases/download/0.2.7/vivaldimodsmanager-0.2.7.zip)
 2. Extract and run `VivaldiModManager.exe`
 3. Click "Add" and select this repo's `user_mods/` folder
-4. Enable desired CSS/JS mods
+4. Enable desired mods (see list below)
 5. Restart Vivaldi
+
+## Available Mods
+
+In VivaldiModManager, you'll see these files to enable/disable individually:
+
+| File | Description |
+|------|-------------|
+| `core.css` | **Base theme** - Arc-style UI (required) |
+| `mod-autohide-addressbar.css` | Hide address bar, show on hover |
+| `mod-autohide-bookmarks.css` | Hide bookmark bar, show on hover |
+| `mod-autohide-panel.css` | Collapse panel, expand on hover |
+| `mod-compact-mode.css` | Auto-collapse sidebar when not hovered |
+| `theme-arc-dark.css` | Dark color scheme |
+| `theme-arc-light.css` | Light color scheme |
+
+Enable `core.css` first, then add any mods/themes you want.
 
 ## Alternative: CSS-Only (No ModManager)
 
@@ -36,22 +53,11 @@ If you only want CSS mods and don't need JS:
 5. Select the `user_mods/css/` folder
 6. Restart Vivaldi
 
+Note: This method loads ALL CSS files. To selectively enable mods, use VivaldiModManager.
+
 ## Customization
 
-### Enable/Disable Modules
-
-Edit `user_mods/css/core.css` - uncomment lines to enable:
-
-```css
-/* === MODULES (optional - uncomment to enable) === */
-@import url('modules/autohide-addressbar.css');
-@import url('modules/compact-mode.css');
-/* @import url('modules/autohide-panel.css'); */
-```
-
-### Tweak Variables
-
-Edit `user_mods/css/base/variables.css`:
+Edit `user_mods/css/base/variables.css` to tweak values:
 
 ```css
 :root {
@@ -66,11 +72,13 @@ Edit `user_mods/css/base/variables.css`:
 ```
 user_mods/
 ├── css/
-│   ├── core.css                # Main entry - import hub
+│   ├── core.css                    # Base theme (VivalArc styling)
+│   ├── mod-*.css                   # Shims for individual modules
+│   ├── theme-*.css                 # Shims for themes
 │   ├── base/
-│   │   ├── variables.css       # All CSS custom properties
-│   │   └── vivalarc-base.css   # Core Arc styling
-│   ├── modules/                # Optional feature modules
+│   │   ├── variables.css           # Customizable CSS variables
+│   │   └── vivalarc-base.css       # Core Arc styling
+│   ├── modules/                    # Actual module implementations
 │   │   ├── autohide-addressbar.css
 │   │   ├── autohide-bookmarks.css
 │   │   ├── autohide-panel.css
@@ -78,7 +86,7 @@ user_mods/
 │   └── themes/
 │       ├── arc-dark.css
 │       └── arc-light.css
-└── js/                         # Optional JS mods (ModManager only)
+└── js/                             # Optional JS mods (ModManager only)
     └── README.md
 ```
 
