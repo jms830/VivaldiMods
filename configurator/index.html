@@ -21,15 +21,12 @@
             --border: #3c3c3c;
             --success: #22c55e;
             --warning: #f59e0b;
+            --orange: #e67e22;
             --radius: 4px;
-            --sidebar-width: 220px;
+            --sidebar-width: 200px;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -40,36 +37,21 @@
             font-size: 13px;
         }
         
-        /* Main layout with sidebar */
         .app-layout {
             display: grid;
-            grid-template-columns: var(--sidebar-width) 1fr 340px;
+            grid-template-columns: var(--sidebar-width) 1fr;
             min-height: 100vh;
         }
         
-        @media (max-width: 1100px) {
-            .app-layout {
-                grid-template-columns: var(--sidebar-width) 1fr;
-            }
-            .preview-panel {
-                display: none;
-            }
+        @media (max-width: 800px) {
+            .app-layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
         }
         
-        @media (max-width: 700px) {
-            .app-layout {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                display: none;
-            }
-        }
-        
-        /* Sidebar navigation */
         .sidebar {
             background: var(--bg-sidebar);
             border-right: 1px solid var(--border);
-            padding: 16px 0;
+            padding: 12px 0;
             position: sticky;
             top: 0;
             height: 100vh;
@@ -77,64 +59,98 @@
         }
         
         .sidebar-header {
-            padding: 12px 16px 20px;
+            padding: 8px 12px 16px;
             border-bottom: 1px solid var(--border);
             margin-bottom: 8px;
         }
         
         .sidebar-header h1 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-bright);
-            margin-bottom: 4px;
         }
         
         .sidebar-header p {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
         }
         
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 16px;
+            gap: 8px;
+            padding: 6px 12px;
             cursor: pointer;
             transition: background 0.1s;
             color: var(--text);
             text-decoration: none;
-            font-size: 13px;
+            font-size: 12px;
         }
         
-        .nav-item:hover {
-            background: var(--bg-hover);
-        }
+        .nav-item:hover { background: var(--bg-hover); }
         
         .nav-item.active {
             background: var(--accent);
             color: var(--text-bright);
         }
         
-        .nav-item .nav-icon {
-            width: 20px;
-            text-align: center;
-            font-size: 14px;
-        }
+        .nav-icon { width: 18px; text-align: center; font-size: 12px; }
         
-        .nav-item.active .nav-icon {
-            filter: brightness(1.2);
-        }
-        
-        /* Main content area */
         .main-content {
-            padding: 24px 32px;
+            padding: 20px 28px;
             overflow-y: auto;
             max-height: 100vh;
         }
         
-        /* Section styling - Vivaldi conventions */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .presets {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .preset-btn {
+            padding: 5px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .preset-btn:hover { border-color: var(--accent); }
+        .preset-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
         .section {
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
         
         .section-header {
@@ -143,28 +159,61 @@
             letter-spacing: 0.5px;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 16px;
-            padding-bottom: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
             border-bottom: 1px solid var(--border);
         }
         
-        .section-group {
-            margin-bottom: 24px;
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
         }
         
-        .group-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-bright);
-            margin-bottom: 12px;
+        .feature-card {
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            transition: border-color 0.15s;
         }
         
-        /* Checkbox styling - Vivaldi style */
-        .checkbox-row {
+        .feature-card:hover { border-color: var(--accent); }
+        
+        .feature-card.enabled { border-color: var(--accent); }
+        
+        .feature-preview {
+            width: 100%;
+            height: 140px;
+            background: var(--bg-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .feature-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        
+        .feature-preview:hover img { transform: scale(1.05); }
+        
+        .feature-preview .no-preview {
+            color: var(--text-muted);
+            font-size: 11px;
+            text-align: center;
+        }
+        
+        .feature-body {
+            padding: 10px 12px;
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            padding: 6px 0;
         }
         
         .checkbox {
@@ -176,13 +225,11 @@
             cursor: pointer;
             position: relative;
             flex-shrink: 0;
-            margin-top: 2px;
+            margin-top: 1px;
             transition: background 0.1s, border-color 0.1s;
         }
         
-        .checkbox:hover {
-            border-color: var(--accent);
-        }
+        .checkbox:hover { border-color: var(--accent); }
         
         .checkbox.checked {
             background: var(--accent);
@@ -201,45 +248,124 @@
             transform: rotate(45deg);
         }
         
-        .checkbox-label {
-            flex: 1;
-        }
-        
-        .checkbox-label .title {
-            font-size: 13px;
-            color: var(--text);
-            cursor: pointer;
-        }
-        
-        .checkbox-label .hint {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-        
         .checkbox.required {
             opacity: 0.6;
             cursor: not-allowed;
         }
         
-        /* Radio button styling */
+        .feature-info { flex: 1; min-width: 0; }
+        
+        .feature-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-bright);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-js {
+            background: var(--orange);
+            color: white;
+        }
+        
+        .badge-required {
+            background: var(--warning);
+            color: #000;
+        }
+        
+        .feature-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        
+        .config-section {
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .config-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 12px;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        
+        .config-row label {
+            font-size: 12px;
+            color: var(--text);
+            cursor: pointer;
+        }
+        
+        .input-row {
+            margin-bottom: 10px;
+        }
+        
+        .input-row label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        
+        .input-row input[type="number"] {
+            width: 100%;
+            padding: 5px 8px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 12px;
+        }
+        
+        .input-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
         .radio-group {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin-top: 8px;
         }
         
         .radio-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
+            font-size: 12px;
         }
         
         .radio {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             background: var(--bg-input);
             border: 1px solid var(--border);
             border-radius: 50%;
@@ -247,238 +373,38 @@
             transition: border-color 0.1s;
         }
         
-        .radio:hover {
-            border-color: var(--accent);
-        }
+        .radio:hover { border-color: var(--accent); }
         
-        .radio.checked {
-            border-color: var(--accent);
-        }
+        .radio.checked { border-color: var(--accent); }
         
         .radio.checked::after {
             content: '';
             position: absolute;
             top: 3px;
             left: 3px;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: var(--accent);
             border-radius: 50%;
         }
         
-        .radio-item span {
-            font-size: 13px;
-            color: var(--text);
-        }
-        
-        /* Input styling */
-        .input-row {
-            margin-bottom: 16px;
-        }
-        
-        .input-row label {
-            display: block;
-            font-size: 13px;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-        
-        .input-row .hint {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        
-        .input-row input[type="number"],
-        .input-row select {
-            width: 100%;
-            max-width: 200px;
-            padding: 6px 10px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: 13px;
-            font-family: inherit;
-        }
-        
-        .input-row input:focus,
-        .input-row select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        
-        .input-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-        }
-        
-        /* Preview panel */
-        .preview-panel {
-            background: var(--bg-sidebar);
-            border-left: 1px solid var(--border);
-            padding: 24px;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-        }
-        
-        .preview-panel h2 {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-        
-        .preview-img {
-            width: 100%;
-            border-radius: var(--radius);
-            margin-bottom: 12px;
-            background: var(--bg-main);
-            min-height: 180px;
-            object-fit: cover;
-        }
-        
-        .preview-label {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 12px;
-            margin-bottom: 24px;
-        }
-        
-        /* Buttons */
-        .btn {
-            width: 100%;
-            padding: 10px 16px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.15s;
-            margin-bottom: 8px;
-        }
-        
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: var(--accent-hover);
-        }
-        
-        .btn-secondary {
-            background: var(--bg-input);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--bg-hover);
-        }
-        
-        /* Preset buttons */
-        .presets {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-        
-        .preset-btn {
-            padding: 6px 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        
-        .preset-btn:hover {
-            border-color: var(--accent);
-        }
-        
-        .preset-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-        
-        /* Info box */
-        .info-box {
-            background: rgba(0, 120, 212, 0.1);
-            border: 1px solid rgba(0, 120, 212, 0.3);
-            border-radius: var(--radius);
-            padding: 12px 16px;
-            margin-bottom: 24px;
-            font-size: 12px;
-            color: var(--text);
-        }
-        
-        .info-box code {
-            background: var(--bg-input);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 11px;
-        }
-        
-        /* Instructions list */
-        .instructions {
-            margin-top: 24px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-        }
-        
-        .instructions h3 {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-        
-        .instructions ol {
-            padding-left: 20px;
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.8;
-        }
-        
-        .instructions a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-        
-        .instructions a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Toast notification */
         .toast {
             position: fixed;
-            bottom: 24px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: var(--bg-sidebar);
             border: 1px solid var(--success);
             color: var(--text);
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: var(--radius);
-            font-size: 13px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             opacity: 0;
             transition: transform 0.3s, opacity 0.3s;
             z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
         .toast.show {
@@ -486,21 +412,50 @@
             opacity: 1;
         }
         
-        .toast .icon {
-            color: var(--success);
+        .toast .icon { color: var(--success); }
+        
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: zoom-out;
         }
         
-        /* Focus states */
-        .checkbox:focus-visible,
-        .radio:focus-visible,
-        .preset-btn:focus-visible,
-        .btn:focus-visible,
-        input:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
+        .lightbox.show { display: flex; }
+        
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 8px;
         }
         
-        /* Skip link */
+        .lightbox-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-sidebar);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            color: var(--text);
+        }
+        
+        footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+        }
+        
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        
         .skip-link {
             position: absolute;
             top: -40px;
@@ -510,38 +465,17 @@
             padding: 8px 16px;
             z-index: 100;
             transition: top 0.2s;
-            font-size: 13px;
+            font-size: 12px;
         }
         
-        .skip-link:focus {
-            top: 0;
-        }
+        .skip-link:focus { top: 0; }
         
-        /* JS note styling */
-        .js-note {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            font-style: italic;
-        }
-        
-        /* Footer for mobile */
-        .mobile-footer {
-            display: none;
-            padding: 24px;
-            text-align: center;
-            border-top: 1px solid var(--border);
-        }
-        
-        @media (max-width: 1100px) {
-            .mobile-footer {
-                display: block;
-            }
-        }
-        
-        .mobile-footer a {
-            color: var(--accent);
-            text-decoration: none;
+        .checkbox:focus-visible,
+        .radio:focus-visible,
+        .preset-btn:focus-visible,
+        .btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
         }
     </style>
 </head>
@@ -553,249 +487,357 @@
         <span class="message">Settings saved</span>
     </div>
     
+    <div class="lightbox" id="lightbox">
+        <img id="lightboxImg" src="" alt="Preview">
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+    
     <div class="app-layout">
-        <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
                 <h1>Vivaldi Configurator</h1>
                 <p>Awesome-Vivaldi Mods</p>
             </div>
-            <a href="#autohide" class="nav-item active" data-section="autohide">
-                <span class="nav-icon">👁️</span> Auto-Hide
-            </a>
-            <a href="#layout" class="nav-item" data-section="layout">
-                <span class="nav-icon">📐</span> Layout
-            </a>
-            <a href="#enhancedux" class="nav-item" data-section="enhancedux">
-                <span class="nav-icon">✨</span> Enhanced UX
-            </a>
-            <a href="#jsmods" class="nav-item" data-section="jsmods">
-                <span class="nav-icon">🔌</span> JS Mods
-            </a>
-            <a href="#config" class="nav-item" data-section="config">
-                <span class="nav-icon">⚙️</span> Configuration
-            </a>
-            <a href="#sizing" class="nav-item" data-section="sizing">
-                <span class="nav-icon">📏</span> Sizing
-            </a>
+            <a href="#sidebar" class="nav-item active" data-section="sidebar"><span class="nav-icon">📐</span> Sidebar</a>
+            <a href="#tabs" class="nav-item" data-section="tabs"><span class="nav-icon">📑</span> Tabs</a>
+            <a href="#panel" class="nav-item" data-section="panel"><span class="nav-icon">📱</span> Panel</a>
+            <a href="#addressbar" class="nav-item" data-section="addressbar"><span class="nav-icon">🔗</span> Address Bar</a>
+            <a href="#startpage" class="nav-item" data-section="startpage"><span class="nav-icon">🏠</span> Start Page</a>
+            <a href="#themes" class="nav-item" data-section="themes"><span class="nav-icon">🎨</span> Themes</a>
+            <a href="#advanced" class="nav-item" data-section="advanced"><span class="nav-icon">⚡</span> Advanced</a>
+            <a href="#sizing" class="nav-item" data-section="sizing"><span class="nav-icon">📏</span> Sizing</a>
         </nav>
         
-        <!-- Main Content -->
         <main class="main-content" id="main">
-            <div class="info-box">
-                Toggle modules, adjust settings, then download your customized <code>Core.css</code>. 
-                Place it in your <code>Awesome-Vivaldi/CSS/</code> folder and point Vivaldi to that directory.
+            <div class="top-bar">
+                <div class="presets">
+                    <button class="preset-btn" data-preset="minimal">Minimal</button>
+                    <button class="preset-btn active" data-preset="recommended">Recommended</button>
+                    <button class="preset-btn" data-preset="maximal">All Features</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary" id="downloadBtn">⬇️ Download Core.css</button>
+                    <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                </div>
             </div>
             
-            <div class="presets">
-                <button class="preset-btn" data-preset="minimal">Minimal</button>
-                <button class="preset-btn active" data-preset="recommended">Recommended</button>
-                <button class="preset-btn" data-preset="maximal">Maximal</button>
-            </div>
-            
-            <!-- Auto-Hide Section -->
-            <section class="section" id="autohide">
-                <h2 class="section-header">Auto-Hide</h2>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="AutoHide/AdaptiveBF.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Adaptive Back/Forward</div>
-                        <div class="hint">Hide navigation buttons when disabled</div>
+            <section class="section" id="sidebar">
+                <h2 class="section-header">Sidebar</h2>
+                <div class="feature-grid">
+                    <div class="feature-card" data-module="Layout/main.css" data-required="true">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif" alt="Smart Sidebar">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked required" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Smart Sidebar <span class="badge badge-required">Required</span></div>
+                                <div class="feature-desc">Core Arc-style sidebar with smooth animations</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox" data-module="AutoHide/Tabbar.css" tabindex="0" role="checkbox" aria-checked="false"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Auto-Hide Tabbar</div>
-                        <div class="hint">Collapse tabbar, expand on hover</div>
+                    
+                    <div class="feature-card" data-module="Layout/FavouriteTabs.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif" alt="Favourite Tabs Grid">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Favourite Tabs Grid</div>
+                                <div class="feature-desc">Arc-style pinned tabs as icon grid</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="AutoHide/Bookmarkbar.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Auto-Hide Bookmark Bar</div>
-                        <div class="hint">Hide bookmark bar until hover</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="AutoHide/Panel.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Auto-Hide Panel</div>
-                        <div class="hint">Collapse side panel until hover</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="AutoHide/StatusBar.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Auto-Hide Status Bar</div>
-                        <div class="hint">Hide status bar for more space</div>
+                    
+                    <div class="feature-card" data-module="AutoHide/Panel.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif" alt="Auto-Hide Panel">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Auto-Hide Panel</div>
+                                <div class="feature-desc">Collapse side panel until hover</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
             
-            <!-- Layout Section -->
-            <section class="section" id="layout">
-                <h2 class="section-header">Layout & Styling</h2>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked required" data-module="Layout/main.css" data-required="true" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Main Layout</div>
-                        <div class="hint">Core Arc-style sidebar & layout (required)</div>
+            <section class="section" id="tabs">
+                <h2 class="section-header">Tabs</h2>
+                <div class="feature-grid">
+                    <div class="feature-card" data-module="AutoHide/Tabbar.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif" alt="Auto-Hide Tabbar">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Auto-Hide Tabbar</div>
+                                <div class="feature-desc">Collapse tabbar, expand on hover</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="Layout/FavouriteTabs.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Favourite Tabs Grid</div>
-                        <div class="hint">Arc-style pinned tabs as icon grid</div>
+                    
+                    <div class="feature-card" data-module="EnhancedUX/TabsTrail.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/TabTrails.gif" alt="Tab Trails">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Tab Trails</div>
+                                <div class="feature-desc">Color trails on tab hover</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="Layout/Addressbar.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Address Bar</div>
-                        <div class="hint">Styled address bar</div>
+                    
+                    <div class="feature-card" data-module="EnhancedUX/Quietify.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/audioIcon.gif" alt="Quietify">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Quietify Audio Icon</div>
+                                <div class="feature-desc">Animated equalizer icon for playing tabs</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="Layout/NeatDial.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Neat Speed Dial</div>
-                        <div class="hint">Clean, minimal new tab page</div>
+                    
+                    <div class="feature-card" data-module="JSIntegration/TidyTabs.css" data-js="true">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/tidyTabs.gif" alt="Tidy Tabs">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Tidy Tabs <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">AI-powered tab grouping</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="Layout/FindInPage.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Find In Page</div>
-                        <div class="hint">Styled find bar</div>
+                    
+                    <div class="feature-card" data-module="JSIntegration/ClearTabs.css" data-js="true">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/ClearTabs.gif" alt="Clear Tabs">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Clear Tabs <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Clear inactive tabs automatically</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="Layout/QuickCommand.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Quick Commands</div>
-                        <div class="hint">Styled command palette</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="Layout/DownloadPanel.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Download Panel</div>
-                        <div class="hint">Styled download panel</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="Layout/ExtensionsPanel.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Extensions Panel</div>
-                        <div class="hint">Styled extensions panel</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox" data-module="Layout/themePreviewer.css" tabindex="0" role="checkbox" aria-checked="false"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Theme Previewer</div>
-                        <div class="hint">Enhanced theme preview in settings</div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Enhanced UX Section -->
-            <section class="section" id="enhancedux">
-                <h2 class="section-header">Enhanced UX</h2>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="EnhancedUX/BtnHoverAnime.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Button Animations</div>
-                        <div class="hint">Subtle hover animations on buttons</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="EnhancedUX/TabsTrail.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Tab Trails</div>
-                        <div class="hint">Color trails on tab hover</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="EnhancedUX/Quietify.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Quietify</div>
-                        <div class="hint">Animated audio icons for playing tabs</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox" data-module="EnhancedUX/SelectableText.css" tabindex="0" role="checkbox" aria-checked="false"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Selectable Text</div>
-                        <div class="hint">Make UI text selectable</div>
+                    
+                    <div class="feature-card" data-module="JSIntegration/ArcPeek.css" data-js="true">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/ArcPeek.gif" alt="Arc Peek">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Arc Peek <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Preview tabs on hover like Arc browser</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
             
-            <!-- JS Mods Section -->
-            <section class="section" id="jsmods">
-                <h2 class="section-header">JS Mod Styles</h2>
-                <p class="js-note">These require the corresponding JS mods installed</p>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="JSIntegration/TidyTabs.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Tidy Tabs</div>
-                        <div class="hint">Styles for AI tab grouping</div>
+            <section class="section" id="panel">
+                <h2 class="section-header">Panel & Status Bar</h2>
+                <div class="feature-grid">
+                    <div class="feature-card" data-module="AutoHide/StatusBar.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/YouDeserveABiggerWebview.png" alt="Auto-Hide Status Bar">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Auto-Hide Status Bar</div>
+                                <div class="feature-desc">Hide status bar for more space</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="JSIntegration/ClearTabs.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Clear Tabs</div>
-                        <div class="hint">Styles for clear tabs feature</div>
+                    
+                    <div class="feature-card" data-module="Layout/DownloadPanel.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/easyFile.png" alt="Download Panel">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Styled Download Panel</div>
+                                <div class="feature-desc">Clean download panel design</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox checked" data-module="JSIntegration/ArcPeek.css" tabindex="0" role="checkbox" aria-checked="true"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Arc Peek</div>
-                        <div class="hint">Styles for Arc peek feature</div>
-                    </div>
-                </div>
-                
-                <div class="checkbox-row">
-                    <div class="checkbox" data-module="JSIntegration/Accentmod.css" tabindex="0" role="checkbox" aria-checked="false"></div>
-                    <div class="checkbox-label">
-                        <div class="title">Accent Mod</div>
-                        <div class="hint">Dynamic accent color integration</div>
+                    
+                    <div class="feature-card" data-module="Layout/ExtensionsPanel.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Styled Extensions Panel</div>
+                                <div class="feature-desc">Clean extensions panel design</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
             
-            <!-- Configuration Section -->
-            <section class="section" id="config">
-                <h2 class="section-header">Configuration</h2>
+            <section class="section" id="addressbar">
+                <h2 class="section-header">Address Bar & Navigation</h2>
+                <div class="feature-grid">
+                    <div class="feature-card" data-module="Layout/Addressbar.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Styled Address Bar</div>
+                                <div class="feature-desc">Arc-style address bar design</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="AutoHide/AdaptiveBF.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/adaptiveBF.gif" alt="Adaptive Back/Forward">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Adaptive Back/Forward</div>
+                                <div class="feature-desc">Hide nav buttons when disabled</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="AutoHide/Bookmarkbar.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif" alt="Auto-Hide Bookmark Bar">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Auto-Hide Bookmark Bar</div>
+                                <div class="feature-desc">Hide bookmark bar until hover</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="Layout/FindInPage.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Styled Find Bar</div>
+                                <div class="feature-desc">Clean find-in-page design</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="Layout/QuickCommand.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Styled Quick Commands</div>
+                                <div class="feature-desc">Clean command palette design</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section" id="startpage">
+                <h2 class="section-header">Start Page</h2>
+                <div class="feature-grid">
+                    <div class="feature-card" data-module="Layout/NeatDial.css">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/NeatNewTab.png" alt="Neat Speed Dial">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Neat Speed Dial</div>
+                                <div class="feature-desc">Clean, minimalist new tab page</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section" id="themes">
+                <h2 class="section-header">Themes & Appearance</h2>
+                <div class="feature-grid">
+                    <div class="feature-card" data-module="JSIntegration/Accentmod.css" data-js="true">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif" alt="Dynamic Theme Colors">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Dynamic Accent <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Dynamic accent color from page content</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="Layout/themePreviewer.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Theme Previewer</div>
+                                <div class="feature-desc">Enhanced theme preview in settings</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="EnhancedUX/BtnHoverAnime.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Button Animations</div>
+                                <div class="feature-desc">Subtle hover animations on buttons</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="EnhancedUX/SelectableText.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Selectable Text</div>
+                                <div class="feature-desc">Make UI text selectable</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
-                <div class="section-group">
-                    <div class="group-label">Theme Mode</div>
+                <div class="config-section" style="margin-top: 16px;">
+                    <div class="config-title">Theme Mode</div>
                     <div class="radio-group">
                         <label class="radio-item">
                             <div class="radio checked" data-value="color" tabindex="0" role="radio" aria-checked="true"></div>
@@ -807,172 +849,113 @@
                         </label>
                         <label class="radio-item">
                             <div class="radio" data-value="immersive" tabindex="0" role="radio" aria-checked="false"></div>
-                            <span>Immersive</span>
+                            <span>Immersive <span class="badge badge-js">JS</span></span>
                         </label>
                     </div>
-                    <p class="hint" style="margin-top: 6px; font-size: 11px; color: var(--text-muted);">Immersive requires immersiveAddressbar.js</p>
                 </div>
+            </section>
+            
+            <section class="section" id="advanced">
+                <h2 class="section-header">Advanced Options</h2>
                 
-                <div class="section-group">
-                    <div class="group-label">Sidebar Behavior</div>
-                    
-                    <div class="checkbox-row">
-                        <div class="checkbox" data-var="compact" data-value="on" tabindex="0" role="checkbox" aria-checked="false"></div>
-                        <div class="checkbox-label">
-                            <div class="title">Compact Mode</div>
-                            <div class="hint">Ultra-thin sidebar when collapsed (7px)</div>
+                <div class="config-section">
+                    <div class="config-title">Sidebar Behavior</div>
+                    <div class="config-grid">
+                        <div class="config-row">
+                            <div class="checkbox" data-var="compact" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <label>Compact Mode (7px collapsed)</label>
                         </div>
-                    </div>
-                    
-                    <div class="checkbox-row">
-                        <div class="checkbox checked" data-var="floatTabbar" data-value="on" tabindex="0" role="checkbox" aria-checked="true"></div>
-                        <div class="checkbox-label">
-                            <div class="title">Floating Tabbar</div>
-                            <div class="hint">Sidebar overlays webpage instead of pushing</div>
+                        <div class="config-row">
+                            <div class="checkbox checked" data-var="floatTabbar" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <label>Floating Tabbar (overlay)</label>
                         </div>
-                    </div>
-                    
-                    <div class="checkbox-row">
-                        <div class="checkbox" data-var="blurMask" data-value="on" tabindex="0" role="checkbox" aria-checked="false"></div>
-                        <div class="checkbox-label">
-                            <div class="title">Blur Mask</div>
-                            <div class="hint">Blur webpage when sidebar expands</div>
+                        <div class="config-row">
+                            <div class="checkbox" data-var="blurMask" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <label>Blur Mask on Expand</label>
                         </div>
-                    </div>
-                    
-                    <div class="checkbox-row">
-                        <div class="checkbox checked" data-var="delay" data-value="on" tabindex="0" role="checkbox" aria-checked="true"></div>
-                        <div class="checkbox-label">
-                            <div class="title">Smart Delay</div>
-                            <div class="hint">Delay expand/collapse animations</div>
+                        <div class="config-row">
+                            <div class="checkbox checked" data-var="delay" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <label>Smart Animation Delay</label>
                         </div>
-                    </div>
-                    
-                    <div class="checkbox-row">
-                        <div class="checkbox checked" data-var="borderRadius" data-value="on" tabindex="0" role="checkbox" aria-checked="true"></div>
-                        <div class="checkbox-label">
-                            <div class="title">Border Radius</div>
-                            <div class="hint">Round corners when expanded</div>
+                        <div class="config-row">
+                            <div class="checkbox checked" data-var="borderRadius" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <label>Border Radius</label>
                         </div>
                     </div>
                 </div>
                 
-                <div class="section-group">
-                    <div class="group-label">Tabs Grid</div>
-                    
-                    <div class="checkbox-row">
-                        <div class="checkbox checked" data-var="tabsGrid" data-value="on" tabindex="0" role="checkbox" aria-checked="true"></div>
-                        <div class="checkbox-label">
-                            <div class="title">Enable Tabs Grid</div>
-                            <div class="hint">Show pinned tabs as grid</div>
+                <div class="config-section">
+                    <div class="config-title">Tabs Grid</div>
+                    <div class="config-grid">
+                        <div class="config-row">
+                            <div class="checkbox checked" data-var="tabsGrid" tabindex="0" role="checkbox" aria-checked="true"></div>
+                            <label>Enable Tabs Grid</label>
                         </div>
-                    </div>
-                    
-                    <div class="checkbox-row">
-                        <div class="checkbox" data-var="pinAtTop" data-value="on" tabindex="0" role="checkbox" aria-checked="false"></div>
-                        <div class="checkbox-label">
-                            <div class="title">Pin Grid at Top</div>
-                            <div class="hint">Experimental - keep grid fixed while scrolling</div>
+                        <div class="config-row">
+                            <div class="checkbox" data-var="pinAtTop" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <label>Pin Grid at Top</label>
                         </div>
-                    </div>
-                    
-                    <div class="checkbox-row">
-                        <div class="checkbox" data-var="blurHibernate" data-value="on" tabindex="0" role="checkbox" aria-checked="false"></div>
-                        <div class="checkbox-label">
-                            <div class="title">Blur Hibernated Tabs</div>
-                            <div class="hint">Visual indicator for hibernated tabs</div>
+                        <div class="config-row">
+                            <div class="checkbox" data-var="blurHibernate" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <label>Blur Hibernated Tabs</label>
                         </div>
                     </div>
                 </div>
             </section>
             
-            <!-- Sizing Section -->
             <section class="section" id="sizing">
                 <h2 class="section-header">Sizing</h2>
                 
-                <div class="section-group">
-                    <div class="group-label">Pinned Tabs Grid</div>
-                    <div class="input-grid">
+                <div class="config-section">
+                    <div class="config-title">Pinned Tabs Grid</div>
+                    <div class="config-grid">
                         <div class="input-row">
-                            <label for="pinnedColumns">Columns</label>
+                            <label>Columns</label>
                             <input type="number" id="pinnedColumns" value="3" min="1" max="6">
                         </div>
                         <div class="input-row">
-                            <label for="pinnedRows">Rows</label>
+                            <label>Rows</label>
                             <input type="number" id="pinnedRows" value="3" min="1" max="6">
                         </div>
                         <div class="input-row">
-                            <label for="pinnedGap">Gap (px)</label>
+                            <label>Gap (px)</label>
                             <input type="number" id="pinnedGap" value="8" min="0" max="20">
                         </div>
                         <div class="input-row">
-                            <label for="pinnedIconSize">Icon Size (px)</label>
+                            <label>Icon Size (px)</label>
                             <input type="number" id="pinnedIconSize" value="20" min="12" max="32">
                         </div>
                     </div>
                 </div>
                 
-                <div class="section-group">
-                    <div class="group-label">Sidebar Dimensions</div>
-                    <div class="input-grid">
+                <div class="config-section">
+                    <div class="config-title">Sidebar Dimensions</div>
+                    <div class="config-grid">
                         <div class="input-row">
-                            <label for="collapseWidth">Collapsed Width (px)</label>
+                            <label>Collapsed Width (px)</label>
                             <input type="number" id="collapseWidth" value="44" min="30" max="80">
                         </div>
                         <div class="input-row">
-                            <label for="expandWidth">Expanded Width (px)</label>
+                            <label>Expanded Width (px)</label>
                             <input type="number" id="expandWidth" value="280" min="200" max="400">
                         </div>
-                    </div>
-                </div>
-                
-                <div class="section-group">
-                    <div class="group-label">Window & Animation</div>
-                    <div class="input-grid">
                         <div class="input-row">
-                            <label for="windowBorder">Window Border (px)</label>
+                            <label>Window Border (px)</label>
                             <input type="number" id="windowBorder" value="4" min="0" max="20">
                         </div>
                         <div class="input-row">
-                            <label for="animationSpeed">Animation Speed (ms)</label>
+                            <label>Animation Speed (ms)</label>
                             <input type="number" id="animationSpeed" value="260" min="100" max="600">
                         </div>
                     </div>
                 </div>
             </section>
             
-            <!-- Mobile download section -->
-            <div class="mobile-footer">
-                <button class="btn btn-primary" id="downloadBtnMobile">⬇️ Download Core.css</button>
-                <button class="btn btn-secondary" id="resetBtnMobile">🔄 Reset to Defaults</button>
-                <p style="margin-top: 16px; font-size: 11px; color: var(--text-muted);">
-                    Built for <a href="https://github.com/PaRr0tBoY/Awesome-Vivaldi" target="_blank">Awesome-Vivaldi</a>
-                </p>
-            </div>
+            <footer>
+                Built for <a href="https://github.com/PaRr0tBoY/Awesome-Vivaldi" target="_blank">Awesome-Vivaldi</a> 
+                by <a href="https://github.com/jms830/VivaldiMods" target="_blank">VivaldiMods</a>
+            </footer>
         </main>
-        
-        <!-- Preview Panel -->
-        <aside class="preview-panel">
-            <h2>Preview</h2>
-            <img class="preview-img" id="previewImg" 
-                 src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif" 
-                 alt="Preview">
-            <p class="preview-label" id="previewLabel">Smart sidebar animations</p>
-            
-            <button class="btn btn-primary" id="downloadBtn">⬇️ Download Core.css</button>
-            <button class="btn btn-secondary" id="resetBtn">🔄 Reset to Defaults</button>
-            
-            <div class="instructions">
-                <h3>Instructions</h3>
-                <ol>
-                    <li>Clone/download <a href="https://github.com/PaRr0tBoY/Awesome-Vivaldi" target="_blank">Awesome-Vivaldi</a></li>
-                    <li>Configure your options</li>
-                    <li>Download and replace <code>CSS/Core.css</code></li>
-                    <li>Point Vivaldi to the CSS folder</li>
-                    <li>Restart Vivaldi</li>
-                </ol>
-            </div>
-        </aside>
     </div>
     
     <script>
@@ -997,34 +980,6 @@
                 windowBorder: 4,
                 animationSpeed: 260
             }
-        };
-        
-        const IMG_BASE = 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase';
-        
-        const previews = {
-            'AutoHide/AdaptiveBF.css': { src: `${IMG_BASE}/feature-small/My-Mods/adaptiveBF.gif`, label: 'Hide disabled back/forward buttons' },
-            'AutoHide/Tabbar.css': { src: `${IMG_BASE}/feature-small/Community/biggerView.gif`, label: 'Auto-hide entire tabbar for bigger view' },
-            'AutoHide/Panel.css': { src: `${IMG_BASE}/feature-small/Community/biggerView.gif`, label: 'Auto-hide side panel for expanded webview' },
-            'AutoHide/Bookmarkbar.css': { src: `${IMG_BASE}/feature-small/Community/biggerView.gif`, label: 'Auto-hide bookmark bar' },
-            'AutoHide/StatusBar.css': { src: `${IMG_BASE}/feature-small/Community/biggerView.gif`, label: 'Auto-hide status bar' },
-            'Layout/main.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Smart sidebar with smooth animations' },
-            'Layout/FavouriteTabs.css': { src: `${IMG_BASE}/Arc-like/FavouritesTabs/Pin-On-Top.gif`, label: 'Arc-style pinned tabs grid' },
-            'Layout/Addressbar.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Styled address bar' },
-            'Layout/NeatDial.css': { src: `${IMG_BASE}/MainShowCase/NeatNewTab.png`, label: 'Clean, minimalist speed dial' },
-            'Layout/FindInPage.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Styled find in page bar' },
-            'Layout/QuickCommand.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Styled quick commands' },
-            'Layout/DownloadPanel.css': { src: `${IMG_BASE}/feature-small/Community/easyFile.png`, label: 'Styled download panel' },
-            'Layout/ExtensionsPanel.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Styled extensions panel' },
-            'Layout/themePreviewer.css': { src: `${IMG_BASE}/MainShowCase/FollowThemeColor.gif`, label: 'Enhanced theme preview in settings' },
-            'EnhancedUX/BtnHoverAnime.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Subtle button hover animations' },
-            'EnhancedUX/TabsTrail.css': { src: `${IMG_BASE}/feature-small/My-Mods/TabTrails.gif`, label: 'Color trails on tab hover' },
-            'EnhancedUX/Quietify.css': { src: `${IMG_BASE}/feature-small/My-Mods/audioIcon.gif`, label: 'Animated audio icon equalizer' },
-            'EnhancedUX/SelectableText.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Make UI text selectable' },
-            'JSIntegration/TidyTabs.css': { src: `${IMG_BASE}/Arc-like/AI-Feature/tidyTabs.gif`, label: 'AI-powered tab grouping' },
-            'JSIntegration/ClearTabs.css': { src: `${IMG_BASE}/Arc-like/AI-Feature/ClearTabs.gif`, label: 'Clear inactive tabs' },
-            'JSIntegration/ArcPeek.css': { src: `${IMG_BASE}/Arc-like/ArcPeek.gif`, label: 'Arc-style tab peek preview' },
-            'JSIntegration/Accentmod.css': { src: `${IMG_BASE}/MainShowCase/FollowThemeColor.gif`, label: 'Dynamic accent color integration' },
-            'default': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Smart sidebar animations' }
         };
         
         const presets = {
@@ -1084,11 +1039,14 @@
         }
         
         function applyConfigToUI() {
-            document.querySelectorAll('.checkbox[data-module]').forEach(cb => {
-                const module = cb.dataset.module;
+            document.querySelectorAll('.feature-card').forEach(card => {
+                const module = card.dataset.module;
+                const cb = card.querySelector('.checkbox');
+                if (!cb) return;
                 const isChecked = config.modules[module] ?? cb.classList.contains('checked');
                 cb.classList.toggle('checked', isChecked);
                 cb.setAttribute('aria-checked', isChecked);
+                card.classList.toggle('enabled', isChecked);
                 config.modules[module] = isChecked;
             });
             
@@ -1098,50 +1056,47 @@
                 radio.setAttribute('aria-checked', isChecked);
             });
             
-            document.querySelectorAll('.checkbox[data-var]').forEach(cb => {
+            document.querySelectorAll('.config-row .checkbox[data-var]').forEach(cb => {
                 const varName = cb.dataset.var;
                 const isChecked = config.vars[varName] === 'on';
                 cb.classList.toggle('checked', isChecked);
                 cb.setAttribute('aria-checked', isChecked);
             });
             
-            const numInputs = ['pinnedColumns', 'pinnedRows', 'pinnedGap', 'pinnedIconSize', 
-                              'collapseWidth', 'expandWidth', 'windowBorder', 'animationSpeed'];
-            numInputs.forEach(id => {
+            ['pinnedColumns', 'pinnedRows', 'pinnedGap', 'pinnedIconSize', 
+             'collapseWidth', 'expandWidth', 'windowBorder', 'animationSpeed'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el && config.vars[id] !== undefined) {
-                    el.value = config.vars[id];
-                }
+                if (el && config.vars[id] !== undefined) el.value = config.vars[id];
             });
         }
         
         function initConfig() {
-            const hadSaved = loadConfig();
-            if (hadSaved) {
+            if (loadConfig()) {
                 applyConfigToUI();
             } else {
-                document.querySelectorAll('.checkbox[data-module]').forEach(cb => {
-                    const module = cb.dataset.module;
-                    config.modules[module] = cb.classList.contains('checked');
+                document.querySelectorAll('.feature-card').forEach(card => {
+                    const module = card.dataset.module;
+                    const cb = card.querySelector('.checkbox');
+                    if (cb) {
+                        config.modules[module] = cb.classList.contains('checked');
+                        card.classList.toggle('enabled', cb.classList.contains('checked'));
+                    }
                 });
             }
-        }
-        
-        function updatePreview(key) {
-            const preview = previews[key] || previews['default'];
-            document.getElementById('previewImg').src = preview.src;
-            document.getElementById('previewLabel').textContent = preview.label;
         }
         
         function applyPreset(presetName) {
             const preset = presets[presetName];
             if (!preset) return;
             
-            document.querySelectorAll('.checkbox[data-module]').forEach(cb => {
-                const module = cb.dataset.module;
+            document.querySelectorAll('.feature-card').forEach(card => {
+                const module = card.dataset.module;
+                const cb = card.querySelector('.checkbox');
+                if (!cb || card.dataset.required) return;
                 const isEnabled = preset.modules.includes(module);
                 cb.classList.toggle('checked', isEnabled);
                 cb.setAttribute('aria-checked', isEnabled);
+                card.classList.toggle('enabled', isEnabled);
                 config.modules[module] = isEnabled;
             });
             
@@ -1205,25 +1160,14 @@
                 css += `\n`;
             }
             
-            css += `/* Custom Mods (add your own imports here) */
-/* @import "Custom/your-mod.css"; */
-
-`;
-            
             css += `:root {
-  /* Theme Mode: color, transparent, immersive */
-  /* immersive requires immersiveAddressbar.js installed */
   --fluid-theme: ${config.vars.themeMode};
-  
-  /* Sidebar Behavior */
   --fluid-compact-mode: ${config.vars.compact};
   --fluid-float-tabbar: ${config.vars.floatTabbar};
   --fluid-mask: ${config.vars.blurMask};
   --fluid-blur-hibernate-tab: ${config.vars.blurHibernate};
   --fluid-delay: ${config.vars.delay};
   --fluid-border-radius: ${config.vars.borderRadius};
-  
-  /* Favourite Tabs Grid */
   --fluid-tabs-grid: ${config.vars.tabsGrid};
   --fluid-pin-at-top: ${config.vars.pinAtTop};
   --pinned-column-count: ${config.vars.pinnedColumns};
@@ -1231,46 +1175,29 @@
   --pinned-gap: ${config.vars.pinnedGap}px;
   --pinned-icon-size: ${config.vars.pinnedIconSize}px;
   --pinned-tab-height: 50px;
-  
-  /* Sidebar Dimensions */
   --tabs-container-collapse-width-default: ${config.vars.collapseWidth}px;
   --tabs-container-collapse-width-compact: 7px;
   --tabs-container-expand-width: ${config.vars.expandWidth}px;
   --tabs-subcontainer-collapse-width: 44px;
-  --tabs-subcontainer-expand-width: calc(
-    var(--tabs-container-expand-width) +
-    var(--tabs-subcontainer-collapse-width) -
-    var(--tabs-container-collapse-width-default)
-  );
-  
+  --tabs-subcontainer-expand-width: calc(var(--tabs-container-expand-width) + var(--tabs-subcontainer-collapse-width) - var(--tabs-container-collapse-width-default));
   --Button-newtab-main-width: calc(var(--tabs-container-expand-width) / 2);
   --Button-newtab-sub-width: calc(var(--tabs-subcontainer-expand-width) / 2);
-  
-  /* Tab Bar Margins */
   --tabbar-margin-top: -6px;
   --tabbar-margin-bottom: 0px;
   --tabbar-padding: 7px;
   --tabbar-border-radius-collapse: 0px;
-  
-  /* Animation */
   --slow-animation-speed: 560ms;
   --animation-speed: ${config.vars.animationSpeed}ms;
   --fast-animation-speed: 140ms;
   --transition-delay-time-expand: 0ms;
   --transition-delay-time-collapse: 200ms;
-  
-  /* Theme Colors (uses Vivaldi theme by default) */
   --tabbar-bg-color-collapse: unset;
   --tabbar-bg-color-expand: unset;
   --tabbar-border-color-collapse: unset;
   --tabbar-border-color-expand: unset;
-  
-  /* Quietify Icon Sizes */
   --tab-icon-size: 16px;
   --popup-icon-size: 14px;
   --panel-icon-size: 10px;
-  
-  /* VivalArc Legacy */
   --window-border: ${config.vars.windowBorder}px;
   --mac-header: 0px;
   --win-header: calc(var(--window-border) + 20px);
@@ -1280,15 +1207,12 @@
   --window-button-opacity: 0.3;
   --tab-padding: 0;
   --colorTransparent: transparent;
-  
-  /* Tab Styling */
   --mod-whitespace-x: 3px;
   --mod-whitespace-y: 5px;
   --mod-whitespace-tabbar-right: 15px;
   --mod-mainbar-height: 25px;
 }
 `;
-            
             return css;
         }
         
@@ -1307,30 +1231,38 @@
         document.addEventListener('DOMContentLoaded', () => {
             initConfig();
             
-            // Module checkboxes
-            document.querySelectorAll('.checkbox[data-module]').forEach(cb => {
-                cb.addEventListener('click', () => {
-                    if (cb.dataset.required) return;
-                    
+            // Feature card checkboxes
+            document.querySelectorAll('.feature-card').forEach(card => {
+                const cb = card.querySelector('.checkbox');
+                if (!cb) return;
+                
+                const handleToggle = () => {
+                    if (card.dataset.required) return;
                     cb.classList.toggle('checked');
                     cb.setAttribute('aria-checked', cb.classList.contains('checked'));
-                    config.modules[cb.dataset.module] = cb.classList.contains('checked');
-                    updatePreview(cb.dataset.module);
+                    card.classList.toggle('enabled', cb.classList.contains('checked'));
+                    config.modules[card.dataset.module] = cb.classList.contains('checked');
                     saveConfig();
-                    
                     document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
-                });
+                };
                 
-                cb.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        cb.click();
-                    }
-                });
+                cb.addEventListener('click', handleToggle);
+                cb.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleToggle(); } });
                 
-                cb.closest('.checkbox-row').addEventListener('mouseenter', () => {
-                    updatePreview(cb.dataset.module);
-                });
+                // Lightbox for preview images
+                const preview = card.querySelector('.feature-preview img');
+                if (preview) {
+                    preview.addEventListener('click', () => {
+                        document.getElementById('lightboxImg').src = preview.src;
+                        document.getElementById('lightboxCaption').textContent = card.querySelector('.feature-title').textContent;
+                        document.getElementById('lightbox').classList.add('show');
+                    });
+                }
+            });
+            
+            // Lightbox close
+            document.getElementById('lightbox').addEventListener('click', () => {
+                document.getElementById('lightbox').classList.remove('show');
             });
             
             // Theme mode radios
@@ -1345,77 +1277,49 @@
                     config.vars.themeMode = radio.dataset.value;
                     saveConfig();
                 };
-                
                 radio.addEventListener('click', handleClick);
-                radio.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleClick();
-                    }
-                });
+                radio.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } });
             });
             
-            // Variable checkboxes (on/off toggles)
-            document.querySelectorAll('.checkbox[data-var]').forEach(cb => {
-                cb.addEventListener('click', () => {
+            // Config checkboxes
+            document.querySelectorAll('.config-row .checkbox[data-var]').forEach(cb => {
+                const handleClick = () => {
                     cb.classList.toggle('checked');
                     cb.setAttribute('aria-checked', cb.classList.contains('checked'));
                     config.vars[cb.dataset.var] = cb.classList.contains('checked') ? 'on' : 'off';
                     saveConfig();
-                    
                     document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
-                });
-                
-                cb.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        cb.click();
-                    }
-                });
+                };
+                cb.addEventListener('click', handleClick);
+                cb.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } });
             });
             
             // Number inputs
-            const numInputs = ['pinnedColumns', 'pinnedRows', 'pinnedGap', 'pinnedIconSize', 
-                              'collapseWidth', 'expandWidth', 'windowBorder', 'animationSpeed'];
-            numInputs.forEach(id => {
+            ['pinnedColumns', 'pinnedRows', 'pinnedGap', 'pinnedIconSize', 
+             'collapseWidth', 'expandWidth', 'windowBorder', 'animationSpeed'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.addEventListener('change', (e) => {
+                    el.addEventListener('change', e => {
                         config.vars[id] = parseInt(e.target.value) || config.vars[id];
                         saveConfig();
                     });
                 }
             });
             
-            // Preset buttons
+            // Presets
             document.querySelectorAll('.preset-btn').forEach(btn => {
                 btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
             });
             
-            // Download buttons
-            document.getElementById('downloadBtn').addEventListener('click', () => {
-                downloadFile(generateCoreCss(), 'Core.css');
-            });
-            document.getElementById('downloadBtnMobile')?.addEventListener('click', () => {
-                downloadFile(generateCoreCss(), 'Core.css');
-            });
+            // Download & Reset
+            document.getElementById('downloadBtn').addEventListener('click', () => downloadFile(generateCoreCss(), 'Core.css'));
+            document.getElementById('resetBtn').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
             
-            // Reset buttons
-            document.getElementById('resetBtn').addEventListener('click', () => {
-                localStorage.removeItem(STORAGE_KEY);
-                location.reload();
-            });
-            document.getElementById('resetBtnMobile')?.addEventListener('click', () => {
-                localStorage.removeItem(STORAGE_KEY);
-                location.reload();
-            });
-            
-            // Sidebar navigation - smooth scroll and active state
+            // Sidebar navigation
             document.querySelectorAll('.nav-item').forEach(navItem => {
-                navItem.addEventListener('click', (e) => {
+                navItem.addEventListener('click', e => {
                     e.preventDefault();
-                    const sectionId = navItem.dataset.section;
-                    const section = document.getElementById(sectionId);
+                    const section = document.getElementById(navItem.dataset.section);
                     if (section) {
                         section.scrollIntoView({ behavior: 'smooth' });
                         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1424,24 +1328,17 @@
                 });
             });
             
-            // Update nav active state on scroll
+            // Update nav on scroll
             const sections = document.querySelectorAll('.section');
             const mainContent = document.querySelector('.main-content');
-            
             mainContent.addEventListener('scroll', () => {
                 let current = '';
                 sections.forEach(section => {
                     const sectionTop = section.offsetTop - mainContent.offsetTop;
-                    if (mainContent.scrollTop >= sectionTop - 100) {
-                        current = section.id;
-                    }
+                    if (mainContent.scrollTop >= sectionTop - 100) current = section.id;
                 });
-                
                 document.querySelectorAll('.nav-item').forEach(nav => {
-                    nav.classList.remove('active');
-                    if (nav.dataset.section === current) {
-                        nav.classList.add('active');
-                    }
+                    nav.classList.toggle('active', nav.dataset.section === current);
                 });
             });
         });
