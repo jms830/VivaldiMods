@@ -777,20 +777,45 @@
             }
         };
         
-        // Preview mappings
+        const IMG_BASE = 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase';
+        
         const previews = {
-            'AutoHide/AdaptiveBF.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/adaptiveBF.gif', label: 'Hide disabled nav buttons' },
-            'AutoHide/Panel.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Auto-hide side panel' },
-            'AutoHide/Bookmarkbar.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Auto-hide bookmark bar' },
-            'AutoHide/StatusBar.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Auto-hide status bar' },
-            'Layout/main.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Core Arc-style layout' },
-            'Layout/FavouriteTabs.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif', label: 'Pinned tabs grid' },
-            'Layout/NeatDial.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/NeatNewTab.png', label: 'Clean speed dial' },
-            'EnhancedUX/TabsTrail.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/TabTrails.gif', label: 'Tab hover trails' },
-            'EnhancedUX/Quietify.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/audioIcon.gif', label: 'Animated audio icons' },
-            'JSIntegration/TidyTabs.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/tidyTabs.gif', label: 'AI-powered tab grouping' },
-            'JSIntegration/ArcPeek.css': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/ArcPeek.gif', label: 'Arc peek preview' },
-            'default': { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Smart sidebar animations' }
+            // AutoHide modules
+            'AutoHide/AdaptiveBF.css': { src: `${IMG_BASE}/feature-small/My-Mods/adaptiveBF.gif`, label: 'Hide disabled back/forward buttons' },
+            'AutoHide/Tabbar.css': { src: `${IMG_BASE}/feature-small/Community/biggerView.gif`, label: 'Auto-hide entire tabbar for bigger view' },
+            'AutoHide/Panel.css': { src: `${IMG_BASE}/feature-small/Community/biggerView.gif`, label: 'Auto-hide side panel for expanded webview' },
+            'AutoHide/Bookmarkbar.css': { src: `${IMG_BASE}/feature-small/Community/biggerView.gif`, label: 'Auto-hide bookmark bar' },
+            'AutoHide/StatusBar.css': { src: `${IMG_BASE}/feature-small/Community/biggerView.gif`, label: 'Auto-hide status bar' },
+            
+            // Layout modules
+            'Layout/main.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Smart sidebar with smooth animations' },
+            'Layout/FavouriteTabs.css': { src: `${IMG_BASE}/Arc-like/FavouritesTabs/Pin-On-Top.gif`, label: 'Arc-style pinned tabs grid' },
+            'Layout/Addressbar.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Styled address bar' },
+            'Layout/NeatDial.css': { src: `${IMG_BASE}/MainShowCase/NeatNewTab.png`, label: 'Clean, minimalist speed dial' },
+            'Layout/FindInPage.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Styled find in page bar' },
+            'Layout/QuickCommand.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Styled quick commands' },
+            'Layout/DownloadPanel.css': { src: `${IMG_BASE}/feature-small/Community/easyFile.png`, label: 'Styled download panel' },
+            'Layout/ExtensionsPanel.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Styled extensions panel' },
+            'Layout/themePreviewer.css': { src: `${IMG_BASE}/MainShowCase/FollowThemeColor.gif`, label: 'Enhanced theme preview in settings' },
+            
+            // Enhanced UX modules
+            'EnhancedUX/BtnHoverAnime.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Subtle button hover animations' },
+            'EnhancedUX/TabsTrail.css': { src: `${IMG_BASE}/feature-small/My-Mods/TabTrails.gif`, label: 'Color trails on tab hover' },
+            'EnhancedUX/Quietify.css': { src: `${IMG_BASE}/feature-small/My-Mods/audioIcon.gif`, label: 'Animated audio icon equalizer' },
+            'EnhancedUX/SelectableText.css': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Make UI text selectable' },
+            
+            // JS Integration modules
+            'JSIntegration/TidyTabs.css': { src: `${IMG_BASE}/Arc-like/AI-Feature/tidyTabs.gif`, label: 'AI-powered tab grouping' },
+            'JSIntegration/ClearTabs.css': { src: `${IMG_BASE}/Arc-like/AI-Feature/ClearTabs.gif`, label: 'Clear inactive tabs' },
+            'JSIntegration/ArcPeek.css': { src: `${IMG_BASE}/Arc-like/ArcPeek.gif`, label: 'Arc-style tab peek preview' },
+            'JSIntegration/Accentmod.css': { src: `${IMG_BASE}/MainShowCase/FollowThemeColor.gif`, label: 'Dynamic accent color integration' },
+            
+            // Config variables previews
+            'themeMode': { src: `${IMG_BASE}/MainShowCase/FollowThemeColor.gif`, label: 'Dynamic theme colors' },
+            'tabsGrid': { src: `${IMG_BASE}/Arc-like/FavouritesTabs/Pin-On-Top.gif`, label: 'Pinned tabs as icon grid' },
+            'pinAtTop': { src: `${IMG_BASE}/Arc-like/FavouritesTabs/FavouritesPeek.gif`, label: 'Peek favourite tab titles' },
+            
+            'default': { src: `${IMG_BASE}/MainShowCase/sidebar.gif`, label: 'Smart sidebar animations' }
         };
         
         // Presets
