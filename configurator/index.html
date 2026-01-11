@@ -729,6 +729,10 @@
                     ⬇️ Download Core.css
                 </button>
                 
+                <button class="download-btn" id="resetBtn" style="background: var(--bg-lighter); margin-top: 8px;">
+                    🔄 Reset to Defaults
+                </button>
+                
                 <div class="card" style="margin-top: 16px;">
                     <h2><span class="icon">📋</span> Instructions</h2>
                     <ol style="padding-left: 20px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
@@ -817,12 +821,64 @@
             }
         };
         
-        // Initialize - read current toggle states
-        function initConfig() {
+        const STORAGE_KEY = 'vivaldi-configurator-config';
+        
+        function saveConfig() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+            } catch (e) {}
+        }
+        
+        function loadConfig() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.modules) config.modules = parsed.modules;
+                    if (parsed.vars) Object.assign(config.vars, parsed.vars);
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+        
+        function applyConfigToUI() {
             document.querySelectorAll('.toggle').forEach(toggle => {
                 const module = toggle.dataset.module;
-                config.modules[module] = toggle.classList.contains('active');
+                const isActive = config.modules[module] ?? toggle.classList.contains('active');
+                toggle.classList.toggle('active', isActive);
+                config.modules[module] = isActive;
             });
+            
+            document.querySelectorAll('.radio-btn:not([data-var])').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.value === config.vars.themeMode);
+            });
+            
+            document.querySelectorAll('.radio-btn[data-var]').forEach(btn => {
+                const varName = btn.dataset.var;
+                btn.classList.toggle('active', btn.dataset.value === config.vars[varName]);
+            });
+            
+            const numInputs = ['pinnedColumns', 'pinnedRows', 'pinnedGap', 'pinnedIconSize', 
+                              'collapseWidth', 'expandWidth', 'windowBorder', 'animationSpeed'];
+            numInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && config.vars[id] !== undefined) {
+                    el.value = config.vars[id];
+                }
+            });
+        }
+        
+        function initConfig() {
+            const hadSaved = loadConfig();
+            if (hadSaved) {
+                applyConfigToUI();
+            } else {
+                document.querySelectorAll('.toggle').forEach(toggle => {
+                    const module = toggle.dataset.module;
+                    config.modules[module] = toggle.classList.contains('active');
+                });
+            }
         }
         
         // Update preview
@@ -1020,13 +1076,13 @@
             // Module toggles
             document.querySelectorAll('.toggle').forEach(toggle => {
                 toggle.addEventListener('click', () => {
-                    if (toggle.dataset.required) return; // Can't disable required modules
+                    if (toggle.dataset.required) return;
                     
                     toggle.classList.toggle('active');
                     config.modules[toggle.dataset.module] = toggle.classList.contains('active');
                     updatePreview(toggle.dataset.module);
+                    saveConfig();
                     
-                    // Clear preset selection
                     document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
                 });
                 
@@ -1042,6 +1098,7 @@
                     btn.parentElement.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     config.vars.themeMode = btn.dataset.value;
+                    saveConfig();
                 });
             });
             
@@ -1052,8 +1109,8 @@
                     document.querySelectorAll(`.radio-btn[data-var="${varName}"]`).forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     config.vars[varName] = btn.dataset.value;
+                    saveConfig();
                     
-                    // Clear preset
                     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
                 });
             });
@@ -1075,19 +1132,29 @@
                 if (el) {
                     el.addEventListener('change', (e) => {
                         config.vars[varName] = parseInt(e.target.value) || config.vars[varName];
+                        saveConfig();
                     });
                 }
             });
             
             // Preset buttons
             document.querySelectorAll('.preset-btn').forEach(btn => {
-                btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+                btn.addEventListener('click', () => {
+                    applyPreset(btn.dataset.preset);
+                    saveConfig();
+                });
             });
             
             // Download button
             document.getElementById('downloadBtn').addEventListener('click', () => {
                 const css = generateCoreCss();
                 downloadFile(css, 'Core.css');
+            });
+            
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
             });
         });
     </script>
