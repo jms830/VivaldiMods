@@ -153,6 +153,14 @@
             border-bottom: none;
         }
         
+        .feature-row:hover {
+            background: var(--bg-lighter);
+            margin: 0 -15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
         .feature-info h4 {
             font-size: 0.9rem;
             font-weight: 500;
@@ -922,19 +930,34 @@
             }
         };
         
-        // Preview images
+        // Preview images - comprehensive mapping for ALL features
         const previews = {
             default: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Smart sidebar animations' },
-            compactMode: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Compact mode sidebar' },
-            floatingTabbar: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Floating tabbar overlay' },
-            blurMask: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Blur mask effect' },
-            tabsGrid: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif', label: 'Pinned tabs grid' },
-            tabTrails: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/TabTrails.gif', label: 'Tab trails effect' },
-            quietify: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/audioIcon.gif', label: 'Animated audio icons' },
-            neatDial: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/NeatNewTab.png', label: 'Clean speed dial' },
-            autohidePanel: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Auto-hide panel' },
-            autohideNavButtons: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/adaptiveBF.gif', label: 'Adaptive nav buttons' },
-            themeColor: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif', label: 'Dynamic theme colors' }
+            // Sidebar Behavior
+            compactMode: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Ultra-thin sidebar when collapsed (7px)' },
+            floatingTabbar: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Sidebar overlays webpage instead of pushing it' },
+            blurMask: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Blur webpage when sidebar expands' },
+            smartDelay: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Smooth delayed expand/collapse animations' },
+            borderRadius: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Rounded corners when sidebar expanded' },
+            blurHibernated: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Blur inactive/hibernated tabs' },
+            // Pinned Tabs Grid
+            tabsGrid: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif', label: 'Pinned tabs as icon grid (Arc-style favorites)' },
+            pinAtTop: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif', label: 'Keep pinned grid fixed while scrolling tabs' },
+            // Auto-Hide Elements
+            autohideAddressbar: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Address bar hides until you hover near top' },
+            autohideBookmarks: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Bookmark bar hides until hover' },
+            autohidePanel: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Side panel collapses until hover' },
+            autohideStatusbar: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif', label: 'Status bar hides for more screen space' },
+            autohideNavButtons: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/adaptiveBF.gif', label: 'Back/Forward buttons hide when disabled' },
+            // Visual Enhancements
+            tabTrails: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/TabTrails.gif', label: 'Green/red color trails on tab hover' },
+            quietify: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/audioIcon.gif', label: 'Animated equalizer for playing audio' },
+            buttonAnimations: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Subtle scale animations on button hover' },
+            neatDial: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/NeatNewTab.png', label: 'Clean, minimal speed dial page' },
+            // Theme modes
+            color: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif', label: 'Follow Vivaldi accent colors' },
+            transparent: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif', label: 'Transparent UI elements' },
+            immersive: { src: 'https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif', label: 'Page colors blend into browser UI' }
         };
         
         // Apply config to UI
@@ -999,6 +1022,16 @@
             });
         });
         
+        // Hover to preview - show what feature does before enabling
+        document.querySelectorAll('.feature-row').forEach(row => {
+            const toggle = row.querySelector('.toggle');
+            if (toggle && toggle.dataset.feature) {
+                row.addEventListener('mouseenter', () => {
+                    updatePreview(toggle.dataset.feature);
+                });
+            }
+        });
+        
         // Theme mode radios
         document.querySelectorAll('.radio-btn[data-mode]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1007,6 +1040,10 @@
                 config.themeMode = btn.dataset.mode;
                 updatePreview('themeColor');
                 clearPresetSelection();
+            });
+            // Hover to preview theme modes
+            btn.addEventListener('mouseenter', () => {
+                updatePreview(btn.dataset.mode);
             });
         });
         
