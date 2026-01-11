@@ -99,13 +99,32 @@ For full functionality, install JavaScript mods from Awesome-Vivaldi:
 | File | Description |
 |------|-------------|
 | tidyTabs.js | AI-powered tab grouping |
-| immersiveAddressbar.js | Required for immersive theme mode |
+| tidyTitles.js | AI-powered tab title cleanup |
 | clearTabs.js | Clear inactive tabs |
+| immersiveAddressbar.js | Required for immersive theme mode |
 | globalMediaControls.js | Media playback panel |
+| colorTabs.js | Color tab borders by favicon |
+| mdNotes.js | Markdown notes in sidebar |
+| elementCapture.js | Screenshot/element capture |
+| easyFiles.js | Quick file picker from downloads |
 
-**Windows:** Use [VivaldiModManager](https://github.com/eximido/vivaldimodmanager)
+### Windows: Quick Install Script
 
-**macOS/Linux:** See [Awesome-Vivaldi installation guide](https://github.com/PaRr0tBoY/Awesome-Vivaldi#ii-install-mods)
+```batch
+scripts\install-js-mods.bat
+```
+
+This automatically finds Vivaldi, backs up `window.html`, and patches it to load all JS mods.
+
+To restore original: `scripts\restore-vivaldi.bat`
+
+### Windows: VivaldiModManager
+
+Alternatively, use [VivaldiModManager](https://github.com/eximido/vivaldimodmanager) for a GUI.
+
+### macOS/Linux
+
+See [Awesome-Vivaldi installation guide](https://github.com/PaRr0tBoY/Awesome-Vivaldi#ii-install-mods)
 
 ## Credits
 
