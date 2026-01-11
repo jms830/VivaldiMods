@@ -350,10 +350,139 @@
         footer a:hover {
             text-decoration: underline;
         }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            border: 1px solid var(--success);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast .icon {
+            color: var(--success);
+        }
+        
+        /* Accessibility: Focus states */
+        .toggle:focus-visible,
+        .radio-btn:focus-visible,
+        .preset-btn:focus-visible,
+        .download-btn:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        /* Required module indicator */
+        .toggle[data-required]::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background: var(--warning);
+            border-radius: 50%;
+        }
+        
+        .toggle[data-required] {
+            position: relative;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        
+        /* Mobile improvements */
+        @media (max-width: 900px) {
+            .preview-panel {
+                position: static;
+                order: -1;
+            }
+            
+            .card h2 {
+                cursor: pointer;
+                user-select: none;
+            }
+            
+            .card h2::after {
+                content: '▼';
+                margin-left: auto;
+                font-size: 0.7rem;
+                transition: transform 0.2s;
+            }
+            
+            .card.collapsed h2::after {
+                transform: rotate(-90deg);
+            }
+            
+            .card.collapsed .module-row,
+            .card.collapsed .var-row,
+            .card.collapsed .var-group,
+            .card.collapsed > p {
+                display: none;
+            }
+        }
+        
+        /* Skip link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            z-index: 100;
+            transition: top 0.2s;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+        }
+        
+        /* Status indicator */
+        .status-saved {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--success);
+            font-size: 0.8rem;
+            margin-left: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .status-saved.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <a href="#config" class="skip-link">Skip to configuration</a>
+    
+    <!-- Toast notification -->
+    <div class="toast" id="toast" role="status" aria-live="polite">
+        <span class="icon">✓</span>
+        <span class="message">Settings saved</span>
+    </div>
+    
+    <div class="container" id="config">
         <header>
             <h1>Awesome Vivaldi Configurator</h1>
             <p class="subtitle">No-code configuration for Awesome-Vivaldi mods</p>
@@ -848,9 +977,17 @@
         
         const STORAGE_KEY = 'vivaldi-configurator-config';
         
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.querySelector('.message').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
         function saveConfig() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+                showToast('Settings saved');
             } catch (e) {}
         }
         
@@ -1104,6 +1241,7 @@
                     if (toggle.dataset.required) return;
                     
                     toggle.classList.toggle('active');
+                    toggle.setAttribute('aria-checked', toggle.classList.contains('active'));
                     config.modules[toggle.dataset.module] = toggle.classList.contains('active');
                     updatePreview(toggle.dataset.module);
                     saveConfig();
@@ -1180,6 +1318,34 @@
             document.getElementById('resetBtn').addEventListener('click', () => {
                 localStorage.removeItem(STORAGE_KEY);
                 location.reload();
+            });
+            
+            // Mobile collapse - click on card headers to toggle
+            if (window.matchMedia('(max-width: 900px)').matches) {
+                document.querySelectorAll('.config-panel .card h2').forEach(header => {
+                    header.addEventListener('click', () => {
+                        header.closest('.card').classList.toggle('collapsed');
+                    });
+                });
+            }
+            
+            // Keyboard accessibility for toggles and radio buttons
+            document.querySelectorAll('.toggle, .radio-btn, .preset-btn').forEach(el => {
+                el.setAttribute('tabindex', '0');
+                el.setAttribute('role', el.classList.contains('toggle') ? 'switch' : 'button');
+                if (el.classList.contains('toggle')) {
+                    el.setAttribute('aria-checked', el.classList.contains('active'));
+                }
+                
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        el.click();
+                        if (el.classList.contains('toggle')) {
+                            el.setAttribute('aria-checked', el.classList.contains('active'));
+                        }
+                    }
+                });
             });
         });
     </script>
