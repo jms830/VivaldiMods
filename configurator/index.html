@@ -97,7 +97,7 @@
         .nav-icon { width: 18px; text-align: center; font-size: 12px; }
         
         .main-content {
-            padding: 20px 28px;
+            padding: 20px 28px 80px;
             overflow-y: auto;
             max-height: 100vh;
         }
@@ -605,6 +605,53 @@
             max-height: 200px;
             overflow-y: auto;
         }
+        
+        .feature-card[data-jsmod] {
+            background: rgba(230, 126, 34, 0.08);
+            border-left: 3px solid var(--orange);
+        }
+        
+        .feature-card[data-jsmod].js-locked .checkbox {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .feature-card[data-jsmod].js-locked {
+            opacity: 0.7;
+        }
+        
+        .feature-card[data-jsmod]:hover {
+            border-color: var(--orange);
+        }
+        
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: var(--bg-sidebar);
+            border-top: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .footer-left, .footer-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        @media (max-width: 800px) {
+            .sticky-footer { left: 0; }
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -634,7 +681,6 @@
             <a href="#themes" class="nav-item" data-section="themes"><span class="nav-icon">🎨</span> Themes</a>
             <a href="#advanced" class="nav-item" data-section="advanced"><span class="nav-icon">⚡</span> Advanced</a>
             <a href="#sizing" class="nav-item" data-section="sizing"><span class="nav-icon">📏</span> Sizing</a>
-            <a href="#jsmods" class="nav-item" data-section="jsmods"><span class="nav-icon">⚙️</span> JavaScript Mods</a>
         </nav>
         
         <main class="main-content" id="main">
@@ -644,10 +690,7 @@
                     <button class="preset-btn active" data-preset="recommended">Recommended</button>
                     <button class="preset-btn" data-preset="maximal">All Features</button>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-primary" id="downloadBtn">⬇️ Download Core.css</button>
-                    <button class="btn btn-secondary" id="resetBtn">Reset</button>
-                </div>
+                <button class="btn btn-secondary" id="resetBtn">Reset</button>
             </div>
             
             <section class="section" id="sidebar">
@@ -774,6 +817,45 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="tidyTitles.js">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Tidy Titles <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">AI-powered tab title cleanup</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="aminought/colorTabs.js">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Color Tabs <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Color tab borders based on favicon</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="Tam710562/dialogTab.js">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Dialog Tab <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Open links in dialog windows</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
             
@@ -815,6 +897,58 @@
                             <div class="feature-info">
                                 <div class="feature-title">Styled Extensions Panel</div>
                                 <div class="feature-desc">Clean extensions panel design</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="Tam710562/globalMediaControls.js">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/AlfaSniper/vivaldi-mods/main/media/audio-panel.png" alt="Global Media Controls">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Global Media Controls <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Media playback control panel</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="Tam710562/elementCapture.js">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Element Capture <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Screenshot and element capture tool</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="Tam710562/easyFiles.js">
+                        <div class="feature-preview">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/easyFile.png" alt="Easy Files">
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Easy Files <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Quick file picker from downloads</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="Tam710562/mdNotes.js">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Markdown Notes <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Markdown notes in sidebar panel</div>
                             </div>
                         </div>
                     </div>
@@ -885,6 +1019,32 @@
                             <div class="feature-info">
                                 <div class="feature-title">Styled Quick Commands</div>
                                 <div class="feature-desc">Clean command palette design</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="immersiveAddressbar.js">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Immersive Addressbar <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Required for immersive theme mode</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="Tam710562/feedIcon.js">
+                        <div class="feature-preview">
+                            <div class="no-preview">No preview available</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Feed Icon <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Show RSS feed icons in address bar</div>
                             </div>
                         </div>
                     </div>
@@ -1080,183 +1240,32 @@
                 </div>
             </section>
             
-            <section class="section" id="jsmods">
-                <h2 class="section-header">JavaScript Mods</h2>
-                <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 16px;">
-                    JS mods require patching Vivaldi's window.html. Select the mods you want, then download the installer or copy the snippet.
-                </p>
-                
-                <div class="feature-grid">
-                    <div class="feature-card" data-jsmod="tidyTabs.js" data-css="JSIntegration/TidyTabs.css">
-                        <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/tidyTabs.gif" alt="Tidy Tabs">
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Tidy Tabs</div>
-                                <div class="feature-desc">AI-powered automatic tab grouping</div>
-                            </div>
-                        </div>
+            <!-- JS Enable Modal -->
+            <div class="modal" id="jsEnableModal" role="dialog" aria-modal="true" aria-labelledby="jsEnableModalTitle">
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3 id="jsEnableModalTitle">Enable JavaScript Mods?</h3>
+                        <button class="modal-close" id="closeJsModalBtn">&times;</button>
                     </div>
-                    
-                    <div class="feature-card" data-jsmod="tidyTitles.js">
-                        <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Tidy Titles</div>
-                                <div class="feature-desc">AI-powered tab title cleanup</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="ClearTabs.js" data-css="JSIntegration/ClearTabs.css">
-                        <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/ClearTabs.gif" alt="Clear Tabs">
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Clear Tabs</div>
-                                <div class="feature-desc">Automatically clear inactive tabs</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="immersiveAddressbar.js">
-                        <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Immersive Addressbar</div>
-                                <div class="feature-desc">Required for immersive theme mode</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="Tam710562/globalMediaControls.js">
-                        <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/AlfaSniper/vivaldi-mods/main/media/audio-panel.png" alt="Global Media Controls">
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Global Media Controls</div>
-                                <div class="feature-desc">Media playback control panel</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="Tam710562/elementCapture.js">
-                        <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Element Capture</div>
-                                <div class="feature-desc">Screenshot and element capture tool</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="Tam710562/easyFiles.js">
-                        <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/easyFile.png" alt="Easy Files">
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Easy Files</div>
-                                <div class="feature-desc">Quick file picker from downloads</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="Tam710562/mdNotes.js">
-                        <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Markdown Notes</div>
-                                <div class="feature-desc">Markdown notes in sidebar panel</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="aminought/colorTabs.js">
-                        <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Color Tabs</div>
-                                <div class="feature-desc">Color tab borders based on favicon</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="luetage/accentMod.js" data-css="JSIntegration/Accentmod.css">
-                        <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif" alt="Accent Mod">
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Accent Mod</div>
-                                <div class="feature-desc">Dynamic accent color from page</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="Tam710562/feedIcon.js">
-                        <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Feed Icon</div>
-                                <div class="feature-desc">Show RSS feed icons in address bar</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-card" data-jsmod="Tam710562/dialogTab.js">
-                        <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Dialog Tab</div>
-                                <div class="feature-desc">Open links in dialog windows</div>
-                            </div>
+                    <div class="modal-body">
+                        <p style="margin-bottom: 16px; color: var(--text);">
+                            JavaScript mods require patching Vivaldi's <code>window.html</code> file. This is more involved than CSS mods:
+                        </p>
+                        <ul style="margin: 0 0 16px 20px; color: var(--text-muted); font-size: 12px;">
+                            <li style="margin-bottom: 8px;"><strong>Windows:</strong> Download and run the generated installer script</li>
+                            <li style="margin-bottom: 8px;"><strong>macOS/Linux:</strong> Manual patching required (see guide)</li>
+                            <li>JS mods need to be re-applied after Vivaldi updates</li>
+                        </ul>
+                        <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 12px;">
+                            Once enabled, you can freely toggle individual JS mods. Your choice is saved.
+                        </p>
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <button class="btn btn-secondary" id="cancelJsEnableBtn">Cancel</button>
+                            <button class="btn btn-primary" id="confirmJsEnableBtn" style="background: var(--orange);">Enable JS Mods</button>
                         </div>
                     </div>
                 </div>
-                
-                <div class="config-section" style="margin-top: 20px;">
-                    <div class="config-title">Installation</div>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-                        <button class="btn btn-primary" id="downloadJsInstallerBtn">⬇️ Download Windows Installer (.bat)</button>
-                        <button class="btn btn-secondary" id="copySnippetBtn">📋 Copy window.html Snippet</button>
-                        <button class="btn btn-secondary" id="showInstructionsBtn">❓ Installation Guide</button>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 11px;">
-                        <strong>Windows:</strong> Run the .bat file with Awesome-Vivaldi cloned nearby.<br>
-                        <strong>macOS/Linux:</strong> Use the snippet method or see the installation guide.
-                    </p>
-                </div>
-            </section>
+            </div>
             
             <!-- Instructions Modal -->
             <div class="modal" id="instructionsModal">
@@ -1331,10 +1340,25 @@
         </main>
     </div>
     
+    <div class="sticky-footer">
+        <div class="footer-left">
+            <label class="btn btn-secondary" style="cursor: pointer;">
+                <input type="file" id="importConfigInput" accept=".css,.bat" style="display: none;">
+                📁 Import Config
+            </label>
+        </div>
+        <div class="footer-right">
+            <button class="btn btn-primary" id="downloadBtn">⬇️ Download Core.css</button>
+            <button class="btn btn-secondary" id="downloadJsInstallerBtn" disabled>⬇️ JS Installer</button>
+            <button class="btn btn-secondary" id="showInstructionsBtn">❓ JS Guide</button>
+        </div>
+    </div>
+    
     <script>
         const config = {
             modules: {},
             jsmods: {},
+            jsEnabled: false,
             vars: {
                 themeMode: 'color',
                 compact: 'off',
@@ -1426,6 +1450,7 @@
                     const parsed = JSON.parse(saved);
                     if (parsed.modules) config.modules = parsed.modules;
                     if (parsed.jsmods) config.jsmods = parsed.jsmods;
+                    if (typeof parsed.jsEnabled === 'boolean') config.jsEnabled = parsed.jsEnabled;
                     if (parsed.vars) Object.assign(config.vars, parsed.vars);
                     return true;
                 }
@@ -1497,6 +1522,51 @@
                     }
                 });
             }
+            updateJsCardsLockState();
+        }
+        
+        function updateJsCardsLockState() {
+            const jsInstallerBtn = document.getElementById('downloadJsInstallerBtn');
+            document.querySelectorAll('.feature-card[data-jsmod]').forEach(card => {
+                if (config.jsEnabled) {
+                    card.classList.remove('js-locked');
+                } else {
+                    card.classList.add('js-locked');
+                }
+            });
+            if (jsInstallerBtn) {
+                jsInstallerBtn.disabled = !config.jsEnabled;
+            }
+        }
+        
+        let pendingJsModCard = null;
+        
+        function showJsEnableModal(card) {
+            pendingJsModCard = card;
+            document.getElementById('jsEnableModal').classList.add('show');
+        }
+        
+        function hideJsEnableModal() {
+            document.getElementById('jsEnableModal').classList.remove('show');
+            pendingJsModCard = null;
+        }
+        
+        function enableJsMods() {
+            config.jsEnabled = true;
+            updateJsCardsLockState();
+            hideJsEnableModal();
+            if (pendingJsModCard) {
+                const cb = pendingJsModCard.querySelector('.checkbox');
+                if (cb) {
+                    cb.classList.add('checked');
+                    cb.setAttribute('aria-checked', 'true');
+                    pendingJsModCard.classList.add('enabled');
+                    config.jsmods[pendingJsModCard.dataset.jsmod] = true;
+                    syncJsCssSelection(pendingJsModCard.dataset.jsmod, true);
+                }
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+            showToast('JS mods enabled');
         }
         
         function applyPreset(presetName) {
@@ -1551,12 +1621,21 @@
             const enhancedUx = enabledModules.filter(m => m.startsWith('EnhancedUX/'));
             const jsIntegration = enabledModules.filter(m => m.startsWith('JSIntegration/'));
             
+            const configJson = JSON.stringify({
+                modules: config.modules,
+                vars: config.vars,
+                jsEnabled: config.jsEnabled,
+                jsmods: config.jsmods
+            });
+            
             let css = `/*
  * Awesome-Vivaldi Core.css
  * Generated by VivaldiMods Configurator
  * https://jms830.github.io/VivaldiMods/
  * 
  * Original: https://github.com/PaRr0tBoY/Awesome-Vivaldi
+ * 
+ * @config ${configJson}
  */
 
 `;
@@ -1653,6 +1732,29 @@
             URL.revokeObjectURL(url);
         }
         
+        function importConfigFromFile(content) {
+            const configMatch = content.match(/@config\s+(\{[^\n\r]*\})/);
+            if (!configMatch) {
+                showToast('No config found in file');
+                return false;
+            }
+            try {
+                const imported = JSON.parse(configMatch[1]);
+                if (imported.modules) config.modules = imported.modules;
+                if (imported.vars) Object.assign(config.vars, imported.vars);
+                if (typeof imported.jsEnabled === 'boolean') config.jsEnabled = imported.jsEnabled;
+                if (imported.jsmods) config.jsmods = imported.jsmods;
+                applyConfigToUI();
+                updateJsCardsLockState();
+                saveConfig();
+                showToast('Config imported successfully');
+                return true;
+            } catch (e) {
+                showToast('Failed to parse config');
+                return false;
+            }
+        }
+        
         function getEnabledJsMods() {
             return Object.entries(config.jsmods)
                 .filter(([_, enabled]) => enabled)
@@ -1683,10 +1785,16 @@
             const luettageMods = mods.filter(m => m.startsWith('luetage/')).map(m => m.replace('luetage/', ''));
             const pageActionMods = mods.filter(m => m.startsWith('PageAction/')).map(m => m.replace('PageAction/', ''));
             
+            const batConfigJson = JSON.stringify({
+                jsmods: config.jsmods,
+                jsEnabled: config.jsEnabled
+            });
+            
             let bat = `@echo off
 REM Vivaldi JS Mods Installer - Custom Selection
 REM Generated by VivaldiMods Configurator
 REM https://jms830.github.io/VivaldiMods/
+REM @config ${batConfigJson}
 
 cd "%~dp0"
 
@@ -1721,7 +1829,7 @@ if not exist "%jsFolder%" (
 echo.
 echo Combining selected JS mods into custom.js...
 echo // Awesome-Vivaldi JS Mods - Custom Selection > "%latestVersionFolder%\\custom.js"
-echo // Generated by VivaldiMods Configurator >> "%latestVersionFolder%\\custom.js"
+echo // Generated by VivaldiModsConfigurator >> "%latestVersionFolder%\\custom.js"
 echo. >> "%latestVersionFolder%\\custom.js"
 
 `;
@@ -1894,6 +2002,10 @@ pause
                 if (!cb) return;
                 
                 const handleToggle = () => {
+                    if (!config.jsEnabled && !cb.classList.contains('checked')) {
+                        showJsEnableModal(card);
+                        return;
+                    }
                     cb.classList.toggle('checked');
                     const isChecked = cb.classList.contains('checked');
                     cb.setAttribute('aria-checked', isChecked);
@@ -1973,6 +2085,18 @@ pause
             document.getElementById('downloadBtn').addEventListener('click', () => downloadFile(generateCoreCss(), 'Core.css'));
             document.getElementById('resetBtn').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
             
+            // Import config
+            document.getElementById('importConfigInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    importConfigFromFile(event.target.result);
+                    e.target.value = '';
+                };
+                reader.readAsText(file);
+            });
+            
             // JS Mod buttons
             document.getElementById('downloadJsInstallerBtn').addEventListener('click', () => {
                 const mods = getEnabledJsMods();
@@ -1984,18 +2108,13 @@ pause
                 showToast('Installer downloaded');
             });
             
-            document.getElementById('copySnippetBtn').addEventListener('click', () => {
-                const snippet = generateWindowHtmlSnippet();
-                if (!snippet) {
-                    showToast('No JS mods selected');
-                    return;
-                }
-                navigator.clipboard.writeText(snippet).then(() => {
-                    showToast('Snippet copied to clipboard');
-                }).catch(() => {
-                    showToast('Failed to copy - check console');
-                    console.log('Snippet:\n' + snippet);
-                });
+            // JS enable modal
+            const jsModal = document.getElementById('jsEnableModal');
+            document.getElementById('closeJsModalBtn').addEventListener('click', hideJsEnableModal);
+            document.getElementById('cancelJsEnableBtn').addEventListener('click', hideJsEnableModal);
+            document.getElementById('confirmJsEnableBtn').addEventListener('click', enableJsMods);
+            jsModal.addEventListener('click', (e) => {
+                if (e.target === jsModal) hideJsEnableModal();
             });
             
             // Instructions modal
@@ -2010,8 +2129,9 @@ pause
                 if (e.target === modal) modal.classList.remove('show');
             });
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.classList.contains('show')) {
-                    modal.classList.remove('show');
+                if (e.key === 'Escape') {
+                    if (jsModal.classList.contains('show')) hideJsEnableModal();
+                    if (modal.classList.contains('show')) modal.classList.remove('show');
                 }
             });
             
