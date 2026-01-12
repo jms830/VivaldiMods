@@ -2167,7 +2167,8 @@ echo. >> "%latestVersionFolder%\\custom.js"
 
             bat += `echo.
 echo Patching window.html...
-type "%latestVersionFolder%\\window.bak.html" | findstr /v "</body>" | findstr /v "</html>" > "%latestVersionFolder%\\window.html"
+REM Use regex to handle indented closing tags in window.html
+type "%latestVersionFolder%\\window.bak.html" | findstr /v /r "^[ 	]*^</body^>" | findstr /v /r "^[ 	]*^</html^>" > "%latestVersionFolder%\\window.html"
 echo     ^<script src="custom.js"^>^</script^> >> "%latestVersionFolder%\\window.html"
 echo   ^</body^> >> "%latestVersionFolder%\\window.html"
 echo ^</html^> >> "%latestVersionFolder%\\window.html"
@@ -2256,22 +2257,49 @@ if exist "%AWESOME_VIVALDI_DIR%\\CSS\\Core.css" (
         rmdir /s /q "%AWESOME_VIVALDI_DIR%" 2>nul
     )
     echo      Cloning Awesome-Vivaldi repository...
+    echo      (Using sparse checkout to download only CSS and JS folders)
     REM Use sparse checkout to skip problematic files with invalid Windows characters
     mkdir "%AWESOME_VIVALDI_DIR%"
-    pushd "%AWESOME_VIVALDI_DIR%"
-    git init
-    git config core.protectNTFS false
-    git remote add origin https://github.com/PaRr0tBoY/Awesome-Vivaldi.git
-    git sparse-checkout init --cone
-    git sparse-checkout set CSS Javascripts
-    git pull origin main 2>nul || git pull origin master
-    popd
-    if not exist "%AWESOME_VIVALDI_DIR%\\CSS\\Core.css" (
-        echo [X] Failed to clone repository. Is git installed?
-        echo     Install git from: https://git-scm.com/download/win
+    if errorlevel 1 (
+        echo [X] Failed to create directory. Check permissions.
         pause
         exit /b 1
     )
+    pushd "%AWESOME_VIVALDI_DIR%"
+    echo      Initializing git...
+    git init
+    if errorlevel 1 (
+        echo [X] git init failed. Is git installed?
+        popd
+        pause
+        exit /b 1
+    )
+    git config core.protectNTFS false
+    echo      Adding remote...
+    git remote add origin https://github.com/PaRr0tBoY/Awesome-Vivaldi.git
+    echo      Setting up sparse checkout...
+    git sparse-checkout init --cone
+    git sparse-checkout set CSS Javascripts
+    echo      Downloading files (this may take a minute)...
+    git pull origin main
+    if errorlevel 1 (
+        echo      Trying master branch instead...
+        git pull origin master
+    )
+    popd
+    if not exist "%AWESOME_VIVALDI_DIR%\\CSS" (
+        echo [X] Failed to clone repository - CSS folder missing.
+        echo     Make sure git is installed: https://git-scm.com/download/win
+        pause
+        exit /b 1
+    )
+    if not exist "%AWESOME_VIVALDI_DIR%\\Javascripts" (
+        echo [X] Failed to clone repository - Javascripts folder missing.
+        echo     Make sure git is installed: https://git-scm.com/download/win
+        pause
+        exit /b 1
+    )
+    echo      Clone successful!
 )
 echo      Done.
 echo.
@@ -2281,7 +2309,9 @@ echo [2/4] Installing CSS configuration...
 (
 `;
             cssLines.forEach(line => {
-                bat += `echo.${line}\n`;
+                // Use echo( instead of echo. for safer batch output
+                // echo. can fail with lines starting with :, (, [, etc.
+                bat += `echo(${line}\n`;
             });
             
             bat += `) > "%AWESOME_VIVALDI_DIR%\\CSS\\Core.css"
@@ -2392,7 +2422,8 @@ echo. >> "%VIVALDI_VERSION_DIR%custom.js"
 
                 bat += `
 REM Patch window.html
-type "%VIVALDI_VERSION_DIR%window.bak.html" | findstr /v "^</body>" | findstr /v "^</html>" > "%VIVALDI_VERSION_DIR%window.html"
+REM Use regex to handle indented closing tags in window.html
+type "%VIVALDI_VERSION_DIR%window.bak.html" | findstr /v /r "^[ 	]*^</body^>" | findstr /v /r "^[ 	]*^</html^>" > "%VIVALDI_VERSION_DIR%window.html"
 echo     ^<script src="custom.js"^>^</script^> >> "%VIVALDI_VERSION_DIR%window.html"
 echo   ^</body^> >> "%VIVALDI_VERSION_DIR%window.html"
 echo ^</html^> >> "%VIVALDI_VERSION_DIR%window.html"
@@ -2425,7 +2456,9 @@ if not errorlevel 1 (
 
 REM Update preferences using PowerShell
 set "CSS_PATH=%AWESOME_VIVALDI_DIR%\\CSS"
+REM Escape backslashes for JSON and single quotes for PowerShell
 set "CSS_PATH_ESCAPED=!CSS_PATH:\\=\\\\!"
+set "CSS_PATH_ESCAPED=!CSS_PATH_ESCAPED:'=''!"
 
 powershell -Command "$prefs = Get-Content '%VIVALDI_PREFS%' -Raw | ConvertFrom-Json; if (-not $prefs.vivaldi) { $prefs | Add-Member -NotePropertyName 'vivaldi' -NotePropertyValue @{} }; if (-not $prefs.vivaldi.appearance) { $prefs.vivaldi | Add-Member -NotePropertyName 'appearance' -NotePropertyValue @{} }; $prefs.vivaldi.appearance.css_ui_mods_directory = '!CSS_PATH_ESCAPED!'; $prefs | ConvertTo-Json -Depth 100 -Compress | Set-Content '%VIVALDI_PREFS%' -Encoding UTF8"
 
