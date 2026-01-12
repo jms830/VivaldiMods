@@ -902,7 +902,10 @@
                     <button class="preset-btn active" data-preset="recommended">Recommended</button>
                     <button class="preset-btn" data-preset="maximal">All Features</button>
                 </div>
-                <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn btn-secondary" id="toggleJsBtn" style="background: var(--orange); border-color: var(--orange); color: white;">Enable JS Mods</button>
+                    <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                </div>
             </div>
             
             <section class="section" id="sidebar">
@@ -2631,6 +2634,28 @@ pause
                 advancedDropdown.classList.remove('open');
             });
             document.getElementById('resetBtn').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
+            
+            // JS Toggle Button
+            const toggleJsBtn = document.getElementById('toggleJsBtn');
+            function updateJsToggleBtn() {
+                if (config.jsEnabled) {
+                    toggleJsBtn.textContent = 'JS Mods: ON';
+                    toggleJsBtn.style.background = 'var(--success)';
+                    toggleJsBtn.style.borderColor = 'var(--success)';
+                } else {
+                    toggleJsBtn.textContent = 'JS Mods: OFF';
+                    toggleJsBtn.style.background = 'var(--orange)';
+                    toggleJsBtn.style.borderColor = 'var(--orange)';
+                }
+            }
+            updateJsToggleBtn();
+            toggleJsBtn.addEventListener('click', () => {
+                config.jsEnabled = !config.jsEnabled;
+                updateJsToggleBtn();
+                updateJsCardsLockState();
+                saveConfig();
+                showToast(config.jsEnabled ? 'JS mods enabled!' : 'JS mods disabled');
+            });
             
             // Import config
             document.getElementById('importConfigInput').addEventListener('change', (e) => {
