@@ -2210,16 +2210,8 @@ pause
                 vars: config.vars
             });
             
-            // Escape CSS for batch echo (handle special chars)
-            const cssLines = css.split('\n').map(line => {
-                return line
-                    .replace(/\^/g, '^^')
-                    .replace(/&/g, '^&')
-                    .replace(/</g, '^<')
-                    .replace(/>/g, '^>')
-                    .replace(/\|/g, '^|')
-                    .replace(/%/g, '%%');
-            });
+            // Escape CSS for PowerShell here-string (only need to handle single quotes)
+            const cssEscaped = css.replace(/'/g, "''");
             
             let bat = `@echo off
 REM ============================================================================
@@ -2306,15 +2298,10 @@ echo.
 
 REM === Step 2: Write Core.css ===
 echo [2/4] Installing CSS configuration...
-(
-`;
-            cssLines.forEach(line => {
-                // Use echo( instead of echo. for safer batch output
-                // echo. can fail with lines starting with :, (, [, etc.
-                bat += `echo(${line}\n`;
-            });
-            
-            bat += `) > "%AWESOME_VIVALDI_DIR%\\CSS\\Core.css"
+REM Use PowerShell here-string to write CSS (handles special characters safely)
+powershell -Command "$css = @'
+${cssEscaped}
+'@; [System.IO.File]::WriteAllText('%AWESOME_VIVALDI_DIR%\\CSS\\Core.css', $css)"
 echo      Done.
 echo.
 
