@@ -2245,20 +2245,28 @@ set "VIVALDI_PREFS=%LOCALAPPDATA%\\Vivaldi\\User Data\\Default\\Preferences"
 REM === Step 1: Clone or Update Awesome-Vivaldi ===
 echo [1/4] Setting up Awesome-Vivaldi...
 
-if exist "%AWESOME_VIVALDI_DIR%\\.git" (
+if exist "%AWESOME_VIVALDI_DIR%\\CSS\\Core.css" (
     echo      Repository exists, pulling latest changes...
     pushd "%AWESOME_VIVALDI_DIR%"
     git pull origin main 2>nul || git pull origin master 2>nul
     popd
 ) else (
     if exist "%AWESOME_VIVALDI_DIR%" (
-        echo      Folder exists but not a git repo. Backing up and re-cloning...
-        for /f "tokens=2-4 delims=/ " %%a in ('date /t') do set "datestamp=%%c%%a%%b"
-        move "%AWESOME_VIVALDI_DIR%" "%AWESOME_VIVALDI_DIR%.backup.!datestamp!"
+        echo      Folder exists but incomplete. Removing and re-cloning...
+        rmdir /s /q "%AWESOME_VIVALDI_DIR%" 2>nul
     )
     echo      Cloning Awesome-Vivaldi repository...
-    git clone https://github.com/PaRr0tBoY/Awesome-Vivaldi.git "%AWESOME_VIVALDI_DIR%"
-    if errorlevel 1 (
+    REM Use sparse checkout to skip problematic files with invalid Windows characters
+    mkdir "%AWESOME_VIVALDI_DIR%"
+    pushd "%AWESOME_VIVALDI_DIR%"
+    git init
+    git config core.protectNTFS false
+    git remote add origin https://github.com/PaRr0tBoY/Awesome-Vivaldi.git
+    git sparse-checkout init --cone
+    git sparse-checkout set CSS Javascripts
+    git pull origin main 2>nul || git pull origin master
+    popd
+    if not exist "%AWESOME_VIVALDI_DIR%\\CSS\\Core.css" (
         echo [X] Failed to clone repository. Is git installed?
         echo     Install git from: https://git-scm.com/download/win
         pause
