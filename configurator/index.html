@@ -2511,6 +2511,10 @@ pause
         document.addEventListener('DOMContentLoaded', () => {
             initConfig();
             
+            // Declare these early so they can be used throughout
+            const advancedDropdown = document.getElementById('advancedDropdown');
+            const toggleJsBtn = document.getElementById('toggleJsBtn');
+            
             // CSS module card checkboxes
             document.querySelectorAll('.feature-card[data-module]').forEach(card => {
                 const cb = card.querySelector('.checkbox');
@@ -2636,7 +2640,6 @@ pause
             document.getElementById('resetBtn').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
             
             // JS Toggle Button
-            const toggleJsBtn = document.getElementById('toggleJsBtn');
             function updateJsToggleBtn() {
                 if (config.jsEnabled) {
                     toggleJsBtn.textContent = 'JS Mods: ON';
@@ -2670,7 +2673,6 @@ pause
             });
             
             // Advanced dropdown toggle
-            const advancedDropdown = document.getElementById('advancedDropdown');
             const advancedDropdownBtn = document.getElementById('advancedDropdownBtn');
             
             advancedDropdownBtn.addEventListener('click', (e) => {
