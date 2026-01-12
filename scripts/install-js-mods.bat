@@ -105,7 +105,7 @@ echo.
 echo Included mods:
 echo   - tidyTabs.js (AI tab grouping)
 echo   - tidyTitles.js (AI title cleanup)
-echo   - clearTabs.js (clear inactive tabs)
+echo   - ClearTabs.js (clear inactive tabs)
 echo   - immersiveAddressbar.js (immersive theme)
 echo   - globalMediaControls.js (media panel)
 echo   - elementCapture.js (screenshots)

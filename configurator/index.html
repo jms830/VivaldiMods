@@ -9,21 +9,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #1e1e1e;
-            --bg-sidebar: #252526;
-            --bg-hover: #2a2d2e;
-            --bg-input: #3c3c3c;
+            --bg-main: #1a1a1a;
+            --bg-sidebar: #1e1e1e;
+            --bg-hover: #2a2a2a;
+            --bg-input: #2d2d2d;
+            --bg-elevated: #242424;
             --accent: #0078d4;
-            --accent-hover: #1084d8;
-            --text: #cccccc;
+            --accent-hover: #1a8fe8;
+            --accent-subtle: rgba(0, 120, 212, 0.12);
+            --text: #d4d4d4;
             --text-bright: #ffffff;
-            --text-muted: #858585;
-            --border: #3c3c3c;
+            --text-muted: #737373;
+            --text-faint: #525252;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --border-hover: rgba(255, 255, 255, 0.15);
             --success: #22c55e;
             --warning: #f59e0b;
-            --orange: #e67e22;
-            --radius: 4px;
+            --error: #ef4444;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --radius-sm: 4px;
+            --radius: 6px;
+            --radius-lg: 8px;
             --sidebar-width: 200px;
+            --transition-fast: 150ms cubic-bezier(0.25, 1, 0.5, 1);
+            --transition: 200ms cubic-bezier(0.25, 1, 0.5, 1);
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -35,6 +46,8 @@
             min-height: 100vh;
             line-height: 1.5;
             font-size: 13px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         .app-layout {
@@ -49,8 +62,8 @@
         }
         
         .sidebar {
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
+            background: var(--bg-main);
+            border-right: 0.5px solid var(--border);
             padding: 12px 0;
             position: sticky;
             top: 0;
@@ -60,7 +73,7 @@
         
         .sidebar-header {
             padding: 8px 12px 16px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 0.5px solid var(--border);
             margin-bottom: 8px;
         }
         
@@ -68,11 +81,13 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text-bright);
+            letter-spacing: -0.01em;
         }
         
         .sidebar-header p {
             font-size: 10px;
             color: var(--text-muted);
+            margin-top: 2px;
         }
         
         .nav-item {
@@ -80,26 +95,35 @@
             align-items: center;
             gap: 8px;
             padding: 6px 12px;
+            margin: 0 8px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: background 0.1s;
-            color: var(--text);
+            transition: all var(--transition-fast);
+            color: var(--text-muted);
             text-decoration: none;
             font-size: 12px;
+            font-weight: 450;
         }
         
-        .nav-item:hover { background: var(--bg-hover); }
+        .nav-item:hover { 
+            background: var(--bg-hover);
+            color: var(--text);
+        }
         
         .nav-item.active {
-            background: var(--accent);
-            color: var(--text-bright);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            font-weight: 500;
         }
         
-        .nav-icon { width: 18px; text-align: center; font-size: 12px; }
+        .nav-icon { width: 18px; text-align: center; font-size: 12px; opacity: 0.7; }
+        .nav-item.active .nav-icon { opacity: 1; }
         
         .main-content {
-            padding: 20px 28px 80px;
+            padding: 20px 24px 100px;
             overflow-y: auto;
             max-height: 100vh;
+            background: var(--bg-sidebar);
         }
         
         .top-bar {
@@ -117,18 +141,27 @@
         }
         
         .preset-btn {
-            padding: 5px 12px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
+            padding: 6px 12px;
+            background: transparent;
+            border: 0.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
             font-size: 11px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all var(--transition-fast);
         }
         
-        .preset-btn:hover { border-color: var(--accent); }
-        .preset-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .preset-btn:hover { 
+            border-color: var(--border-hover);
+            color: var(--text);
+            background: var(--bg-hover);
+        }
+        .preset-btn.active { 
+            background: var(--accent-subtle); 
+            border-color: var(--accent); 
+            color: var(--accent);
+        }
         
         .btn {
             padding: 8px 16px;
@@ -137,80 +170,134 @@
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-primary { 
+            background: var(--accent); 
+            color: white;
+            border: 0.5px solid transparent;
+        }
+        .btn-primary:hover { 
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
         
         .btn-secondary {
-            background: var(--bg-input);
+            background: var(--bg-elevated);
             color: var(--text);
-            border: 1px solid var(--border);
+            border: 0.5px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+        }
+        
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 8px 12px;
+        }
+        .btn-ghost:hover {
+            color: var(--text);
+            background: var(--bg-hover);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .section {
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
         
         .section-header {
             font-size: 11px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: var(--text-faint);
             margin-bottom: 12px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            border-bottom: 0.5px solid var(--border-subtle);
         }
         
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 12px;
         }
         
         .feature-card {
-            background: var(--bg-sidebar);
-            border: 1px solid var(--border);
-            border-radius: 6px;
+            background: var(--bg-main);
+            border: 0.5px solid var(--border);
+            border-radius: var(--radius);
             overflow: hidden;
-            transition: border-color 0.15s;
+            transition: all var(--transition-fast);
         }
         
-        .feature-card:hover { border-color: var(--accent); }
+        .feature-card:hover { 
+            border-color: var(--border-hover);
+            background: var(--bg-elevated);
+        }
         
-        .feature-card.enabled { border-color: var(--accent); }
+        .feature-card.enabled { 
+            border-color: var(--accent);
+            background: var(--accent-subtle);
+        }
         
         .feature-preview {
             width: 100%;
-            height: 140px;
-            background: var(--bg-main);
+            height: 120px;
+            background: var(--bg-elevated);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             cursor: pointer;
             position: relative;
+            border-bottom: 0.5px solid var(--border-subtle);
         }
         
         .feature-preview img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.2s;
+            transition: transform var(--transition), opacity var(--transition);
+            opacity: 0.9;
         }
         
-        .feature-preview:hover img { transform: scale(1.05); }
+        .feature-card:hover .feature-preview img { 
+            transform: scale(1.03);
+            opacity: 1;
+        }
         
         .feature-preview .no-preview {
-            color: var(--text-muted);
+            color: var(--text-faint);
             font-size: 11px;
             text-align: center;
         }
         
+        /* Skeleton loading state */
+        .feature-preview img[loading="lazy"] {
+            background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-hover) 50%, var(--bg-elevated) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
         .feature-body {
-            padding: 10px 12px;
+            padding: 12px;
             display: flex;
             align-items: flex-start;
             gap: 10px;
@@ -220,16 +307,19 @@
             width: 16px;
             height: 16px;
             background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 3px;
+            border: 0.5px solid var(--border-hover);
+            border-radius: var(--radius-sm);
             cursor: pointer;
             position: relative;
             flex-shrink: 0;
-            margin-top: 1px;
-            transition: background 0.1s, border-color 0.1s;
+            margin-top: 2px;
+            transition: all var(--transition-fast);
         }
         
-        .checkbox:hover { border-color: var(--accent); }
+        .checkbox:hover { 
+            border-color: var(--accent);
+            background: var(--bg-hover);
+        }
         
         .checkbox.checked {
             background: var(--accent);
@@ -244,49 +334,72 @@
             width: 4px;
             height: 8px;
             border: solid white;
-            border-width: 0 2px 2px 0;
+            border-width: 0 1.5px 1.5px 0;
             transform: rotate(45deg);
         }
         
         .checkbox.required {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
+        }
+        
+        .checkbox:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
         }
         
         .feature-info { flex: 1; min-width: 0; }
         
         .feature-title {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--text-bright);
             display: flex;
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
+            letter-spacing: -0.01em;
         }
         
         .badge {
             font-size: 9px;
-            padding: 2px 5px;
-            border-radius: 3px;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
         
         .badge-js {
-            background: var(--orange);
-            color: white;
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--orange);
+            border: 0.5px solid rgba(249, 115, 22, 0.3);
         }
         
         .badge-required {
-            background: var(--warning);
-            color: #000;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 0.5px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .badge-toggle {
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 0.5px solid rgba(0, 120, 212, 0.3);
+            cursor: help;
+        }
+        
+        .badge-ai {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--purple);
+            border: 0.5px solid rgba(139, 92, 246, 0.3);
         }
         
         .feature-desc {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 3px;
+            line-height: 1.4;
         }
         
         .config-section {
@@ -314,39 +427,47 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 4px 0;
+            padding: 6px 0;
         }
         
         .config-row label {
             font-size: 12px;
             color: var(--text);
             cursor: pointer;
+            user-select: none;
         }
         
         .input-row {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         
         .input-row label {
             display: block;
             font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         
         .input-row input[type="number"] {
             width: 100%;
-            padding: 5px 8px;
+            padding: 8px 10px;
             background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
+            border: 0.5px solid var(--border);
+            border-radius: var(--radius-sm);
             color: var(--text);
             font-size: 12px;
+            font-variant-numeric: tabular-nums;
+            transition: all var(--transition-fast);
+        }
+        
+        .input-row input:hover {
+            border-color: var(--border-hover);
         }
         
         .input-row input:focus {
             outline: none;
             border-color: var(--accent);
+            background: var(--bg-hover);
         }
         
         .radio-group {
@@ -367,10 +488,10 @@
             width: 14px;
             height: 14px;
             background: var(--bg-input);
-            border: 1px solid var(--border);
+            border: 0.5px solid var(--border-hover);
             border-radius: 50%;
             position: relative;
-            transition: border-color 0.1s;
+            transition: all var(--transition-fast);
         }
         
         .radio:hover { border-color: var(--accent); }
@@ -390,21 +511,22 @@
         
         .toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 80px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-sidebar);
-            border: 1px solid var(--success);
+            transform: translateX(-50%) translateY(20px);
+            background: var(--bg-elevated);
+            border: 0.5px solid var(--border);
             color: var(--text);
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-radius: var(--radius);
             font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             opacity: 0;
-            transition: transform 0.3s, opacity 0.3s;
+            transition: all var(--transition);
             z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
         .toast.show {
@@ -412,17 +534,19 @@
             opacity: 1;
         }
         
-        .toast .icon { color: var(--success); }
+        .toast .icon { color: var(--success); font-size: 14px; }
         
         .lightbox {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.92);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             cursor: zoom-out;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         
         .lightbox.show { display: flex; }
@@ -430,31 +554,33 @@
         .lightbox img {
             max-width: 90vw;
             max-height: 90vh;
-            border-radius: 8px;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
         
         .lightbox-caption {
             position: absolute;
-            bottom: 20px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--bg-sidebar);
-            padding: 8px 16px;
+            background: var(--bg-elevated);
+            border: 0.5px solid var(--border);
+            padding: 10px 20px;
             border-radius: var(--radius);
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text);
         }
         
         footer {
-            padding: 20px;
+            padding: 24px;
             text-align: center;
             font-size: 11px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border);
+            color: var(--text-faint);
+            border-top: 0.5px solid var(--border-subtle);
         }
         
-        footer a { color: var(--accent); text-decoration: none; }
-        footer a:hover { text-decoration: underline; }
+        footer a { color: var(--text-muted); text-decoration: none; transition: color var(--transition-fast); }
+        footer a:hover { color: var(--accent); }
         
         .skip-link {
             position: absolute;
@@ -481,24 +607,27 @@
         .modal {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1001;
             padding: 20px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
         
         .modal.show { display: flex; }
         
         .modal-content {
             background: var(--bg-sidebar);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            max-width: 700px;
+            border: 0.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            max-width: 640px;
             width: 100%;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
         
         .modal-header {
@@ -506,7 +635,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 0.5px solid var(--border);
         }
         
         .modal-header h3 {
@@ -514,19 +643,25 @@
             font-weight: 600;
             color: var(--text-bright);
             margin: 0;
+            letter-spacing: -0.01em;
         }
         
         .modal-close {
             background: none;
             border: none;
-            color: var(--text-muted);
-            font-size: 20px;
+            color: var(--text-faint);
+            font-size: 18px;
             cursor: pointer;
-            padding: 0;
+            padding: 4px;
             line-height: 1;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
         }
         
-        .modal-close:hover { color: var(--text-bright); }
+        .modal-close:hover { 
+            color: var(--text);
+            background: var(--bg-hover);
+        }
         
         .modal-body {
             padding: 20px;
@@ -536,15 +671,15 @@
             display: flex;
             gap: 4px;
             margin-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 0.5px solid var(--border);
             padding-bottom: 12px;
         }
         
         .platform-tab {
             padding: 6px 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
+            background: transparent;
+            border: 0.5px solid var(--border);
+            border-radius: var(--radius-sm);
             color: var(--text);
             font-size: 12px;
             cursor: pointer;
@@ -629,13 +764,15 @@
             bottom: 0;
             left: var(--sidebar-width);
             right: 0;
-            background: var(--bg-sidebar);
-            border-top: 1px solid var(--border);
-            padding: 12px 20px;
+            background: var(--bg-main);
+            border-top: 0.5px solid var(--border);
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 100;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         
         .footer-left, .footer-right {
@@ -644,13 +781,87 @@
             align-items: center;
         }
         
-        @media (max-width: 800px) {
-            .sticky-footer { left: 0; }
+        .footer-right {
+            gap: 12px;
         }
         
-        .btn:disabled {
+        /* Dropdown menu for advanced options */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .dropdown-toggle svg {
+            width: 12px;
+            height: 12px;
+            opacity: 0.6;
+            transition: transform var(--transition-fast);
+        }
+        
+        .dropdown.open .dropdown-toggle svg {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-elevated);
+            border: 0.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 4px;
+            min-width: 160px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all var(--transition-fast);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dropdown.open .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 12px;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .dropdown-item:hover {
+            background: var(--bg-hover);
+        }
+        
+        .dropdown-item:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+        
+        .dropdown-divider {
+            height: 0.5px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+        
+        @media (max-width: 800px) {
+            .sticky-footer { left: 0; padding: 12px 16px; }
         }
     </style>
 </head>
@@ -698,20 +909,20 @@
                 <div class="feature-grid">
                     <div class="feature-card" data-module="Layout/main.css" data-required="true">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif" alt="Smart Sidebar">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/sidebar.gif" alt="Base Layout" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked required" tabindex="0" role="checkbox" aria-checked="true"></div>
                             <div class="feature-info">
-                                <div class="feature-title">Smart Sidebar <span class="badge badge-required">Required</span></div>
-                                <div class="feature-desc">Core Arc-style sidebar with smooth animations</div>
+                                <div class="feature-title">Base Layout <span class="badge badge-required">Required</span></div>
+                                <div class="feature-desc">Core styling: Mac headers, scrollbars, toolbar fixes. Enable "Auto-Hide Tabbar" separately for sidebar auto-hide.</div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="feature-card" data-module="Layout/FavouriteTabs.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif" alt="Favourite Tabs Grid">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/FavouritesTabs/Pin-On-Top.gif" alt="Favourite Tabs Grid" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
@@ -724,13 +935,13 @@
                     
                     <div class="feature-card" data-module="AutoHide/Panel.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif" alt="Auto-Hide Panel">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif" alt="Auto-Hide Panel" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
                             <div class="feature-info">
-                                <div class="feature-title">Auto-Hide Panel</div>
-                                <div class="feature-desc">Collapse side panel until hover</div>
+                                <div class="feature-title">Auto-Hide Panel <span class="badge badge-toggle" title="Toggle in Vivaldi: Create Command Chain 'Disable Autohide Panel'">⚡</span></div>
+                                <div class="feature-desc">Collapse side panel until hover. Toggle in-browser via Command Chain.</div>
                             </div>
                         </div>
                     </div>
@@ -742,7 +953,7 @@
                 <div class="feature-grid">
                     <div class="feature-card" data-module="AutoHide/Tabbar.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif" alt="Auto-Hide Tabbar">
+                            <img src="assets/sidebar.gif" alt="Auto-Hide Tabbar" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
@@ -755,7 +966,7 @@
                     
                     <div class="feature-card" data-module="EnhancedUX/TabsTrail.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/TabTrails.gif" alt="Tab Trails">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/TabTrails.gif" alt="Tab Trails" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
@@ -768,7 +979,7 @@
                     
                     <div class="feature-card" data-module="EnhancedUX/Quietify.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/audioIcon.gif" alt="Quietify">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/audioIcon.gif" alt="Quietify" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
@@ -779,35 +990,35 @@
                         </div>
                     </div>
                     
-                    <div class="feature-card" data-module="JSIntegration/TidyTabs.css" data-js="true">
+                    <div class="feature-card" data-module="JSIntegration/tidyTabs.css" data-js="true">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/tidyTabs.gif" alt="Tidy Tabs">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/tidyTabs.gif" alt="Tidy Tabs" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
                             <div class="feature-info">
-                                <div class="feature-title">Tidy Tabs <span class="badge badge-js">JS</span></div>
-                                <div class="feature-desc">AI-powered tab grouping</div>
+                                <div class="feature-title">Tidy Tabs <span class="badge badge-ai">AI-Powered</span></div>
+                                <div class="feature-desc">Groups tabs by category using AI (requires API key)</div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="feature-card" data-module="JSIntegration/ClearTabs.css" data-js="true">
+                    <div class="feature-card" data-module="JSIntegration/clearTabs.css" data-js="true">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/ClearTabs.gif" alt="Clear Tabs">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/ClearTabs.gif" alt="Clear Tabs" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
                             <div class="feature-info">
                                 <div class="feature-title">Clear Tabs <span class="badge badge-js">JS</span></div>
-                                <div class="feature-desc">Clear inactive tabs automatically</div>
+                                <div class="feature-desc">Adds "Clear" button to close all unpinned inactive tabs at once</div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="feature-card" data-module="JSIntegration/ArcPeek.css" data-js="true">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/ArcPeek.gif" alt="Arc Peek">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/ArcPeek.gif" alt="Arc Peek" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
@@ -820,13 +1031,13 @@
                     
                     <div class="feature-card js-locked" data-jsmod="tidyTitles.js">
                         <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/Arc-like/AI-Feature/tidyTitles.gif" alt="Tidy Titles" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
                             <div class="feature-info">
-                                <div class="feature-title">Tidy Titles <span class="badge badge-js">JS</span></div>
-                                <div class="feature-desc">AI-powered tab title cleanup</div>
+                                <div class="feature-title">Tidy Titles <span class="badge badge-ai">AI-Powered</span></div>
+                                <div class="feature-desc">Shortens messy tab titles using AI (requires API key)</div>
                             </div>
                         </div>
                     </div>
@@ -864,20 +1075,20 @@
                 <div class="feature-grid">
                     <div class="feature-card" data-module="AutoHide/StatusBar.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/YouDeserveABiggerWebview.png" alt="Auto-Hide Status Bar">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/YouDeserveABiggerWebview.png" alt="Auto-Hide Status Bar" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
                             <div class="feature-info">
-                                <div class="feature-title">Auto-Hide Status Bar</div>
-                                <div class="feature-desc">Hide status bar for more space</div>
+                                <div class="feature-title">Auto-Hide Status Bar <span class="badge badge-toggle" title="Toggle in Vivaldi: Create Command Chain 'Disable Autohide StatusBar'">⚡</span></div>
+                                <div class="feature-desc">Hide status bar for more space. Toggle in-browser via Command Chain.</div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="feature-card" data-module="Layout/DownloadPanel.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/easyFile.png" alt="Download Panel">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/easyFile.png" alt="Download Panel" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
@@ -903,7 +1114,7 @@
                     
                     <div class="feature-card js-locked" data-jsmod="Tam710562/globalMediaControls.js">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/AlfaSniper/vivaldi-mods/main/media/audio-panel.png" alt="Global Media Controls">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/audio-panel.png" alt="Global Media Controls" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
@@ -929,7 +1140,7 @@
                     
                     <div class="feature-card js-locked" data-jsmod="Tam710562/easyFiles.js">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/easyFile.png" alt="Easy Files">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/easyFile.png" alt="Easy Files" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
@@ -958,7 +1169,7 @@
             <section class="section" id="addressbar">
                 <h2 class="section-header">Address Bar & Navigation</h2>
                 <div class="feature-grid">
-                    <div class="feature-card" data-module="Layout/Addressbar.css">
+                    <div class="feature-card" data-module="Layout/addressbar.css">
                         <div class="feature-preview">
                             <div class="no-preview">No preview available</div>
                         </div>
@@ -973,7 +1184,7 @@
                     
                     <div class="feature-card" data-module="AutoHide/AdaptiveBF.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/adaptiveBF.gif" alt="Adaptive Back/Forward">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/adaptiveBF.gif" alt="Adaptive Back/Forward" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
@@ -986,13 +1197,13 @@
                     
                     <div class="feature-card" data-module="AutoHide/Bookmarkbar.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/Community/biggerView.gif" alt="Auto-Hide Bookmark Bar">
+                            <div class="no-preview">No preview available</div>
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
                             <div class="feature-info">
-                                <div class="feature-title">Auto-Hide Bookmark Bar</div>
-                                <div class="feature-desc">Hide bookmark bar until hover</div>
+                                <div class="feature-title">Auto-Hide Bookmark Bar <span class="badge badge-toggle" title="Toggle in Vivaldi: Create Command Chain 'Disable Autohide Bookmarks'">⚡</span></div>
+                                <div class="feature-desc">Hide bookmark bar until hover. Toggle in-browser via Command Chain.</div>
                             </div>
                         </div>
                     </div>
@@ -1023,19 +1234,6 @@
                         </div>
                     </div>
                     
-                    <div class="feature-card js-locked" data-jsmod="immersiveAddressbar.js">
-                        <div class="feature-preview">
-                            <div class="no-preview">No preview available</div>
-                        </div>
-                        <div class="feature-body">
-                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
-                            <div class="feature-info">
-                                <div class="feature-title">Immersive Addressbar <span class="badge badge-js">JS</span></div>
-                                <div class="feature-desc">Required for immersive theme mode</div>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <div class="feature-card js-locked" data-jsmod="Tam710562/feedIcon.js">
                         <div class="feature-preview">
                             <div class="no-preview">No preview available</div>
@@ -1056,7 +1254,7 @@
                 <div class="feature-grid">
                     <div class="feature-card" data-module="Layout/NeatDial.css">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/NeatNewTab.png" alt="Neat Speed Dial">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/NeatNewTab.png" alt="Neat Speed Dial" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox checked" tabindex="0" role="checkbox" aria-checked="true"></div>
@@ -1072,9 +1270,9 @@
             <section class="section" id="themes">
                 <h2 class="section-header">Themes & Appearance</h2>
                 <div class="feature-grid">
-                    <div class="feature-card" data-module="JSIntegration/Accentmod.css" data-js="true">
+                    <div class="feature-card" data-module="JSIntegration/AccentMod.css" data-js="true">
                         <div class="feature-preview">
-                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif" alt="Dynamic Theme Colors">
+                            <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/FollowThemeColor.gif" alt="Dynamic Theme Colors" loading="lazy">
                         </div>
                         <div class="feature-body">
                             <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
@@ -1136,9 +1334,9 @@
                             <div class="radio" data-value="transparent" tabindex="0" role="radio" aria-checked="false"></div>
                             <span>Transparent</span>
                         </label>
-                        <label class="radio-item">
+                        <label class="radio-item" title="Requires immersiveAddressbar.js to be installed">
                             <div class="radio" data-value="immersive" tabindex="0" role="radio" aria-checked="false"></div>
-                            <span>Immersive <span class="badge badge-js">JS</span></span>
+                            <span>Immersive <span class="badge badge-js">JS Required</span></span>
                         </label>
                     </div>
                 </div>
@@ -1333,6 +1531,40 @@
                 </div>
             </div>
             
+            <section class="section" id="command-chain-flags">
+                <h2 class="section-header">Command Chain Flags <span class="badge badge-toggle">⚡ In-Browser Toggles</span></h2>
+                <div class="config-section">
+                    <p style="margin-bottom: 12px;">Features marked with <span class="badge badge-toggle">⚡</span> can be toggled on/off directly in Vivaldi without editing CSS. This uses Vivaldi's Command Chain feature as flags.</p>
+                    
+                    <div class="config-title">How It Works</div>
+                    <ol style="margin: 0 0 16px 20px; color: var(--text-muted);">
+                        <li>Go to <strong>Settings > Quick Commands > Command Chains</strong></li>
+                        <li>Create a new Command Chain with the exact name shown below (leave it empty, no commands needed)</li>
+                        <li>Add the Command Chain's button to any toolbar (right-click toolbar > Customize)</li>
+                        <li>When the button is visible on a toolbar, that autohide feature is <strong>disabled</strong></li>
+                        <li>Remove the button from the toolbar to re-enable autohide</li>
+                    </ol>
+                    
+                    <div class="config-title">Available Toggle Names</div>
+                    <div style="display: grid; gap: 8px;">
+                        <div style="background: var(--bg-card); padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+                            <strong>Disable Autohide Panel</strong> - Stops side panel from auto-hiding
+                        </div>
+                        <div style="background: var(--bg-card); padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+                            <strong>Disable Autohide Bookmarks</strong> - Stops bookmark bar from auto-hiding
+                        </div>
+                        <div style="background: var(--bg-card); padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+                            <strong>Disable Autohide StatusBar</strong> - Stops status bar from auto-hiding
+                        </div>
+                    </div>
+                    
+                    <p style="margin-top: 12px; font-size: 11px; color: var(--text-muted);">
+                        <strong>Tip:</strong> The CSS uses <code>:has(button[title*="..."])</code> to detect if a button with that name exists on any toolbar. 
+                        This is a pure CSS solution - no JavaScript required! Requires Vivaldi 6.6+ for <code>:has()</code> support.
+                    </p>
+                </div>
+            </section>
+            
             <footer>
                 Built for <a href="https://github.com/PaRr0tBoY/Awesome-Vivaldi" target="_blank">Awesome-Vivaldi</a> 
                 by <a href="https://github.com/jms830/VivaldiMods" target="_blank">VivaldiMods</a>
@@ -1342,15 +1574,37 @@
     
     <div class="sticky-footer">
         <div class="footer-left">
-            <label class="btn btn-secondary" style="cursor: pointer;">
+            <label class="btn btn-ghost" style="cursor: pointer;">
                 <input type="file" id="importConfigInput" accept=".css,.bat" style="display: none;">
-                📁 Import Config
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Import
             </label>
+            <button class="btn btn-ghost" id="showInstructionsBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Help
+            </button>
         </div>
         <div class="footer-right">
-            <button class="btn btn-primary" id="downloadBtn">⬇️ Download Core.css</button>
-            <button class="btn btn-secondary" id="downloadJsInstallerBtn" disabled>⬇️ JS Installer</button>
-            <button class="btn btn-secondary" id="showInstructionsBtn">❓ JS Guide</button>
+            <div class="dropdown" id="advancedDropdown">
+                <button class="btn btn-secondary dropdown-toggle" id="advancedDropdownBtn">
+                    Advanced
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" id="downloadBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Download Core.css Only
+                    </button>
+                    <button class="dropdown-item" id="downloadJsInstallerBtn" disabled>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        Download JS Installer Only
+                    </button>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="downloadAllInOneBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download Installer
+            </button>
         </div>
     </div>
     
@@ -1381,31 +1635,31 @@
         };
         
         const jsModToCssMap = {
-            'tidyTabs.js': 'JSIntegration/TidyTabs.css',
-            'ClearTabs.js': 'JSIntegration/ClearTabs.css',
-            'luetage/accentMod.js': 'JSIntegration/Accentmod.css'
+            'tidyTabs.js': 'JSIntegration/tidyTabs.css',
+            'ClearTabs.js': 'JSIntegration/clearTabs.css',
+            'luetage/accentMod.js': 'JSIntegration/AccentMod.css'
         };
         
         const cssToJsModMap = {
-            'JSIntegration/TidyTabs.css': 'tidyTabs.js',
-            'JSIntegration/ClearTabs.css': 'ClearTabs.js',
-            'JSIntegration/Accentmod.css': 'luetage/accentMod.js',
+            'JSIntegration/tidyTabs.css': 'tidyTabs.js',
+            'JSIntegration/clearTabs.css': 'ClearTabs.js',
+            'JSIntegration/AccentMod.css': 'luetage/accentMod.js',
             'JSIntegration/ArcPeek.css': null
         };
         
         const presets = {
             minimal: {
-                modules: ['Layout/main.css', 'Layout/Addressbar.css'],
+                modules: ['Layout/main.css', 'Layout/addressbar.css'],
                 jsmods: [],
                 vars: { compact: 'off', floatTabbar: 'off', tabsGrid: 'off' }
             },
             recommended: {
                 modules: [
                     'AutoHide/AdaptiveBF.css', 'AutoHide/Bookmarkbar.css', 'AutoHide/Panel.css', 'AutoHide/StatusBar.css',
-                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/Addressbar.css', 'Layout/NeatDial.css',
+                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/addressbar.css', 'Layout/NeatDial.css',
                     'Layout/FindInPage.css', 'Layout/QuickCommand.css', 'Layout/DownloadPanel.css', 'Layout/ExtensionsPanel.css',
                     'EnhancedUX/BtnHoverAnime.css', 'EnhancedUX/TabsTrail.css', 'EnhancedUX/Quietify.css',
-                    'JSIntegration/TidyTabs.css', 'JSIntegration/ClearTabs.css', 'JSIntegration/ArcPeek.css'
+                    'JSIntegration/tidyTabs.css', 'JSIntegration/clearTabs.css', 'JSIntegration/ArcPeek.css'
                 ],
                 jsmods: ['tidyTabs.js', 'tidyTitles.js', 'ClearTabs.js', 'Tam710562/globalMediaControls.js'],
                 vars: { compact: 'off', floatTabbar: 'on', tabsGrid: 'on', delay: 'on', borderRadius: 'on' }
@@ -1413,10 +1667,10 @@
             maximal: {
                 modules: [
                     'AutoHide/AdaptiveBF.css', 'AutoHide/Tabbar.css', 'AutoHide/Bookmarkbar.css', 'AutoHide/Panel.css', 'AutoHide/StatusBar.css',
-                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/Addressbar.css', 'Layout/NeatDial.css',
+                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/addressbar.css', 'Layout/NeatDial.css',
                     'Layout/FindInPage.css', 'Layout/QuickCommand.css', 'Layout/DownloadPanel.css', 'Layout/ExtensionsPanel.css', 'Layout/themePreviewer.css',
                     'EnhancedUX/BtnHoverAnime.css', 'EnhancedUX/TabsTrail.css', 'EnhancedUX/Quietify.css', 'EnhancedUX/SelectableText.css',
-                    'JSIntegration/TidyTabs.css', 'JSIntegration/ClearTabs.css', 'JSIntegration/ArcPeek.css', 'JSIntegration/Accentmod.css'
+                    'JSIntegration/tidyTabs.css', 'JSIntegration/clearTabs.css', 'JSIntegration/ArcPeek.css', 'JSIntegration/AccentMod.css'
                 ],
                 jsmods: [
                     'tidyTabs.js', 'tidyTitles.js', 'ClearTabs.js', 'immersiveAddressbar.js',
@@ -1440,7 +1694,10 @@
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
                 showToast('Settings saved');
-            } catch (e) {}
+            } catch (e) {
+                console.warn('Failed to save config', e);
+                showToast('Settings save failed');
+            }
         }
         
         function loadConfig() {
@@ -1454,7 +1711,11 @@
                     if (parsed.vars) Object.assign(config.vars, parsed.vars);
                     return true;
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.warn('Failed to load config', e);
+                showToast('Saved settings could not be loaded');
+                localStorage.removeItem(STORAGE_KEY);
+            }
             return false;
         }
         
@@ -1733,7 +1994,7 @@
         }
         
         function importConfigFromFile(content) {
-            const configMatch = content.match(/@config\s+(\{[^\n\r]*\})/);
+            const configMatch = content.match(/@config\s+(\{[\s\S]*?\})/);
             if (!configMatch) {
                 showToast('No config found in file');
                 return false;
@@ -1750,6 +2011,7 @@
                 showToast('Config imported successfully');
                 return true;
             } catch (e) {
+                console.warn('Failed to parse config', e);
                 showToast('Failed to parse config');
                 return false;
             }
@@ -1930,6 +2192,268 @@ pause
             return bat;
         }
         
+        function generateAllInOneInstaller() {
+            const css = generateCoreCss();
+            const mods = getEnabledJsMods();
+            
+            const rootMods = mods.filter(m => !m.includes('/'));
+            const tam710562Mods = mods.filter(m => m.startsWith('Tam710562/')).map(m => m.replace('Tam710562/', ''));
+            const aminoughtMods = mods.filter(m => m.startsWith('aminought/')).map(m => m.replace('aminought/', ''));
+            const luettageMods = mods.filter(m => m.startsWith('luetage/')).map(m => m.replace('luetage/', ''));
+            const pageActionMods = mods.filter(m => m.startsWith('PageAction/')).map(m => m.replace('PageAction/', ''));
+            
+            const configJson = JSON.stringify({
+                modules: config.modules,
+                jsmods: config.jsmods,
+                jsEnabled: config.jsEnabled,
+                vars: config.vars
+            });
+            
+            // Escape CSS for batch echo (handle special chars)
+            const cssLines = css.split('\n').map(line => {
+                return line
+                    .replace(/\^/g, '^^')
+                    .replace(/&/g, '^&')
+                    .replace(/</g, '^<')
+                    .replace(/>/g, '^>')
+                    .replace(/\|/g, '^|')
+                    .replace(/%/g, '%%');
+            });
+            
+            let bat = `@echo off
+REM ============================================================================
+REM Vivaldi Mods - All-in-One Installer
+REM Generated by VivaldiMods Configurator
+REM https://jms830.github.io/VivaldiMods/
+REM ============================================================================
+REM @config ${configJson}
+
+setlocal EnableDelayedExpansion
+cd "%~dp0"
+
+echo.
+echo ========================================
+echo  Vivaldi Mods - All-in-One Installer
+echo ========================================
+echo.
+
+REM === Configuration ===
+set "INSTALL_DIR=%USERPROFILE%\\Documents"
+set "AWESOME_VIVALDI_DIR=%INSTALL_DIR%\\Awesome-Vivaldi"
+set "VIVALDI_PREFS=%LOCALAPPDATA%\\Vivaldi\\User Data\\Default\\Preferences"
+
+REM === Step 1: Clone or Update Awesome-Vivaldi ===
+echo [1/4] Setting up Awesome-Vivaldi...
+
+if exist "%AWESOME_VIVALDI_DIR%\\.git" (
+    echo      Repository exists, pulling latest changes...
+    pushd "%AWESOME_VIVALDI_DIR%"
+    git pull origin main 2>nul || git pull origin master 2>nul
+    popd
+) else (
+    if exist "%AWESOME_VIVALDI_DIR%" (
+        echo      Folder exists but not a git repo. Backing up and re-cloning...
+        for /f "tokens=2-4 delims=/ " %%a in ('date /t') do set "datestamp=%%c%%a%%b"
+        move "%AWESOME_VIVALDI_DIR%" "%AWESOME_VIVALDI_DIR%.backup.!datestamp!"
+    )
+    echo      Cloning Awesome-Vivaldi repository...
+    git clone https://github.com/PaRr0tBoY/Awesome-Vivaldi.git "%AWESOME_VIVALDI_DIR%"
+    if errorlevel 1 (
+        echo [X] Failed to clone repository. Is git installed?
+        echo     Install git from: https://git-scm.com/download/win
+        pause
+        exit /b 1
+    )
+)
+echo      Done.
+echo.
+
+REM === Step 2: Write Core.css ===
+echo [2/4] Installing CSS configuration...
+(
+`;
+            cssLines.forEach(line => {
+                bat += `echo.${line}\n`;
+            });
+            
+            bat += `) > "%AWESOME_VIVALDI_DIR%\\CSS\\Core.css"
+echo      Done.
+echo.
+
+`;
+
+            // Step 3: Install JS mods (only if any selected)
+            if (mods.length > 0) {
+                bat += `REM === Step 3: Install JS Mods ===
+echo [3/4] Installing JavaScript mods...
+
+REM Find Vivaldi installation
+set "VIVALDI_PATH=%LOCALAPPDATA%\\Vivaldi\\Application"
+for /f "tokens=*" %%a in ('dir /a:-d /b /s "%VIVALDI_PATH%" 2^>nul') do (
+    if "%%~nxa"=="window.html" set "VIVALDI_VERSION_DIR=%%~dpa"
+)
+
+if "%VIVALDI_VERSION_DIR%"=="" (
+    echo [!] Vivaldi not found. Skipping JS mod installation.
+    goto :set_css_path
+)
+
+echo      Found Vivaldi at: %VIVALDI_VERSION_DIR%
+
+REM Backup window.html if not already backed up
+if not exist "%VIVALDI_VERSION_DIR%window.bak.html" (
+    echo      Creating backup of window.html...
+    copy "%VIVALDI_VERSION_DIR%window.html" "%VIVALDI_VERSION_DIR%window.bak.html" >nul
+)
+
+REM Build custom.js
+set "JS_FOLDER=%AWESOME_VIVALDI_DIR%\\Javascripts"
+echo // Awesome-Vivaldi JS Mods > "%VIVALDI_VERSION_DIR%custom.js"
+echo // Installed by VivaldiMods All-in-One Installer >> "%VIVALDI_VERSION_DIR%custom.js"
+echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+
+`;
+                if (rootMods.length > 0) {
+                    rootMods.forEach(mod => {
+                        bat += `if exist "%JS_FOLDER%\\${mod}" (
+    echo      Adding: ${mod}
+    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+    echo // === ${mod} === >> "%VIVALDI_VERSION_DIR%custom.js"
+    type "%JS_FOLDER%\\${mod}" >> "%VIVALDI_VERSION_DIR%custom.js"
+)
+`;
+                    });
+                }
+
+                if (tam710562Mods.length > 0) {
+                    tam710562Mods.forEach(mod => {
+                        bat += `if exist "%JS_FOLDER%\\Tam710562\\${mod}" (
+    echo      Adding: Tam710562/${mod}
+    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+    echo // === Tam710562/${mod} === >> "%VIVALDI_VERSION_DIR%custom.js"
+    type "%JS_FOLDER%\\Tam710562\\${mod}" >> "%VIVALDI_VERSION_DIR%custom.js"
+)
+`;
+                    });
+                }
+
+                if (aminoughtMods.length > 0) {
+                    if (aminoughtMods.includes('colorTabs.js')) {
+                        bat += `if exist "%JS_FOLDER%\\aminought\\chroma.min.js" (
+    echo      Adding: aminought/chroma.min.js (dependency)
+    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+    echo // === aminought/chroma.min.js === >> "%VIVALDI_VERSION_DIR%custom.js"
+    type "%JS_FOLDER%\\aminought\\chroma.min.js" >> "%VIVALDI_VERSION_DIR%custom.js"
+)
+`;
+                    }
+                    aminoughtMods.forEach(mod => {
+                        bat += `if exist "%JS_FOLDER%\\aminought\\${mod}" (
+    echo      Adding: aminought/${mod}
+    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+    echo // === aminought/${mod} === >> "%VIVALDI_VERSION_DIR%custom.js"
+    type "%JS_FOLDER%\\aminought\\${mod}" >> "%VIVALDI_VERSION_DIR%custom.js"
+)
+`;
+                    });
+                }
+
+                if (luettageMods.length > 0) {
+                    luettageMods.forEach(mod => {
+                        bat += `if exist "%JS_FOLDER%\\luetage\\${mod}" (
+    echo      Adding: luetage/${mod}
+    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+    echo // === luetage/${mod} === >> "%VIVALDI_VERSION_DIR%custom.js"
+    type "%JS_FOLDER%\\luetage\\${mod}" >> "%VIVALDI_VERSION_DIR%custom.js"
+)
+`;
+                    });
+                }
+
+                if (pageActionMods.length > 0) {
+                    pageActionMods.forEach(mod => {
+                        bat += `if exist "%JS_FOLDER%\\PageAction\\${mod}" (
+    echo      Adding: PageAction/${mod}
+    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+    echo // === PageAction/${mod} === >> "%VIVALDI_VERSION_DIR%custom.js"
+    type "%JS_FOLDER%\\PageAction\\${mod}" >> "%VIVALDI_VERSION_DIR%custom.js"
+)
+`;
+                    });
+                }
+
+                bat += `
+REM Patch window.html
+type "%VIVALDI_VERSION_DIR%window.bak.html" | findstr /v "^</body>" | findstr /v "^</html>" > "%VIVALDI_VERSION_DIR%window.html"
+echo     ^<script src="custom.js"^>^</script^> >> "%VIVALDI_VERSION_DIR%window.html"
+echo   ^</body^> >> "%VIVALDI_VERSION_DIR%window.html"
+echo ^</html^> >> "%VIVALDI_VERSION_DIR%window.html"
+echo      Done.
+echo.
+`;
+            } else {
+                bat += `echo [3/4] No JS mods selected, skipping...
+echo.
+`;
+            }
+
+            bat += `:set_css_path
+REM === Step 4: Set Vivaldi CSS Path ===
+echo [4/4] Configuring Vivaldi to use CSS mods...
+
+if not exist "%VIVALDI_PREFS%" (
+    echo [!] Vivaldi preferences not found.
+    echo     Please set CSS path manually in Vivaldi Settings.
+    goto :done
+)
+
+REM Check if Vivaldi is running
+tasklist /FI "IMAGENAME eq vivaldi.exe" 2>nul | find /I "vivaldi.exe" >nul
+if not errorlevel 1 (
+    echo [!] Vivaldi is currently running.
+    echo     Please close Vivaldi, then press any key to continue...
+    pause >nul
+)
+
+REM Update preferences using PowerShell
+set "CSS_PATH=%AWESOME_VIVALDI_DIR%\\CSS"
+set "CSS_PATH_ESCAPED=!CSS_PATH:\\=\\\\!"
+
+powershell -Command "$prefs = Get-Content '%VIVALDI_PREFS%' -Raw | ConvertFrom-Json; if (-not $prefs.vivaldi) { $prefs | Add-Member -NotePropertyName 'vivaldi' -NotePropertyValue @{} }; if (-not $prefs.vivaldi.appearance) { $prefs.vivaldi | Add-Member -NotePropertyName 'appearance' -NotePropertyValue @{} }; $prefs.vivaldi.appearance.css_ui_mods_directory = '!CSS_PATH_ESCAPED!'; $prefs | ConvertTo-Json -Depth 100 -Compress | Set-Content '%VIVALDI_PREFS%' -Encoding UTF8"
+
+if errorlevel 1 (
+    echo [!] Failed to update preferences automatically.
+    echo     Please set CSS path manually in Vivaldi Settings.
+) else (
+    echo      CSS path set to: %CSS_PATH%
+)
+echo      Done.
+echo.
+
+:done
+echo ========================================
+echo  Installation Complete!
+echo ========================================
+echo.
+echo  CSS Mods: %AWESOME_VIVALDI_DIR%\\CSS
+`;
+            if (mods.length > 0) {
+                bat += `echo  JS Mods:  ${mods.length} mods installed
+`;
+            }
+            bat += `echo.
+echo  Next steps:
+echo  1. Open vivaldi://experiments in Vivaldi
+echo  2. Enable "Allow for using CSS modifications"
+echo  3. Restart Vivaldi
+echo.
+echo  To reconfigure: Visit https://jms830.github.io/VivaldiMods/
+echo.
+pause
+`;
+            return bat;
+        }
+        
         function syncCssJsSelection(cssModule, isEnabled) {
             const jsmod = cssToJsModMap[cssModule];
             if (jsmod) {
@@ -2082,7 +2606,11 @@ pause
             });
             
             // Download & Reset
-            document.getElementById('downloadBtn').addEventListener('click', () => downloadFile(generateCoreCss(), 'Core.css'));
+            document.getElementById('downloadBtn').addEventListener('click', () => {
+                downloadFile(generateCoreCss(), 'Core.css');
+                showToast('Core.css downloaded');
+                advancedDropdown.classList.remove('open');
+            });
             document.getElementById('resetBtn').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
             
             // Import config
@@ -2097,6 +2625,27 @@ pause
                 reader.readAsText(file);
             });
             
+            // Advanced dropdown toggle
+            const advancedDropdown = document.getElementById('advancedDropdown');
+            const advancedDropdownBtn = document.getElementById('advancedDropdownBtn');
+            
+            advancedDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                advancedDropdown.classList.toggle('open');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!advancedDropdown.contains(e.target)) {
+                    advancedDropdown.classList.remove('open');
+                }
+            });
+            
+            // All-in-One Installer
+            document.getElementById('downloadAllInOneBtn').addEventListener('click', () => {
+                downloadFile(generateAllInOneInstaller(), 'vivaldi-mods-installer.bat', 'text/plain');
+                showToast('Installer downloaded! Run it to set up everything.');
+            });
+            
             // JS Mod buttons
             document.getElementById('downloadJsInstallerBtn').addEventListener('click', () => {
                 const mods = getEnabledJsMods();
@@ -2105,7 +2654,8 @@ pause
                     return;
                 }
                 downloadFile(generateJsInstallerBat(), 'install-js-mods.bat', 'text/plain');
-                showToast('Installer downloaded');
+                showToast('JS installer downloaded');
+                advancedDropdown.classList.remove('open');
             });
             
             // JS enable modal
