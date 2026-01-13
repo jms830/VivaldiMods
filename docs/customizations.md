@@ -6,7 +6,7 @@ Each tweak should be applied and tested individually before moving to the next.
 ## Baseline
 
 - **Source**: https://github.com/PaRr0tBoY/Awesome-Vivaldi
-- **Copied to**: `vendor/awesome-vivaldi/`
+- **Location**: `CSS/` (repo root)
 - **Date**: 2026-01-13
 
 ## Tweaks to Apply
@@ -17,9 +17,9 @@ Each tweak should be applied and tested individually before moving to the next.
 
 **Root Cause**: `Layout/main.css` sets `#header` height for Windows but never hides it for sidebar tab layouts.
 
-**File**: `vendor/awesome-vivaldi/CSS/Layout/main.css`
+**File**: `CSS/Layout/main.css`
 
-**Fix**: Add to the existing `display: none` rule block (around line 49-53):
+**Fix**: Added to the existing `display: none` rule block (line 49-55):
 
 ```css
 #browser:not(.is-settingspage).fullscreen > #header,
@@ -31,7 +31,7 @@ Each tweak should be applied and tested individually before moving to the next.
 }
 ```
 
-**Status**: NOT YET APPLIED - Apply and test first
+**Status**: APPLIED 2026-01-13
 
 ---
 
@@ -39,7 +39,7 @@ Each tweak should be applied and tested individually before moving to the next.
 
 **Problem**: Default toolbar is taller than Zen browser's 44px.
 
-**File**: `vendor/awesome-vivaldi/CSS/Layout/main.css` (line ~23)
+**File**: `CSS/Layout/main.css` (line ~23)
 
 **Current**:
 ```css
@@ -106,7 +106,7 @@ Tried adding overrides at the end of generated `Core.css` to hide `#header`:
 
 | File | Purpose |
 |------|---------|
-| `vendor/awesome-vivaldi/CSS/Core.css` | Entry point, imports modules |
-| `vendor/awesome-vivaldi/CSS/Layout/main.css` | Core layout, header, toolbar |
-| `vendor/awesome-vivaldi/CSS/Layout/addressbar.css` | Address bar styling |
-| `vendor/awesome-vivaldi/CSS/AutoHide/*.css` | Auto-hide features |
+| `CSS/Core.css` | Entry point, imports modules |
+| `CSS/Layout/main.css` | Core layout, header, toolbar |
+| `CSS/Layout/addressbar.css` | Address bar styling |
+| `CSS/AutoHide/*.css` | Auto-hide features |
