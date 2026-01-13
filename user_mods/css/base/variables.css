@@ -8,7 +8,9 @@
     --mac-header: calc(var(--window-border) + 0px);
     --win-header: calc(var(--window-border) + 0px);
     --linux-header: calc(var(--window-border) + 0px);
-    --addressbar-height: 36px;
+    --addressbar-height: 32px;
+    --tabs-container-expand-width: 230px;
+    --tabs-container-collapse-width: 44px;
     
     /* === Window Buttons === */
     --window-button-scale: 0.8;
@@ -20,7 +22,7 @@
     --webview-shadow-dark: 0px 2px 2px 0px rgba(0, 0, 0, 0.05), 0px 2px 8px 0px rgba(0, 0, 0, 0.05), 0px 0px 0px 1.2px #ffffff18;
     
     /* === Pinned Tabs Grid === */
-    --pinned-column-count: 4;
+    --pinned-column-count: 2;
     --pinned-sticky-enabled: 1;
     --pinned-background: var(--colorTabBar);
     --pinned-separator-color: var(--colorBorder);
