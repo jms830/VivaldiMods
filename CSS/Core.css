@@ -7,11 +7,12 @@ You may manage and config all your css mods and config them as well all in this 
 */
 
 /* Import AutoHide folder CSS files */
-@import "AutoHide/AdaptiveBF.css";
-@import "AutoHide/Tabbar.css";
-@import "AutoHide/Bookmarkbar.css";
-@import "AutoHide/Panel.css";
-@import "AutoHide/StatusBar.css";
+/* Disabled - Vivaldi 7.8+ has native AutoHide (Settings > Appearance > Auto-hide UI) */
+/* @import "AutoHide/AdaptiveBF.css"; */
+/* @import "AutoHide/Tabbar.css"; */
+/* @import "AutoHide/Bookmarkbar.css"; */
+/* @import "AutoHide/Panel.css"; */
+/* @import "AutoHide/StatusBar.css"; */
 
 /* Import Layout folder CSS files */
 @import "Layout/main.css";
