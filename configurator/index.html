@@ -2347,7 +2347,7 @@ echo. >> "!VIVALDI_VERSION_DIR!custom.js"
                 jsInstallCommands += `
 REM Patch window.html to load custom.js
 echo      Patching window.html...
-powershell -Command "(Get-Content '!VIVALDI_VERSION_DIR!window.bak.html' -Raw) -replace '</body>', '    <script src=\"custom.js\"></script>\\r\\n  </body>' | Set-Content '!VIVALDI_VERSION_DIR!window.html' -Encoding UTF8"
+powershell -Command "(Get-Content '!VIVALDI_VERSION_DIR!window.bak.html' -Raw) -replace '</body>', '    <script src=\"custom.js\"><\/script>\\r\\n  </body>' | Set-Content '!VIVALDI_VERSION_DIR!window.html' -Encoding UTF8"
 if errorlevel 1 (
     echo [!] Failed to patch window.html
     echo     JS mods may not work. Try running as Administrator.
