@@ -1980,6 +1980,24 @@
   --mod-whitespace-y: 2px;
   --mod-whitespace-tabbar-right: 15px;
   --mod-mainbar-height: 32px;
+  --bookmark-bar-show-ctrlkey: false;
+}
+
+/* Compact mainbar - remove extra padding below address bar */
+.mainbar {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.mainbar > .toolbar-mainbar {
+  min-height: var(--mod-mainbar-height) !important;
+  max-height: var(--mod-mainbar-height) !important;
+  padding: 0 4px !important;
+}
+
+/* Bookmark bar shows on hover without requiring Ctrl key */
+#browser {
+  --bookmark-bar-show-ctrlkey: false;
 }
 `;
             return css;
