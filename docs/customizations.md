@@ -9,9 +9,9 @@ Each tweak should be applied and tested individually before moving to the next.
 - **Location**: `CSS/` (repo root)
 - **Date**: 2026-01-13
 
-## Tweaks to Apply
+## Applied Tweaks
 
-### 1. Hide Windows Header for Sidebar Tabs (PRIORITY)
+### 1. Hide Windows Header for Sidebar Tabs
 
 **Problem**: Extra ~20px space above address bar when using sidebar tabs (`.tabs-left` / `.tabs-right`) on Windows. Right-clicking the space shows Windows window controls.
 
@@ -19,13 +19,9 @@ Each tweak should be applied and tested individually before moving to the next.
 
 **File**: `CSS/Layout/main.css`
 
-**Fix**: Added to the existing `display: none` rule block (line 49-55):
+**Fix**: Added to the existing `display: none` rule block:
 
 ```css
-#browser:not(.is-settingspage).fullscreen > #header,
-#browser:not(.is-settingspage):not(.address-top).tabs-bottom > #header,
-#browser:not(.is-settingspage).tabs-off.address-top > #header,
-.color-behind-tabs-off:not(.is-settingspage).tabs-bottom #header,
 #browser.win:is(.tabs-left, .tabs-right):not(.is-settingspage) > #header {
   display: none;
 }
@@ -35,14 +31,14 @@ Each tweak should be applied and tested individually before moving to the next.
 
 ---
 
-### 2. Compact Toolbar Height (44px Zen-style)
+### 2. Remove Toolbar Min-Height (Vivaldi 7.8+ Fix)
 
-**Problem**: Default toolbar is taller than Zen browser's 44px.
+**Problem**: Blank space below address bar in Vivaldi 7.8+ snapshot caused by CSS forcing toolbar height that conflicts with Vivaldi's native auto-hide.
 
-**File**: `CSS/Layout/main.css` (line ~23)
+**Root Cause**: This rule in `Layout/main.css` forced a minimum height:
 
-**Current**:
 ```css
+/* REMOVED - caused blank space in Vivaldi 7.8+ */
 #browser:not(.address-top-off, .address-bottom-off, .address-bottom)
   .mainbar
   > .toolbar-mainbar {
@@ -50,13 +46,50 @@ Each tweak should be applied and tested individually before moving to the next.
 }
 ```
 
-**Proposed Fix**: Override or modify to force 44px height.
+**File**: `CSS/Layout/main.css`
 
-**Status**: NOT YET APPLIED - Test header fix first
+**Fix**: Removed the entire rule block.
+
+**Status**: APPLIED 2026-01-13
 
 ---
 
-### 3. Address Bar Field Height (32px pill)
+### 3. Disable AutoHide CSS Modules
+
+**Problem**: Vivaldi 7.8+ has native Auto-hide UI (Settings > Appearance > Auto-hide UI). Our CSS AutoHide modules conflict with it.
+
+**File**: `CSS/Core.css`
+
+**Fix**: Commented out all AutoHide imports:
+
+```css
+/* Disabled - Vivaldi 7.8+ has native AutoHide (Settings > Appearance > Auto-hide UI) */
+/* @import "AutoHide/AdaptiveBF.css"; */
+/* @import "AutoHide/Tabbar.css"; */
+/* @import "AutoHide/Bookmarkbar.css"; */
+/* @import "AutoHide/Panel.css"; */
+/* @import "AutoHide/StatusBar.css"; */
+```
+
+**Status**: APPLIED 2026-01-13
+
+---
+
+### 4. Differentiate Tidy vs Clear AI Buttons
+
+**Problem**: Both AI buttons (Tidy Tabs and Clear Tabs) looked identical, confusing users.
+
+**Files**: 
+- `CSS/JSIntegration/tidyTabs.css` - Blue theme (`#4a9eff`) with border
+- `CSS/JSIntegration/clearTabs.css` - Red theme (`#ff6b6b`) with border
+
+**Status**: APPLIED 2026-01-13
+
+---
+
+## Pending Tweaks (Lower Priority)
+
+### Address Bar Field Height (32px pill)
 
 **Problem**: Address bar pill could be more compact.
 
@@ -69,7 +102,7 @@ Each tweak should be applied and tested individually before moving to the next.
 }
 ```
 
-**Status**: NOT YET APPLIED - Lower priority
+**Status**: NOT YET APPLIED - Test other changes first
 
 ---
 
@@ -108,5 +141,17 @@ Tried adding overrides at the end of generated `Core.css` to hide `#header`:
 |------|---------|
 | `CSS/Core.css` | Entry point, imports modules |
 | `CSS/Layout/main.css` | Core layout, header, toolbar |
-| `CSS/Layout/addressbar.css` | Address bar styling |
-| `CSS/AutoHide/*.css` | Auto-hide features |
+| `CSS/Layout/Addressbar.css` | Address bar styling |
+| `CSS/AutoHide/*.css` | Auto-hide features (disabled for 7.8+) |
+| `CSS/JSIntegration/*.css` | CSS for JS-dependent features |
+
+---
+
+## Vivaldi 7.8+ Compatibility Notes
+
+Vivaldi 7.8 snapshot introduced **native Auto-hide UI** which makes our AutoHide CSS modules redundant. Key changes:
+
+1. **Use Vivaldi's native auto-hide**: Settings > Appearance > Auto-hide UI
+2. **Our CSS disabled**: `AutoHide/Tabbar.css`, `Bookmarkbar.css`, `Panel.css`, `StatusBar.css`, `AdaptiveBF.css`
+3. **Still active**: Arc-style polish - `FavouriteTabs.css`, `TabsTrail.css`, `Quietify.css`, `BtnHoverAnime.css`
+4. **Known issue**: Vivaldi's native autohide doesn't get CSS rounding/transparency polish from our themes
