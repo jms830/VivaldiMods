@@ -49,7 +49,8 @@ I used to only have this one file to store all css mods from community, until th
 #browser:not(.is-settingspage).fullscreen > #header,
 #browser:not(.is-settingspage):not(.address-top).tabs-bottom > #header,
 #browser:not(.is-settingspage).tabs-off.address-top > #header,
-.color-behind-tabs-off:not(.is-settingspage).tabs-bottom #header {
+.color-behind-tabs-off:not(.is-settingspage).tabs-bottom #header,
+#browser.win:is(.tabs-left, .tabs-right):not(.is-settingspage) > #header {
   display: none;
 }
 
