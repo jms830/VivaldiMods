@@ -1984,31 +1984,42 @@
 }
 
 /* Compact mainbar - Zen-style tight toolbar (44px total) */
+/* Override Awesome-Vivaldi's main.css line 23: min-height: calc(34px / var(--uiZoomLevel)) */
 .mainbar {
   padding: 0 !important;
   margin: 0 !important;
 }
 
-/* Override the hardcoded 34px min-height from main.css */
-#browser:not(.address-top-off, .address-bottom-off, .address-bottom) .mainbar > .toolbar-mainbar {
-  min-height: 44px !important;
-  max-height: 44px !important;
-  height: 44px !important;
-}
-
-.mainbar > .toolbar-mainbar {
+/* Force 44px height on all .toolbar-mainbar selectors */
+#browser:not(.address-top-off, .address-bottom-off, .address-bottom) .mainbar > .toolbar-mainbar,
+.mainbar > .toolbar-mainbar,
+.mainbar .toolbar-mainbar {
   min-height: 44px !important;
   max-height: 44px !important;
   height: 44px !important;
   padding: 6px 8px !important;
   align-items: center !important;
+  box-sizing: border-box !important;
 }
 
-/* Address bar field - 32px pill with 6px padding = 44px toolbar */
+/* Address bar field - 32px pill height */
 .UrlBar-AddressField {
   height: 32px !important;
   min-height: 32px !important;
   max-height: 32px !important;
+  box-sizing: border-box !important;
+}
+
+/* URL input field - reduce internal padding from 8px 12px to 4px 8px */
+.UrlBar-UrlField {
+  padding: 4px 8px !important;
+}
+
+/* Ensure all toolbar buttons fit in 32px height */
+.mainbar .toolbar-mainbar button.ToolbarButton-Button,
+.mainbar .toolbar-mainbar .button-toolbar > button {
+  height: 28px !important;
+  min-height: 28px !important;
 }
 
 /* Bookmark bar shows on hover without requiring Ctrl key */
