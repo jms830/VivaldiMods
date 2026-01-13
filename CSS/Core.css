@@ -18,7 +18,7 @@ You may manage and config all your css mods and config them as well all in this 
 @import "Layout/main.css";
 @import "Layout/NeatDial.css";
 @import "Layout/FavouriteTabs.css";
-/* @import "Layout/Addressbar.css"; */ /* Disabled - causes blank space below address bar */
+@import "Layout/Addressbar.css";
 @import "Layout/FindInPage.css";
 @import "Layout/QuickCommand.css";
 @import "Layout/DownloadPanel.css";
@@ -151,5 +151,5 @@ You may manage and config all your css mods and config them as well all in this 
   --mod-whitespace-x: 3px;
   --mod-whitespace-y: 5px;
   --mod-whitespace-tabbar-right: 15px;
-  --mod-mainbar-height: 25px;
+  --mod-mainbar-height: 36px;
 }
