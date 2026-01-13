@@ -898,6 +898,7 @@
         <main class="main-content" id="main">
             <div class="top-bar">
                 <div class="presets">
+                    <button class="preset-btn" data-preset="default">Default</button>
                     <button class="preset-btn" data-preset="minimal">Minimal</button>
                     <button class="preset-btn active" data-preset="recommended">Recommended</button>
                     <button class="preset-btn" data-preset="maximal">All Features</button>
@@ -1630,6 +1631,7 @@
             modules: {},
             jsmods: {},
             jsEnabled: true,
+            activePreset: 'recommended',
             vars: {
                 themeMode: 'color',
                 compact: 'off',
@@ -1665,6 +1667,17 @@
         };
         
         const presets = {
+            default: {
+                modules: ['Layout/main.css'],
+                jsmods: [],
+                vars: { 
+                    themeMode: 'color', compact: 'off', floatTabbar: 'off', blurMask: 'off',
+                    delay: 'on', borderRadius: 'on', tabsGrid: 'off', pinAtTop: 'on', blurHibernate: 'off',
+                    pinnedColumns: 2, pinnedRows: 3, pinnedGap: 4, pinnedIconSize: 20,
+                    collapseWidth: 44, expandWidth: 230, windowBorder: 4, animationSpeed: 260
+                },
+                skipCustomOverrides: true
+            },
             minimal: {
                 modules: ['Layout/main.css', 'Layout/addressbar.css'],
                 jsmods: [],
@@ -1851,6 +1864,8 @@
             const preset = presets[presetName];
             if (!preset) return;
             
+            config.activePreset = presetName;
+            
             document.querySelectorAll('.feature-card[data-module]').forEach(card => {
                 const module = card.dataset.module;
                 const cb = card.querySelector('.checkbox');
@@ -1995,9 +2010,18 @@
   --mod-mainbar-height: 44px;
   --bookmark-bar-show-ctrlkey: false;
 }
+`;
+            
+            const activePreset = presets[config.activePreset];
+            if (!activePreset?.skipCustomOverrides) {
+                css += `
+/* ============================================
+   CUSTOM OVERRIDES (VivaldiMods Configurator)
+   These are experimental fixes not in upstream.
+   Use "Default" preset for clean upstream output.
+   ============================================ */
 
 /* Compact mainbar - Zen-style tight toolbar (44px total) */
-/* Override Awesome-Vivaldi's main.css line 23: min-height: calc(34px / var(--uiZoomLevel)) */
 .mainbar {
   padding: 0 !important;
   margin: 0 !important;
@@ -2023,12 +2047,12 @@
   box-sizing: border-box !important;
 }
 
-/* URL input field - reduce internal padding from 8px 12px to 4px 8px */
+/* URL input field */
 .UrlBar-UrlField {
   padding: 4px 8px !important;
 }
 
-/* Ensure all toolbar buttons fit in 32px height */
+/* Toolbar buttons fit in 32px height */
 .mainbar .toolbar-mainbar button.ToolbarButton-Button,
 .mainbar .toolbar-mainbar .button-toolbar > button {
   height: 28px !important;
@@ -2040,21 +2064,15 @@
   --bookmark-bar-show-ctrlkey: false;
 }
 
-/* Force minimal Windows header height - this is the title bar area above the address bar */
-#browser.win:not(.is-settingspage):not(.tabs-top):not(.tabs-bottom) > #header,
-#browser.win:not(.is-settingspage):not(.address-top) > #header {
-  min-height: 0 !important;
-  height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-
-/* Hide the header completely when using sidebar tabs (Arc-style) */
+/* Hide Windows header for sidebar tabs (Arc-style) */
 #browser.win:is(.tabs-left, .tabs-right):not(.is-settingspage) > #header {
   display: none !important;
+  min-height: 0 !important;
+  height: 0 !important;
 }
 `;
+            }
+            
             return css;
         }
         
