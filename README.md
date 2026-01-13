@@ -92,6 +92,33 @@ The configurator sets these `:root` variables in Core.css:
 
 See the [Awesome-Vivaldi docs](https://github.com/PaRr0tBoY/Awesome-Vivaldi) for full variable reference.
 
+## Compatibility Notes
+
+- Case-sensitive filesystems (Linux/macOS) require exact module filename casing; the configurator outputs the correct casing.
+- CSS relies on modern Chromium features like `:has()` and container queries; Vivaldi 6.6+ recommended.
+
+## Command Chain Flags (In-Browser Toggles)
+
+Some autohide features can be toggled on/off directly in Vivaldi without editing CSS. This uses Vivaldi's Command Chain feature as flags - a pure CSS solution with no JavaScript required.
+
+### How It Works
+
+1. Go to **Settings > Quick Commands > Command Chains**
+2. Create a new Command Chain with one of the names below (leave it empty - no commands needed)
+3. Add the Command Chain's button to any toolbar (right-click toolbar > Customize)
+4. When the button is visible, that autohide feature is **disabled**
+5. Remove the button from the toolbar to re-enable autohide
+
+### Available Toggles
+
+| Command Chain Name | Effect |
+|-------------------|--------|
+| `Disable Autohide Panel` | Stops side panel from auto-hiding |
+| `Disable Autohide Bookmarks` | Stops bookmark bar from auto-hiding |
+| `Disable Autohide StatusBar` | Stops status bar from auto-hiding |
+
+This works because the CSS uses `:has(button[title*="..."])` to detect if a button with that name exists on any toolbar.
+
 ## JS Mods (Optional)
 
 For full functionality, install JavaScript mods from Awesome-Vivaldi:

@@ -2039,6 +2039,21 @@
 #browser {
   --bookmark-bar-show-ctrlkey: false;
 }
+
+/* Force minimal Windows header height - this is the title bar area above the address bar */
+#browser.win:not(.is-settingspage):not(.tabs-top):not(.tabs-bottom) > #header,
+#browser.win:not(.is-settingspage):not(.address-top) > #header {
+  min-height: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Hide the header completely when using sidebar tabs (Arc-style) */
+#browser.win:is(.tabs-left, .tabs-right):not(.is-settingspage) > #header {
+  display: none !important;
+}
 `;
             return css;
         }
