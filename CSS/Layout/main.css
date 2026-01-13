@@ -17,12 +17,6 @@ I used to only have this one file to store all css mods from community, until th
   padding-left: calc(68px / var(--uiZoomLevel));
 }
 
-#browser:not(.address-top-off, .address-bottom-off, .address-bottom)
-  .mainbar
-  > .toolbar-mainbar {
-  min-height: calc(34px / var(--uiZoomLevel));
-}
-
 /* Top Header Mac */
 #browser.mac:not(.is-settingspage):not(.address-top).tabs-left.tabs-right
   > #header,
