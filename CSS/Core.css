@@ -18,7 +18,7 @@ You may manage and config all your css mods and config them as well all in this 
 @import "Layout/main.css";
 @import "Layout/NeatDial.css";
 @import "Layout/FavouriteTabs.css";
-@import "Layout/Addressbar.css";
+/* @import "Layout/Addressbar.css"; */ /* Disabled - causes blank space below address bar */
 @import "Layout/FindInPage.css";
 @import "Layout/QuickCommand.css";
 @import "Layout/DownloadPanel.css";
