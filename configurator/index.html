@@ -1979,20 +1979,36 @@
   --mod-whitespace-x: 3px;
   --mod-whitespace-y: 2px;
   --mod-whitespace-tabbar-right: 15px;
-  --mod-mainbar-height: 32px;
+  --mod-mainbar-height: 44px;
   --bookmark-bar-show-ctrlkey: false;
 }
 
-/* Compact mainbar - remove extra padding below address bar */
+/* Compact mainbar - Zen-style tight toolbar (44px total) */
 .mainbar {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Override the hardcoded 34px min-height from main.css */
+#browser:not(.address-top-off, .address-bottom-off, .address-bottom) .mainbar > .toolbar-mainbar {
+  min-height: 44px !important;
+  max-height: 44px !important;
+  height: 44px !important;
 }
 
 .mainbar > .toolbar-mainbar {
-  min-height: var(--mod-mainbar-height) !important;
-  max-height: var(--mod-mainbar-height) !important;
-  padding: 0 4px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  height: 44px !important;
+  padding: 6px 8px !important;
+  align-items: center !important;
+}
+
+/* Address bar field - 32px pill with 6px padding = 44px toolbar */
+.UrlBar-AddressField {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
 }
 
 /* Bookmark bar shows on hover without requiring Ctrl key */
