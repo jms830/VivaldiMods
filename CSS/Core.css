@@ -7,8 +7,8 @@ You may manage and config all your css mods and config them as well all in this 
 */
 
 /* Import AutoHide folder CSS files */
-/* Disabled - Vivaldi 7.8+ has native AutoHide (Settings > Appearance > Auto-hide UI) */
-/* @import "AutoHide/AdaptiveBF.css"; */
+/* Most disabled - Vivaldi 7.8+ has native AutoHide (Settings > Appearance > Auto-hide UI) */
+@import "AutoHide/adaptiveBF.css"; /* Hide disabled back/forward buttons */
 /* @import "AutoHide/Tabbar.css"; */
 /* @import "AutoHide/Bookmarkbar.css"; */
 /* @import "AutoHide/Panel.css"; */
@@ -23,13 +23,16 @@ You may manage and config all your css mods and config them as well all in this 
 @import "Layout/QuickCommand.css";
 @import "Layout/DownloadPanel.css";
 @import "Layout/ExtensionsPanel.css";
+@import "Layout/WorkspaceButtons.css";
+@import "Layout/NativeAutohidePolish.css";
+@import "Layout/ToolbarAutoHide.css";
 /* @import "Layout/themePreviewer.css"; */
 
 /* Import EnhancedUX folder CSS files */
 @import "EnhancedUX/BtnHoverAnime.css";
 @import "EnhancedUX/TabsTrail.css";
 @import "EnhancedUX/Quietify.css";
-/* @import "EnhancedUX/LonM-selectableTextEverywhere.css"; */
+@import "EnhancedUX/SelectableText.css";
 
 /* Import JSIntegretion folder CSS files */
 @import "JSIntegration/ClearTabs.css";

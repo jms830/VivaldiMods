@@ -101,6 +101,27 @@ VivaldiModManager is a .NET Windows application. Linux/macOS users can only use 
 3. Check DevTools (F12) > Console for CSS errors
 4. Check Elements panel to verify styles applied
 
+## Known Issues & Fixes
+
+### Blank Space Below Address Bar (Vivaldi 7.8+)
+
+**Symptom**: Extra blank space appears below the address bar when using sidebar tabs.
+
+**Cause**: A `min-height` rule in `CSS/Layout/main.css` conflicts with Vivaldi 7.8+'s native auto-hide handling.
+
+**The problematic rule (REMOVED)**:
+```css
+#browser:not(.address-top-off, .address-bottom-off, .address-bottom)
+  .mainbar
+  > .toolbar-mainbar {
+  min-height: calc(34px / var(--uiZoomLevel));
+}
+```
+
+**Fix**: This rule was removed from `main.css` in commit `cfb5d9a`. If blank space reappears after upstream updates, check for similar `min-height` rules on `.toolbar-mainbar`.
+
+**How we found it**: Binary search through `main.css` - commented out half the file at a time until the culprit was isolated.
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc

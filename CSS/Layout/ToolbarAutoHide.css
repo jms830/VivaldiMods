@@ -1,0 +1,69 @@
+/*
+Toolbar Auto-Hide
+version 2026.01.13
+Auto-hides the toolbar row in the sidebar, expands on hover
+Extracted from AutoHide/tabbar.css for standalone use
+*/
+
+/* Before toolbar: collapsed state */
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget {
+  margin: 3px !important;
+  min-height: 35px !important;
+  max-height: 35px !important;
+  overflow: hidden !important;
+  transition: all var(--animation-speed, 260ms) ease-out;
+}
+
+/* Hide toolbar items except URL bar and workspace popup */
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget
+  > *:not(:is(.UrlBar-AddressField, .workspace-popup)) {
+  opacity: 0;
+  min-height: 0px;
+  max-height: 0px;
+  overflow: hidden;
+  transition: all var(--animation-speed, 260ms) ease-out;
+}
+
+/* Before toolbar: expanded state on hover or focus */
+body:has(
+    :is(
+      #tabs-tabbar-container .toolbar-tabbar-before .UrlBar-AddressField:focus-within,
+      .toolbar-editor,
+      .toolbar-tabbar-before .ToolbarButton-Button.button-pressed
+    )
+  )
+  .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget,
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget:hover {
+  margin: 3px !important;
+  min-height: 35px !important;
+  max-height: 100000px !important;
+  overflow: visible !important;
+  transition: all var(--animation-speed, 260ms) ease-out;
+}
+
+/* Show toolbar items when expanded */
+body:has(
+    :is(
+      #tabs-tabbar-container .toolbar-tabbar-before .UrlBar-AddressField:focus-within,
+      .toolbar-editor,
+      .toolbar-tabbar-before .ToolbarButton-Button.button-pressed
+    )
+  )
+  .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget
+  > *:not(:is(.UrlBar-AddressField, .workspace-popup)),
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget:hover
+  > *:not(:is(.UrlBar-AddressField, .workspace-popup)) {
+  opacity: 1;
+  min-height: 30px;
+  max-height: 30px;
+  z-index: 300 !important;
+  overflow: visible;
+  transition: all var(--animation-speed, 260ms) ease-out;
+}
+
+/* After toolbar sizing */
+#tabs-tabbar-container .toolbar-tabbar-after {
+  align-content: flex-end;
+  min-height: 35px !important;
+  min-width: 100% !important;
+}

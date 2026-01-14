@@ -1,0 +1,65 @@
+/*
+Workspace Buttons Styling
+version 2026.01.13
+Extracted from AutoHide/tabbar.css for use without auto-hide
+Styles workspace buttons in the tab bar with hover effects and proper sizing
+See: https://vivaldi.com/blog/how-to/pawel-shows-you-how-to-play-with-workspaces-and-custom-icons-in-vivaldi/
+*/
+
+/* Toolbar after section (where workspace buttons typically live) */
+#tabs-tabbar-container .toolbar-tabbar-after {
+  align-content: flex-end;
+  min-height: 35px !important;
+  min-width: 100% !important;
+}
+
+/* Workspace button container with subtle background pill */
+/* Uncomment for Arc-style grouped look:
+.toolbar-tabbar-after {
+  position: relative;
+}
+
+.toolbar-tabbar-after::before {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--tabs-container-expand-width, 280px) - 12px);
+  height: 28px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  pointer-events: none;
+  z-index: 0;
+  background-color: rgba(119, 116, 116, 0.165);
+}
+*/
+
+/* Workspace buttons z-index fix */
+.toolbar-tabbar-after .button-toolbar:has(.ToolbarButton-Button) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Workspace button hover effect */
+.toolbar-tabbar-after button.ToolbarButton-Button[title*="workspace"]:hover,
+.toolbar-tabbar-after button.ToolbarButton-Button[title*="Workspace"]:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: calc(var(--radius, 8px) * 0.7);
+  transition: background 0.2s ease;
+}
+
+/* Workspace button full width in sidebar */
+.tabbar-workspace-button {
+  width: 100% !important;
+}
+
+/* Workspace popup styling */
+.WorkspacePopup-Items {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.WorkspacePopup-Items::-webkit-scrollbar {
+  display: none;
+}

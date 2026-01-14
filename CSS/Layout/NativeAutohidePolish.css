@@ -1,0 +1,102 @@
+/*
+Native Auto-Hide Polish
+version 2026.01.13
+Applies Arc-style rounding and transparency to Vivaldi 7.8+ native auto-hide UI
+Fixes: https://github.com/jms830/revivarc-vivaldi/issues - ynomas92-ctrl's report
+*/
+
+/* ============================================ */
+/* Native Auto-Hide Wrapper Rounding           */
+/* ============================================ */
+
+.auto-hide-wrapper.left,
+.auto-hide-wrapper.right {
+  border-radius: 0 var(--radius, 12px) var(--radius, 12px) 0 !important;
+  overflow: hidden !important;
+}
+
+.auto-hide-wrapper.right {
+  border-radius: var(--radius, 12px) 0 0 var(--radius, 12px) !important;
+}
+
+.auto-hide-wrapper.top {
+  border-radius: 0 0 var(--radius, 12px) var(--radius, 12px) !important;
+  overflow: hidden !important;
+}
+
+.auto-hide-wrapper.bottom {
+  border-radius: var(--radius, 12px) var(--radius, 12px) 0 0 !important;
+  overflow: hidden !important;
+}
+
+/* ============================================ */
+/* Transparent Skin Support                    */
+/* ============================================ */
+
+/* Use theme background with transparency for auto-hide wrappers */
+@container style(--fluid-theme: transparent) {
+  .auto-hide-wrapper {
+    background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+}
+
+/* Ensure auto-hide inherits theme colors properly */
+.auto-hide-wrapper {
+  background-color: var(--colorBg) !important;
+  border: 1px solid var(--colorBorder, transparent) !important;
+}
+
+/* Top bar (address bar) specific - match toolbar styling */
+.auto-hide-wrapper.top {
+  background-color: var(--colorTabBar, var(--colorBg)) !important;
+}
+
+/* ============================================ */
+/* Animation Smoothing                         */
+/* ============================================ */
+
+.auto-hide-wrapper {
+  transition: 
+    transform var(--animation-speed, 260ms) cubic-bezier(0.4, 0, 0.2, 1),
+    opacity var(--animation-speed, 260ms) ease-out,
+    background-color var(--animation-speed, 260ms) ease-out !important;
+}
+
+/* ============================================ */
+/* Inner Element Rounding                      */
+/* ============================================ */
+
+.auto-hide-wrapper .toolbar-mainbar {
+  border-radius: inherit !important;
+  background-color: inherit !important;
+}
+
+.auto-hide-wrapper #tabs-tabbar-container {
+  border-radius: inherit !important;
+}
+
+.auto-hide-wrapper .UrlBar-AddressField {
+  border-radius: calc(var(--radius, 12px) * 0.6) !important;
+}
+
+/* ============================================ */
+/* Corner Gap Fix                              */
+/* ============================================ */
+
+/* Fix corners sticking out (ynomas92-ctrl's report) */
+.auto-hide-wrapper.left {
+  margin-top: var(--window-border, 4px) !important;
+  margin-bottom: var(--window-border, 4px) !important;
+}
+
+.auto-hide-wrapper.right {
+  margin-top: var(--window-border, 4px) !important;
+  margin-bottom: var(--window-border, 4px) !important;
+}
+
+/* Prevent corner overflow */
+#browser:not(.fullscreen) .auto-hide-wrapper {
+  box-sizing: border-box !important;
+}
