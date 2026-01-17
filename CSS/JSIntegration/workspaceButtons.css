@@ -1,0 +1,61 @@
+/*
+Workspace Buttons Panel
+version 2026.01.13
+Additional styling for workspaceButtons.js
+Shows workspace icons as clickable buttons in sidebar
+*/
+
+#workspace-buttons-container {
+  order: 100;
+}
+
+.tabs-left #workspace-buttons-container,
+.tabs-right #workspace-buttons-container {
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  max-width: 100%;
+}
+
+#workspace-buttons-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.workspace-quick-button {
+  position: relative;
+}
+
+.workspace-quick-button::after {
+  content: attr(title);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 8px;
+  padding: 4px 8px;
+  background: var(--colorBg);
+  border: 1px solid var(--colorBorder);
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.workspace-quick-button:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tabs-right .workspace-quick-button::after {
+  left: auto;
+  right: 100%;
+  margin-left: 0;
+  margin-right: 8px;
+}

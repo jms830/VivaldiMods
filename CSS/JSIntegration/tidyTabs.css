@@ -48,7 +48,7 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
   pointer-events: none;
 }
 
-#tabs-container:hover .tidy-tabs-below-button {
+.tab-strip .separator:hover .tidy-tabs-below-button {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;

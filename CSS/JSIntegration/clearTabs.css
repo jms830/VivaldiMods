@@ -36,7 +36,7 @@ Clear Unpinned Tabs with one button, must install with ClearTabs.js
   pointer-events: none;
 }
 
-#tabs-container:hover .clear-tabs-below-button {
+.tab-strip .separator:hover .clear-tabs-below-button {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;

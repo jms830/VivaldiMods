@@ -289,6 +289,19 @@
         flex-wrap: nowrap;
         overflow: hidden;
         min-height: 28px;
+        flex-shrink: 0;
+      }
+
+      .tabbar-wrapper:has(#${CONFIG.containerId}) {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      
+      .tabbar-wrapper:has(#${CONFIG.containerId}) .tab-strip {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
       }
 
       .${CONFIG.buttonClass} {

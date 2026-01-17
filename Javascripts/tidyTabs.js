@@ -2,21 +2,49 @@
 	'use strict';
 
 	// ==================== Configuration ====================
+	// Right-click the TidyTabs button → Settings to configure API provider and key
 	
-	const CONFIG = {
-		// GLM API configuration
-		glm: {
-			url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
-			key: '',
-			model: 'glm-4.5-flash',
-			temperature: 0.3,
-			maxTokens: 2048
+	const STORAGE_KEY = 'tidyTabs_config';
+	
+	const DEFAULT_CONFIG = {
+		// API Provider: 'gemini', 'openai', 'glm', 'openrouter', 'custom'
+		provider: 'gemini',
+		
+		// API configurations per provider
+		api: {
+			gemini: {
+				url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+				key: '',
+				model: 'gemini-2.0-flash'
+			},
+			openai: {
+				url: 'https://api.openai.com/v1/chat/completions',
+				key: '',
+				model: 'gpt-4o-mini'
+			},
+			glm: {
+				url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+				key: '',
+				model: 'glm-4.5-flash'
+			},
+			openrouter: {
+				url: 'https://openrouter.ai/api/v1/chat/completions',
+				key: '',
+				model: 'google/gemini-2.0-flash-exp:free'
+			},
+			custom: {
+				url: '',
+				key: '',
+				model: ''
+			}
 		},
 		
+		// Shared API settings
+		temperature: 0.3,
+		maxTokens: 2048,
+		
 		// Auto-stack enabled workspaces (empty array = disabled for all)
-		autoStackWorkspaces: [
-			// "<default_workspace>",
-		],
+		autoStackWorkspaces: [],
 		
 		// Feature toggles
 		enableAIGrouping: true,
@@ -33,6 +61,193 @@
 			autoStack: 1000
 		}
 	};
+	
+	// Load config from localStorage or use defaults
+	const loadConfig = () => {
+		try {
+			const saved = localStorage.getItem(STORAGE_KEY);
+			if (saved) {
+				const parsed = JSON.parse(saved);
+				return { ...DEFAULT_CONFIG, ...parsed, api: { ...DEFAULT_CONFIG.api, ...parsed.api } };
+			}
+		} catch (e) {
+			console.error('TidyTabs: Error loading config', e);
+		}
+		return { ...DEFAULT_CONFIG };
+	};
+	
+	// Save config to localStorage
+	const saveConfig = (config) => {
+		try {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+		} catch (e) {
+			console.error('TidyTabs: Error saving config', e);
+		}
+	};
+	
+	let CONFIG = loadConfig();
+	
+	// Helper to get current API settings
+	const getApiConfig = () => {
+		const provider = CONFIG.provider || 'gemini';
+		return CONFIG.api[provider] || CONFIG.api.gemini;
+	};
+	
+	// Legacy compatibility: map old glm config to new structure
+	const CONFIG_COMPAT = {
+		get glm() {
+			const api = getApiConfig();
+			return {
+				url: api.url,
+				key: api.key,
+				model: api.model,
+				temperature: CONFIG.temperature,
+				maxTokens: CONFIG.maxTokens
+			};
+		}
+	};
+	
+	// ==================== Settings UI ====================
+	
+	const showSettingsDialog = () => {
+		const existing = document.getElementById('tidytabs-settings-dialog');
+		if (existing) existing.remove();
+		
+		const api = getApiConfig();
+		const dialog = document.createElement('div');
+		dialog.id = 'tidytabs-settings-dialog';
+		dialog.innerHTML = `
+			<style>
+				#tidytabs-settings-dialog {
+					position: fixed;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					background: var(--colorBg, #1e1e1e);
+					color: var(--colorFg, #fff);
+					border: 1px solid var(--colorBorder, #444);
+					border-radius: 8px;
+					padding: 20px;
+					z-index: 999999;
+					min-width: 400px;
+					box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+					font-family: system-ui, -apple-system, sans-serif;
+				}
+				#tidytabs-settings-dialog h2 {
+					margin: 0 0 15px 0;
+					font-size: 16px;
+				}
+				#tidytabs-settings-dialog label {
+					display: block;
+					margin: 10px 0 5px;
+					font-size: 12px;
+					opacity: 0.8;
+				}
+				#tidytabs-settings-dialog select,
+				#tidytabs-settings-dialog input {
+					width: 100%;
+					padding: 8px;
+					border: 1px solid var(--colorBorder, #444);
+					border-radius: 4px;
+					background: var(--colorBgDark, #2d2d2d);
+					color: var(--colorFg, #fff);
+					font-size: 13px;
+				}
+				#tidytabs-settings-dialog .buttons {
+					margin-top: 20px;
+					display: flex;
+					gap: 10px;
+					justify-content: flex-end;
+				}
+				#tidytabs-settings-dialog button {
+					padding: 8px 16px;
+					border: none;
+					border-radius: 4px;
+					cursor: pointer;
+					font-size: 13px;
+				}
+				#tidytabs-settings-dialog .btn-primary {
+					background: var(--colorAccentBg, #0078d4);
+					color: white;
+				}
+				#tidytabs-settings-dialog .btn-secondary {
+					background: var(--colorBgDark, #3d3d3d);
+					color: var(--colorFg, #fff);
+				}
+				#tidytabs-settings-dialog .hint {
+					font-size: 11px;
+					opacity: 0.6;
+					margin-top: 4px;
+				}
+			</style>
+			<h2>TidyTabs Settings</h2>
+			
+			<label>AI Provider</label>
+			<select id="tt-provider">
+				<option value="gemini" ${CONFIG.provider === 'gemini' ? 'selected' : ''}>Google Gemini</option>
+				<option value="openai" ${CONFIG.provider === 'openai' ? 'selected' : ''}>OpenAI</option>
+				<option value="openrouter" ${CONFIG.provider === 'openrouter' ? 'selected' : ''}>OpenRouter (free tier available)</option>
+				<option value="glm" ${CONFIG.provider === 'glm' ? 'selected' : ''}>GLM (Zhipu AI)</option>
+				<option value="custom" ${CONFIG.provider === 'custom' ? 'selected' : ''}>Custom OpenAI-compatible</option>
+			</select>
+			
+			<label>API Key</label>
+			<input type="password" id="tt-apikey" value="${api.key || ''}" placeholder="Enter your API key">
+			<div class="hint">
+				Get free key: 
+				<a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--colorAccentFg, #4fc3f7)">Gemini</a> |
+				<a href="https://openrouter.ai/keys" target="_blank" style="color: var(--colorAccentFg, #4fc3f7)">OpenRouter</a>
+			</div>
+			
+			<label>Model</label>
+			<input type="text" id="tt-model" value="${api.model || ''}" placeholder="e.g., gemini-2.0-flash">
+			
+			<div id="tt-custom-url" style="display: ${CONFIG.provider === 'custom' ? 'block' : 'none'}">
+				<label>API URL</label>
+				<input type="text" id="tt-url" value="${api.url || ''}" placeholder="https://api.example.com/v1/chat/completions">
+			</div>
+			
+			<div class="buttons">
+				<button class="btn-secondary" id="tt-cancel">Cancel</button>
+				<button class="btn-primary" id="tt-save">Save</button>
+			</div>
+		`;
+		
+		document.body.appendChild(dialog);
+		
+		const providerSelect = document.getElementById('tt-provider');
+		const apikeyInput = document.getElementById('tt-apikey');
+		const modelInput = document.getElementById('tt-model');
+		const urlInput = document.getElementById('tt-url');
+		const customUrlDiv = document.getElementById('tt-custom-url');
+		
+		providerSelect.addEventListener('change', () => {
+			const provider = providerSelect.value;
+			customUrlDiv.style.display = provider === 'custom' ? 'block' : 'none';
+			const providerConfig = CONFIG.api[provider] || DEFAULT_CONFIG.api[provider];
+			apikeyInput.value = providerConfig.key || '';
+			modelInput.value = providerConfig.model || '';
+			if (urlInput) urlInput.value = providerConfig.url || '';
+		});
+		
+		document.getElementById('tt-cancel').addEventListener('click', () => dialog.remove());
+		
+		document.getElementById('tt-save').addEventListener('click', () => {
+			const provider = providerSelect.value;
+			CONFIG.provider = provider;
+			CONFIG.api[provider] = {
+				url: provider === 'custom' ? urlInput.value : DEFAULT_CONFIG.api[provider].url,
+				key: apikeyInput.value,
+				model: modelInput.value || DEFAULT_CONFIG.api[provider].model
+			};
+			saveConfig(CONFIG);
+			dialog.remove();
+			showNotification('Settings saved! Reload to apply.', 'info');
+		});
+	};
+	
+	// Expose settings dialog globally
+	window.tidyTabsSettings = showSettingsDialog;
 
 	// Selectors
 	const SELECTORS = {
@@ -486,11 +701,12 @@ Avoid the following:
 		}
 	};
 
-	// Call GLM API for intelligent grouping
 	const getAIGrouping = async (tabs, existingStacks = []) => {
-		if (!CONFIG.glm.key) {
-			console.error('GLM API key not configured');
-			showNotification('GLM API Key not configured, cannot use AI grouping');
+		const apiConfig = getApiConfig();
+		
+		if (!apiConfig.key) {
+			console.error('API key not configured');
+			showNotification('API Key not configured. Right-click TidyTabs button → Settings to add one.');
 			return null;
 		}
 		
@@ -507,35 +723,34 @@ Avoid the following:
 		const prompt = buildAIPrompt(tabs, existingStacks, languageName);
 
 		try {
-			console.log('Calling GLM API for intelligent grouping...');
+			console.log(`Calling ${CONFIG.provider} API for intelligent grouping...`);
 			
-			const response = await fetch(CONFIG.glm.url, {
+			const response = await fetch(apiConfig.url, {
 				method: 'POST',
 				headers: {
-					'Authorization': `Bearer ${CONFIG.glm.key}`,
+					'Authorization': `Bearer ${apiConfig.key}`,
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					model: CONFIG.glm.model,
+					model: apiConfig.model,
 					messages: [{ role: 'user', content: prompt }],
-					temperature: CONFIG.glm.temperature,
-					max_tokens: CONFIG.glm.maxTokens,
-					stream: false,
-					thinking: { type: "disabled" }
+					temperature: CONFIG.temperature,
+					max_tokens: CONFIG.maxTokens,
+					stream: false
 				})
 			});
 			
 			if (!response.ok) {
 				const errorText = await response.text();
-				console.error('GLM API error response:', errorText);
-				throw new Error(`GLM API error: ${response.status} ${response.statusText}`);
+				console.error('API error response:', errorText);
+				throw new Error(`API error: ${response.status} ${response.statusText}`);
 			}
 			
 			const data = await response.json();
-			console.log('GLM API full response:', data);
+			console.log('API full response:', data);
 			
 			const content = data.choices[0].message.content;
-			console.log('GLM API content:', content);
+			console.log('API content:', content);
 			
 			const result = parseAIResponse(content);
 			if (!result) return null;
@@ -776,9 +991,92 @@ Avoid the following:
 
 			button.addEventListener('click', function(e) {
 				e.stopPropagation();
-				tidyTabsBelow(separator);
+				if (e.ctrlKey || e.metaKey) {
+					showSettingsDialog();
+				} else {
+					tidyTabsBelow(separator);
+				}
+			});
+			
+			button.addEventListener('contextmenu', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				showContextMenu(e.clientX, e.clientY, separator);
 			});
 		});
+	};
+	
+	const showContextMenu = (x, y, separator) => {
+		const existing = document.getElementById('tidytabs-context-menu');
+		if (existing) existing.remove();
+		
+		const menu = document.createElement('div');
+		menu.id = 'tidytabs-context-menu';
+		menu.innerHTML = `
+			<style>
+				#tidytabs-context-menu {
+					position: fixed;
+					background: var(--colorBg, #252525);
+					border: 1px solid var(--colorBorder, #444);
+					border-radius: 6px;
+					padding: 4px 0;
+					z-index: 999999;
+					min-width: 160px;
+					box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+					font-family: system-ui, -apple-system, sans-serif;
+					font-size: 13px;
+				}
+				#tidytabs-context-menu .menu-item {
+					padding: 8px 12px;
+					cursor: pointer;
+					color: var(--colorFg, #fff);
+					display: flex;
+					align-items: center;
+					gap: 8px;
+				}
+				#tidytabs-context-menu .menu-item:hover {
+					background: var(--colorHighlightBg, #3d3d3d);
+				}
+				#tidytabs-context-menu .menu-item .icon {
+					width: 16px;
+					text-align: center;
+				}
+				#tidytabs-context-menu .separator {
+					height: 1px;
+					background: var(--colorBorder, #444);
+					margin: 4px 0;
+				}
+			</style>
+			<div class="menu-item" data-action="tidy"><span class="icon">📑</span> Tidy Tabs Below</div>
+			<div class="menu-item" data-action="tidy-ai"><span class="icon">✨</span> Tidy with AI</div>
+			<div class="separator"></div>
+			<div class="menu-item" data-action="settings"><span class="icon">⚙️</span> Settings...</div>
+		`;
+		
+		menu.style.left = `${x}px`;
+		menu.style.top = `${y}px`;
+		document.body.appendChild(menu);
+		
+		const closeMenu = () => menu.remove();
+		
+		menu.querySelectorAll('.menu-item').forEach(item => {
+			item.addEventListener('click', () => {
+				const action = item.dataset.action;
+				closeMenu();
+				
+				if (action === 'tidy') {
+					tidyTabsBelow(separator, false);
+				} else if (action === 'tidy-ai') {
+					tidyTabsBelow(separator, true);
+				} else if (action === 'settings') {
+					showSettingsDialog();
+				}
+			});
+		});
+		
+		setTimeout(() => {
+			document.addEventListener('click', closeMenu, { once: true });
+		}, 0);
 	};
 
 	// ==================== Core Functionality ====================
@@ -801,7 +1099,7 @@ Avoid the following:
 		
 		let groups;
 		
-		if (CONFIG.enableAIGrouping && CONFIG.glm.key) {
+		if (CONFIG.enableAIGrouping && getApiConfig().key) {
 			groups = await getAIGrouping(tabs);
 			
 			if (!groups) {
@@ -821,8 +1119,7 @@ Avoid the following:
 		console.log('Auto-stacking completed!');
 	};
 
-	// Manually tidy tabs below separator
-	const tidyTabsBelow = async (separator) => {
+	const tidyTabsBelow = async (separator, forceAI = null) => {
 		const existingStacks = await detectExistingStacks(separator.nextElementSibling);
 		const tabsInfo = collectTabsFromSeparator(separator);
 
@@ -849,8 +1146,9 @@ Avoid the following:
 			}
 
 			let groups;
+			const useAI = forceAI !== null ? forceAI : (CONFIG.enableAIGrouping && getApiConfig().key);
 			
-			if (CONFIG.enableAIGrouping && CONFIG.glm.key) {
+			if (useAI && getApiConfig().key) {
 				console.log('Using AI grouping...');
 				groups = await getAIGrouping(validTabs, existingStacks);
 				
@@ -858,6 +1156,9 @@ Avoid the following:
 					console.log('AI grouping failed, falling back to domain grouping');
 					groups = groupByDomain(validTabs);
 				}
+			} else if (useAI && !getApiConfig().key) {
+				showNotification('AI requested but no API key configured. Right-click → Settings to add one.');
+				groups = groupByDomain(validTabs);
 			} else {
 				console.log('Using domain grouping...');
 				groups = groupByDomain(validTabs);

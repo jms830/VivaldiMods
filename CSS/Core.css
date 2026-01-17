@@ -35,10 +35,11 @@ You may manage and config all your css mods and config them as well all in this 
 @import "EnhancedUX/SelectableText.css";
 
 /* Import JSIntegretion folder CSS files */
-@import "JSIntegration/ClearTabs.css";
-@import "JSIntegration/TidyTabs.css";
+@import "JSIntegration/clearTabs.css";
+@import "JSIntegration/tidyTabs.css";
 @import "JSIntegration/ArcPeek.css";
-@import "JSIntegration/Accentmod.css";
+@import "JSIntegration/AccentMod.css";
+@import "JSIntegration/workspaceButtons.css";
 
 /* Import under dev folder CSS files */
 /* @import "Dev/TabStack.css"; */
