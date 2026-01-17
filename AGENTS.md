@@ -122,6 +122,53 @@ VivaldiModManager is a .NET Windows application. Linux/macOS users can only use 
 
 **How we found it**: Binary search through `main.css` - commented out half the file at a time until the culprit was isolated.
 
+### Workspace Buttons: Triggering React-Controlled UI (Fixed Jan 2026)
+
+**Symptom**: Custom workspace quick-switch buttons could activate tabs in another workspace, but the tabbar UI wouldn't update to show that workspace's tabs.
+
+**Root Cause**: Vivaldi's UI is React-based. Standard DOM events (`.click()`, `dispatchEvent()`) don't trigger React's internal state updates. The workspace popup button and items require React's event system.
+
+**What DOESN'T Work**:
+- `element.click()` - Native click doesn't trigger React handlers
+- `dispatchEvent(new MouseEvent(...))` - DOM events bypass React
+- `element.__reactProps$.onClick(event)` - React's onClick isn't the right handler
+- Keyboard shortcut simulation - JS-generated events aren't "trusted" by browser
+
+**What WORKS** (from `globalMediaControls.js`):
+```javascript
+// Get React's internal props from a DOM element
+const getReactProps = (element) => {
+  const key = Object.keys(element).find(k => k.startsWith('__reactProps'));
+  return element[key];
+};
+
+// Trigger via onPointerDown - React's preferred event for buttons
+const simulateButtonClick = (element) => {
+  const pointerDown = new PointerEvent('pointerdown', {
+    view: window, bubbles: true, cancelable: true,
+    buttons: 0, pointerType: 'mouse',
+  });
+  pointerDown.persist = () => {};  // Required for React event pooling
+  
+  const props = getReactProps(element);
+  if (props?.onPointerDown) {
+    props.onPointerDown(pointerDown);
+    element.dispatchEvent(new PointerEvent('pointerup', {...}));
+    return true;
+  }
+  return false;
+};
+```
+
+**Key Insights**:
+1. React uses `onPointerDown` not `onClick` for toolbar buttons
+2. The `.persist()` method is needed even if empty (prevents React event pooling issues)
+3. Popup menus are rendered via React portals at document root, not inside the button
+4. The popup selector is `div[class*="Popup"]` with multiple `button` children
+5. "Default" workspace maps to the `.this-window` button in the popup
+
+**File**: `Javascripts/workspaceButtons.js`
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc
