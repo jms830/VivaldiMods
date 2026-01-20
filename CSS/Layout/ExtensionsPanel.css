@@ -3,21 +3,24 @@ ExtensionsPanel
 version 2025.01.20
 Author PaRr0tBoY (modified)
 https://github.com/PaRr0tBoY/Awesome-Vivaldi
-Extension toolbar styling - preserves drag/drop and visibility settings
 */
 
-/* 
-NOTE: Auto-hide extensions feature REMOVED because it breaks:
-  - Drag and drop reordering of extensions
-  - Right-click context menu for visibility settings
-  - Extension badge visibility
-  
-If you want auto-hide, use Vivaldi's native settings instead:
-  Settings > Appearance > Toolbar Customization
-*/
+.toolbar-extensions {
+  gap: 0 !important;
+}
 
 .toolbar-extensions .ExtensionIcon {
-  transition: opacity 0.2s ease-in-out;
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.toolbar-extensions:hover {
+  gap: var(--densityGap) !important;
+}
+
+.toolbar-extensions:hover .ExtensionIcon {
+  transform: scale(1);
 }
 
 /* ========================================
