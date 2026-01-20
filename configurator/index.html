@@ -901,6 +901,7 @@
                     <button class="preset-btn" data-preset="default">Default</button>
                     <button class="preset-btn" data-preset="minimal">Minimal</button>
                     <button class="preset-btn active" data-preset="recommended">Recommended</button>
+                    <button class="preset-btn" data-preset="nativeAutohide">Native 7.8+</button>
                     <button class="preset-btn" data-preset="maximal">All Features</button>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
@@ -950,13 +951,65 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="feature-card" data-module="Layout/WorkspaceButtons.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">Workspace quick-switch buttons</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Workspace Buttons Styling</div>
+                                <div class="feature-desc">Hover effects and sizing for workspace quick-switch buttons in sidebar.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="Layout/NativeAutohidePolish.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">Polish for Vivaldi 7.8+ native auto-hide</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Native Auto-Hide Polish <span class="badge badge-toggle" title="For Vivaldi 7.8+ native auto-hide">7.8+</span></div>
+                                <div class="feature-desc">Rounded corners and transparency fixes for Vivaldi's built-in auto-hide feature.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="Layout/ToolbarAutoHide.css">
+                        <div class="feature-preview">
+                            <div class="no-preview">Collapsible toolbar row</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Toolbar Auto-Hide</div>
+                                <div class="feature-desc">Collapsible toolbar row in sidebar. URL bar + toolbar buttons collapse when not hovered.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" data-module="JSIntegration/workspaceButtons.css" data-js="true">
+                        <div class="feature-preview">
+                            <div class="no-preview">CSS for JS workspace buttons</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Workspace Buttons JS Styling <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">CSS styles for the workspaceButtons.js mod - quick workspace switching.</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
             
             <section class="section" id="tabs">
                 <h2 class="section-header">Tabs</h2>
                 <div class="feature-grid">
-                    <div class="feature-card" data-module="AutoHide/Tabbar.css">
+                    <div class="feature-card" data-module="AutoHide/tabbar.css">
                         <div class="feature-preview">
                             <img src="assets/sidebar.gif" alt="Auto-Hide Tabbar" loading="lazy">
                         </div>
@@ -969,7 +1022,7 @@
                         </div>
                     </div>
                     
-                    <div class="feature-card" data-module="EnhancedUX/TabsTrail.css">
+                    <div class="feature-card" data-module="EnhancedUX/tabsTrail.css">
                         <div class="feature-preview">
                             <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/TabTrails.gif" alt="Tab Trails" loading="lazy">
                         </div>
@@ -982,7 +1035,7 @@
                         </div>
                     </div>
                     
-                    <div class="feature-card" data-module="EnhancedUX/Quietify.css">
+                    <div class="feature-card" data-module="EnhancedUX/quietify.css">
                         <div class="feature-preview">
                             <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/audioIcon.gif" alt="Quietify" loading="lazy">
                         </div>
@@ -1069,6 +1122,19 @@
                             <div class="feature-info">
                                 <div class="feature-title">Dialog Tab <span class="badge badge-js">JS</span></div>
                                 <div class="feature-desc">Open links or search results in a floating dialog popup instead of new tabs.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card js-locked" data-jsmod="workspaceButtons.js">
+                        <div class="feature-preview">
+                            <div class="no-preview">Quick workspace switching</div>
+                        </div>
+                        <div class="feature-body">
+                            <div class="checkbox" tabindex="0" role="checkbox" aria-checked="false"></div>
+                            <div class="feature-info">
+                                <div class="feature-title">Workspace Buttons <span class="badge badge-js">JS</span></div>
+                                <div class="feature-desc">Adds workspace quick-switch buttons below tabbar. Click to switch workspaces instantly.</div>
                             </div>
                         </div>
                     </div>
@@ -1187,7 +1253,7 @@
                         </div>
                     </div>
                     
-                    <div class="feature-card" data-module="AutoHide/AdaptiveBF.css">
+                    <div class="feature-card" data-module="AutoHide/adaptiveBF.css">
                         <div class="feature-preview">
                             <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/feature-small/My-Mods/adaptiveBF.gif" alt="Adaptive Back/Forward" loading="lazy">
                         </div>
@@ -1270,7 +1336,7 @@
             <section class="section" id="startpage">
                 <h2 class="section-header">Start Page</h2>
                 <div class="feature-grid">
-                    <div class="feature-card" data-module="Layout/NeatDial.css">
+                    <div class="feature-card" data-module="Layout/neatDial.css">
                         <div class="feature-preview">
                             <img src="https://raw.githubusercontent.com/PaRr0tBoY/Awesome-Vivaldi/main/Others/Showcase/MainShowCase/NeatNewTab.png" alt="Neat Speed Dial" loading="lazy">
                         </div>
@@ -1656,14 +1722,16 @@
         const jsModToCssMap = {
             'tidyTabs.js': 'JSIntegration/tidyTabs.css',
             'ClearTabs.js': 'JSIntegration/clearTabs.css',
-            'luetage/accentMod.js': 'JSIntegration/AccentMod.css'
+            'luetage/accentMod.js': 'JSIntegration/AccentMod.css',
+            'workspaceButtons.js': 'JSIntegration/workspaceButtons.css'
         };
         
         const cssToJsModMap = {
             'JSIntegration/tidyTabs.css': 'tidyTabs.js',
             'JSIntegration/clearTabs.css': 'ClearTabs.js',
             'JSIntegration/AccentMod.css': 'luetage/accentMod.js',
-            'JSIntegration/ArcPeek.css': null
+            'JSIntegration/ArcPeek.css': null,
+            'JSIntegration/workspaceButtons.css': 'workspaceButtons.js'
         };
         
         const presets = {
@@ -1685,10 +1753,10 @@
             },
             recommended: {
                 modules: [
-                    'AutoHide/AdaptiveBF.css', 'AutoHide/Bookmarkbar.css', 'AutoHide/Panel.css', 'AutoHide/StatusBar.css',
-                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/addressbar.css', 'Layout/NeatDial.css',
+                    'AutoHide/adaptiveBF.css', 'AutoHide/Bookmarkbar.css', 'AutoHide/Panel.css', 'AutoHide/StatusBar.css',
+                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/addressbar.css', 'Layout/neatDial.css',
                     'Layout/FindInPage.css', 'Layout/QuickCommand.css', 'Layout/DownloadPanel.css', 'Layout/ExtensionsPanel.css',
-                    'EnhancedUX/BtnHoverAnime.css', 'EnhancedUX/TabsTrail.css', 'EnhancedUX/Quietify.css',
+                    'EnhancedUX/BtnHoverAnime.css', 'EnhancedUX/tabsTrail.css', 'EnhancedUX/quietify.css',
                     'JSIntegration/tidyTabs.css', 'JSIntegration/clearTabs.css', 'JSIntegration/ArcPeek.css'
                 ],
                 jsmods: ['tidyTabs.js', 'tidyTitles.js', 'ClearTabs.js', 'Tam710562/globalMediaControls.js'],
@@ -1696,10 +1764,10 @@
             },
             maximal: {
                 modules: [
-                    'AutoHide/AdaptiveBF.css', 'AutoHide/Tabbar.css', 'AutoHide/Bookmarkbar.css', 'AutoHide/Panel.css', 'AutoHide/StatusBar.css',
-                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/addressbar.css', 'Layout/NeatDial.css',
+                    'AutoHide/adaptiveBF.css', 'AutoHide/tabbar.css', 'AutoHide/Bookmarkbar.css', 'AutoHide/Panel.css', 'AutoHide/StatusBar.css',
+                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/addressbar.css', 'Layout/neatDial.css',
                     'Layout/FindInPage.css', 'Layout/QuickCommand.css', 'Layout/DownloadPanel.css', 'Layout/ExtensionsPanel.css', 'Layout/themePreviewer.css',
-                    'EnhancedUX/BtnHoverAnime.css', 'EnhancedUX/TabsTrail.css', 'EnhancedUX/Quietify.css', 'EnhancedUX/SelectableText.css',
+                    'EnhancedUX/BtnHoverAnime.css', 'EnhancedUX/tabsTrail.css', 'EnhancedUX/quietify.css', 'EnhancedUX/SelectableText.css',
                     'JSIntegration/tidyTabs.css', 'JSIntegration/clearTabs.css', 'JSIntegration/ArcPeek.css', 'JSIntegration/AccentMod.css'
                 ],
                 jsmods: [
@@ -1708,6 +1776,32 @@
                     'aminought/colorTabs.js', 'luetage/accentMod.js', 'Tam710562/feedIcon.js', 'Tam710562/dialogTab.js'
                 ],
                 vars: { compact: 'on', floatTabbar: 'on', blurMask: 'on', tabsGrid: 'on', pinAtTop: 'on', delay: 'on', borderRadius: 'on' }
+            },
+            nativeAutohide: {
+                modules: [
+                    // Layout - core Arc styling
+                    'Layout/main.css', 'Layout/FavouriteTabs.css', 'Layout/addressbar.css', 'Layout/neatDial.css',
+                    'Layout/FindInPage.css', 'Layout/QuickCommand.css', 'Layout/DownloadPanel.css', 'Layout/ExtensionsPanel.css',
+                    // NEW: Native auto-hide polish modules
+                    'Layout/WorkspaceButtons.css', 'Layout/NativeAutohidePolish.css', 'Layout/ToolbarAutoHide.css',
+                    // EnhancedUX
+                    'EnhancedUX/BtnHoverAnime.css', 'EnhancedUX/tabsTrail.css', 'EnhancedUX/quietify.css', 'EnhancedUX/SelectableText.css',
+                    // JSIntegration
+                    'JSIntegration/tidyTabs.css', 'JSIntegration/clearTabs.css', 'JSIntegration/ArcPeek.css', 'JSIntegration/AccentMod.css',
+                    'JSIntegration/workspaceButtons.css'
+                    // NOTE: AutoHide modules are intentionally EXCLUDED - use Vivaldi 7.8+ native auto-hide instead
+                ],
+                jsmods: [
+                    'tidyTabs.js', 'tidyTitles.js', 'ClearTabs.js',
+                    'Tam710562/globalMediaControls.js', 'Tam710562/mdNotes.js', 'Tam710562/easyFiles.js',
+                    'workspaceButtons.js'
+                ],
+                vars: { 
+                    themeMode: 'color', compact: 'off', floatTabbar: 'on', blurMask: 'off',
+                    delay: 'on', borderRadius: 'on', tabsGrid: 'on', pinAtTop: 'off', blurHibernate: 'off',
+                    pinnedColumns: 3, pinnedRows: 3, pinnedGap: 8, pinnedIconSize: 20,
+                    collapseWidth: 44, expandWidth: 280, windowBorder: 4, animationSpeed: 260
+                }
             }
         };
         

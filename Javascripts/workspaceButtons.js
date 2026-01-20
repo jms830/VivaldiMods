@@ -281,54 +281,52 @@
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        gap: 2px;
-        padding: 6px 4px;
-        margin: 4px;
+        gap: 1px;
+        padding: 2px;
+        margin: 0;
         background: var(--colorBgAlphaHeavy, rgba(0,0,0,0.2));
         border-radius: var(--radius, 8px);
         flex-wrap: nowrap;
+        min-height: 24px;
+        flex-shrink: 1;
+        box-sizing: border-box;
+        width: auto;
+        max-width: 100%;
+        min-width: 0;
         overflow: hidden;
-        min-height: 28px;
-        flex-shrink: 0;
+        --workspace-button-size: 30px;
+        --workspace-button-min: 18px;
       }
 
-      .tabbar-wrapper:has(#${CONFIG.containerId}) {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      
-      .tabbar-wrapper:has(#${CONFIG.containerId}) .tab-strip {
-        flex: 1;
-        min-height: 0;
-        overflow-y: auto;
+      #tabs-tabbar-container .toolbar-tabbar-after {
+        min-width: 0 !important;
       }
 
       .${CONFIG.buttonClass} {
         display: flex;
         align-items: center;
         justify-content: center;
-        min-width: ${CONFIG.minButtonSize}px;
-        max-width: ${CONFIG.maxButtonSize}px;
-        width: ${CONFIG.maxButtonSize}px;
-        height: ${CONFIG.maxButtonSize}px;
-        min-height: ${CONFIG.minButtonSize}px;
-        padding: 2px;
+        min-width: var(--workspace-button-min);
+        min-height: var(--workspace-button-min);
+        width: var(--workspace-button-size);
+        height: var(--workspace-button-size);
+        max-width: var(--workspace-button-size);
+        padding: 0;
         border: none;
         border-radius: calc(var(--radius, 8px) * 0.6);
         background: transparent;
         color: var(--colorFg);
         cursor: pointer;
         transition: all 0.15s ease;
-        opacity: 0.6;
-        flex-shrink: 1;
-        flex-grow: 0;
+        opacity: 0.7;
+        flex: 1 1 0px;
       }
 
       .${CONFIG.buttonClass}:hover {
         background: var(--colorBgAlphaHeavy, rgba(255,255,255,0.1));
         opacity: 1;
         transform: scale(1.05);
+        z-index: 1;
       }
 
       .${CONFIG.buttonClass}.${CONFIG.activeClass} {
@@ -338,13 +336,14 @@
       }
 
       .${CONFIG.buttonClass} svg {
-        width: 14px;
-        height: 14px;
-        min-width: 12px;
-        min-height: 12px;
+        width: calc(var(--workspace-button-size) * 0.45);
+        height: calc(var(--workspace-button-size) * 0.45);
+        min-width: 10px;
+        min-height: 10px;
         stroke: currentColor;
         fill: none;
         flex-shrink: 0;
+        transform-origin: center;
       }
 
       .${CONFIG.addButtonClass} {
@@ -358,29 +357,24 @@
       }
 
       /* Responsive sizing based on container width */
-      @container tabs-container (max-width: 200px) {
-        .${CONFIG.buttonClass} {
-          width: 24px;
-          height: 24px;
-          min-width: 20px;
-          min-height: 20px;
+      @container tabs-container (max-width: 220px) {
+        #${CONFIG.containerId} {
+          --workspace-button-size: 20px;
+          --workspace-button-min: 16px;
         }
-        .${CONFIG.buttonClass} svg {
-          width: 12px;
-          height: 12px;
+      }
+      
+      @container tabs-container (max-width: 160px) {
+        #${CONFIG.containerId} {
+          --workspace-button-size: 16px;
+          --workspace-button-min: 14px;
         }
       }
 
       /* Fallback: CSS calc based responsive */
       #tabs-tabbar-container.left #${CONFIG.containerId},
       #tabs-tabbar-container.right #${CONFIG.containerId} {
-        max-width: calc(100% - 8px);
-      }
-
-      /* When very narrow, allow smaller buttons */
-      #tabs-tabbar-container #${CONFIG.containerId} .${CONFIG.buttonClass} {
-        flex: 1 1 auto;
-        max-width: ${CONFIG.maxButtonSize}px;
+        max-width: calc(100% - 4px);
       }
     `;
     document.head.appendChild(style);
@@ -407,8 +401,6 @@
     if (!tabbarContainer) return null;
 
     const targets = [
-      '#tabs-tabbar-container.left .tabbar-wrapper',
-      '#tabs-tabbar-container.right .tabbar-wrapper',
       '#tabs-tabbar-container .toolbar-tabbar-after',
       '#tabs-tabbar-container .sync-and-trash-container',
       '.tabbar-wrapper',
@@ -418,7 +410,7 @@
     for (const selector of targets) {
       const el = document.querySelector(selector);
       if (el) {
-        console.log('[WorkspaceButtons] Found insertion point:', selector);
+        console.log('[WorkspaceButtons] Fallback insertion point:', selector);
         return el;
       }
     }

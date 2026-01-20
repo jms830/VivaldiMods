@@ -1104,11 +1104,6 @@ body:has(#panel_switch)
   width: 100% !important;
 }
 
-/* Disable tab bar resizing */
-#tabs-tabbar-container .SlideBar {
-  display: none !important;
-}
-
 /* Transparent background for left tab bar wrapper */
 .tabbar-wrapper:has(#tabs-container.left) {
   background-color: transparent !important;

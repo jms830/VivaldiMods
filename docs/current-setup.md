@@ -56,6 +56,7 @@ This documents the current working configuration for Vivaldi 7.8 Snapshot with A
 | ✅ | TidyTabs.css | Tidy tabs button (blue) |
 | ✅ | ArcPeek.css | Arc peek feature |
 | ✅ | Accentmod.css | Accent color mod |
+| ✅ | workspaceButtons.css | Workspace buttons JS styling |
 
 ### Dev
 | Module | File | Purpose |
@@ -117,6 +118,7 @@ Location: `C:\Users\jordans\AppData\Local\Vivaldi\Application\7.8.3916.3\resourc
 | globalMediaControls.js | Media playback panel | 76KB |
 | mdNotes.js | Markdown notes in sidebar | 12KB |
 | easyFiles.js | File management panel | 36KB |
+| workspaceButtons.js | Quick workspace switching buttons | 18KB |
 
 ### JS Mods NOT Installed (Available in repo)
 - colorTabs.js - Color tab borders by favicon
@@ -186,6 +188,7 @@ To add this as a preset in the configurator:
     "JSIntegration/TidyTabs.css": true,
     "JSIntegration/ArcPeek.css": true,
     "JSIntegration/Accentmod.css": true,
+    "JSIntegration/workspaceButtons.css": true,
     
     // Dev
     "Dev/LineBreak.css": true,
@@ -211,7 +214,8 @@ To add this as a preset in the configurator:
     "ClearTabs.js",
     "globalMediaControls.js",
     "mdNotes.js",
-    "easyFiles.js"
+    "easyFiles.js",
+    "workspaceButtons.js"
   ]
 }
 ```

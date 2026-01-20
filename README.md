@@ -49,7 +49,10 @@ revivarc-vivaldi/
 ├── scripts/                # Installation scripts
 │   ├── install.bat         # CSS setup (Windows)
 │   ├── install-js-mods.bat # JS setup (Windows)
-│   └── restore-vivaldi.bat # Remove JS mods
+│   ├── restore-vivaldi.bat # Remove JS mods
+│   ├── auto-patch-vivaldi.bat   # Re-apply JS mods if missing
+│   ├── setup-auto-patch.bat     # Schedule auto-patch on login
+│   └── vivaldi-watcher.ahk      # Auto-apply JS mods on Vivaldi update
 ├── configurator/           # Web-based configuration tool
 ├── docs/                   # Documentation and customization notes
 └── Themes/                 # Theme presets
@@ -64,6 +67,7 @@ The configurator offers these presets:
 | **Default** | Clean upstream Awesome-Vivaldi |
 | **Minimal** | Basic Arc-style sidebar |
 | **Recommended** | Balanced features with auto-hide and animations |
+| **Native 7.8+** | For Vivaldi 7.8+ users with native auto-hide enabled |
 | **All Features** | Everything enabled |
 
 ## What's Included
@@ -91,8 +95,26 @@ The configurator offers these presets:
 | globalMediaControls.js | Media playback panel |
 | colorTabs.js | Color tab borders by favicon |
 | mdNotes.js | Markdown notes in sidebar |
+| workspaceButtons.js | Quick workspace switching buttons in tabbar |
 
-**Note:** JS mods require patching Vivaldi's `window.html`. Run `scripts/install-js-mods.bat` on Windows, or see [docs](docs/) for manual instructions on macOS/Linux. You'll need to re-run this after Vivaldi updates.
+**Note:** JS mods require patching Vivaldi's `window.html`. Run `scripts/install-js-mods.bat` on Windows, or see [docs](docs/) for manual instructions on macOS/Linux.
+
+### JS Mod Persistence (Vivaldi Updates)
+
+JS mods are injected into Vivaldi's versioned `Application/<version>/resources/vivaldi/` folder. **When Vivaldi updates, this folder is replaced and JS mods are lost.** CSS mods persist because their path is stored in user preferences.
+
+**Solutions for Windows:**
+
+| Script | Description |
+|--------|-------------|
+| `scripts/auto-patch-vivaldi.bat` | Checks if latest Vivaldi version has custom.js, re-applies if missing. Run manually or on schedule. |
+| `scripts/setup-auto-patch.bat` | Creates a Windows scheduled task to run auto-patch on login. |
+| `scripts/vivaldi-watcher.ahk` | AutoHotkey v2 script that monitors Vivaldi's folder and auto-applies JS mods when a new version is detected. **Recommended** - set it to run at startup. |
+
+To use the watcher:
+1. Install [AutoHotkey v2](https://www.autohotkey.com/)
+2. Edit `scripts/vivaldi-watcher.ahk` and set `installerScript` to the full path of your `install-js-mods.bat`
+3. Add the .ahk file to Windows startup (Win+R → `shell:startup` → create shortcut)
 
 ## Customizations
 
