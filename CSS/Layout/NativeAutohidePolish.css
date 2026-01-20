@@ -100,3 +100,12 @@ Fixes: https://github.com/jms830/revivarc-vivaldi/issues - ynomas92-ctrl's repor
 #browser:not(.fullscreen) .auto-hide-wrapper {
   box-sizing: border-box !important;
 }
+
+#panels-container.switcher,
+#panels-container.icons #switch {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
