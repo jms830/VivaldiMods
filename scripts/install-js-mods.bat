@@ -9,12 +9,32 @@ REM What it does:
 REM   1. Backs up Vivaldi's original window.html
 REM   2. Combines all JS mods into a single custom.js file
 REM   3. Patches window.html to load custom.js
+REM   4. (Optional) Installs AutoHotkey watcher for auto-patching on updates
 REM
-REM NOTE: You'll need to re-run this after Vivaldi updates!
+REM Usage:
+REM   install-js-mods.bat              - Normal install with watcher prompt
+REM   install-js-mods.bat --silent     - Silent mode (no watcher prompt)
+REM   install-js-mods.bat --ahk-path "C:\path\to\AutoHotkey"
+REM                                    - Custom AHK scripts folder
+REM
+REM NOTE: You'll need to re-run this after Vivaldi updates (or use the watcher)!
 REM ============================================================================
 
 setlocal EnableDelayedExpansion
 cd "%~dp0"
+
+REM === Parse arguments ===
+set "SILENT_MODE=0"
+set "AHK_PATH=%USERPROFILE%\Documents\AutoHotkey"
+
+:parse_args
+if "%~1"=="" goto :done_args
+if /I "%~1"=="--silent" set "SILENT_MODE=1" & shift & goto :parse_args
+if /I "%~1"=="-s" set "SILENT_MODE=1" & shift & goto :parse_args
+if /I "%~1"=="--ahk-path" set "AHK_PATH=%~2" & shift & shift & goto :parse_args
+shift
+goto :parse_args
+:done_args
 
 echo.
 echo ========================================
@@ -178,10 +198,58 @@ echo  Installed %MOD_COUNT% JavaScript mods.
 echo.
 echo  Location: %VIVALDI_VERSION_DIR%custom.js
 echo.
+
+REM === Offer to install watcher (if not silent and AHK exists) ===
+if "%SILENT_MODE%"=="1" goto :skip_watcher
+
+set "WATCHER_SRC=%~dp0vivaldi-watcher.ahk"
+set "WATCHER_DST=%AHK_PATH%\Vivaldi Watcher.ahk"
+
+if not exist "%WATCHER_SRC%" goto :skip_watcher
+
+REM Check if watcher already installed
+if exist "%WATCHER_DST%" (
+    echo  [i] Watcher already installed: %WATCHER_DST%
+    echo.
+    goto :after_watcher
+)
+
+REM Check if AHK folder exists
+if not exist "%AHK_PATH%" (
+    echo  [?] AutoHotkey folder not found: %AHK_PATH%
+    echo      Use --ahk-path to specify a different location.
+    echo.
+    goto :skip_watcher
+)
+
+echo  Would you like to install the AutoHotkey watcher?
+echo  This will auto-patch Vivaldi when it updates.
+echo.
+echo  Install location: %WATCHER_DST%
+echo.
+choice /C YN /M "Install watcher"
+if errorlevel 2 goto :skip_watcher
+
+copy "%WATCHER_SRC%" "%WATCHER_DST%" >nul
+echo.
+echo  [OK] Watcher installed: %WATCHER_DST%
+echo.
+echo  To enable auto-start:
+echo    1. Press Win+R, type: shell:startup
+echo    2. Create a shortcut to the watcher script
+echo.
+goto :after_watcher
+
+:skip_watcher
 echo  IMPORTANT:
 echo  - Restart Vivaldi to apply changes
 echo  - Re-run this script after Vivaldi updates!
 echo.
+echo  TIP: Install the AutoHotkey watcher to auto-patch on updates:
+echo       run: install-js-mods.bat (without --silent)
+echo.
+
+:after_watcher
 echo  To remove JS mods: run restore-vivaldi.bat
 echo.
 pause

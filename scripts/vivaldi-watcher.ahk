@@ -23,8 +23,36 @@
 vivaldiPath := A_AppData . "\..\Local\Vivaldi\Application"
 
 ; Path to the JS mods installer script
-; IMPORTANT: Change this to the actual path of your revivarc-vivaldi repo
-installerScript := "C:\Users\YourUsername\github\revivarc-vivaldi\scripts\install-js-mods.bat"
+; Auto-detect: if this script is in the repo's scripts/ folder, use that
+; Otherwise, set this manually to your revivarc-vivaldi repo location
+installerScript := ""
+
+; Try to auto-detect installer path
+if FileExist(A_ScriptDir "\install-js-mods.bat") {
+    ; We're running from the repo's scripts/ folder
+    installerScript := A_ScriptDir "\install-js-mods.bat"
+} else if FileExist(A_ScriptDir "\..\revivarc-vivaldi\scripts\install-js-mods.bat") {
+    ; We're in a sibling AutoHotkey folder, repo is nearby
+    installerScript := A_ScriptDir "\..\revivarc-vivaldi\scripts\install-js-mods.bat"
+} else {
+    ; Fallback: check common locations
+    for _, path in [
+        A_MyDocuments "\github\revivarc-vivaldi\scripts\install-js-mods.bat",
+        A_MyDocuments "\..\github\revivarc-vivaldi\scripts\install-js-mods.bat",
+        "C:\Users\" A_UserName "\github\revivarc-vivaldi\scripts\install-js-mods.bat"
+    ] {
+        if FileExist(path) {
+            installerScript := path
+            break
+        }
+    }
+}
+
+; If still not found, check if path was set via config file
+configFile := A_ScriptDir "\vivaldi-watcher.ini"
+if FileExist(configFile) {
+    installerScript := IniRead(configFile, "Settings", "InstallerScript", installerScript)
+}
 
 ; Cooldown in milliseconds (don't run installer more than once per 30 seconds)
 cooldownMs := 30000
@@ -36,8 +64,20 @@ if !DirExist(vivaldiPath) {
 }
 
 if !FileExist(installerScript) {
-    MsgBox("Error: JS mods installer script not found.`n`n" installerScript "`n`nPlease update the installerScript path in this script.", "Vivaldi Watcher Error")
-    ExitApp
+    ; Offer to let user browse for it
+    result := MsgBox("JS mods installer script not found.`n`nWould you like to browse for install-js-mods.bat?", "Vivaldi Watcher", "YesNo")
+    if result = "Yes" {
+        selectedFile := FileSelect(1, A_MyDocuments, "Select install-js-mods.bat", "Batch Files (*.bat)")
+        if selectedFile {
+            installerScript := selectedFile
+            ; Save to config for next time
+            IniWrite(installerScript, configFile, "Settings", "InstallerScript")
+        } else {
+            ExitApp
+        }
+    } else {
+        ExitApp
+    }
 }
 
 ; --- State ---
