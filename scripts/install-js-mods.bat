@@ -183,11 +183,33 @@ echo [3/3] Patching window.html...
 
 REM Remove closing tags and add script reference
 type "%VIVALDI_VERSION_DIR%window.bak.html" | findstr /v "</body>" | findstr /v "</html>" > "%VIVALDI_VERSION_DIR%window.html"
+if errorlevel 1 goto :patch_failed
 echo     ^<script src="custom.js"^>^</script^> >> "%VIVALDI_VERSION_DIR%window.html"
 echo   ^</body^> >> "%VIVALDI_VERSION_DIR%window.html"
 echo ^</html^> >> "%VIVALDI_VERSION_DIR%window.html"
 
-echo     Done.
+REM === Validate patch ===
+echo     Validating...
+
+REM Check that window.html exists and has content
+if not exist "%VIVALDI_VERSION_DIR%window.html" goto :patch_failed
+
+REM Check that custom.js script tag was added
+findstr /C:"custom.js" "%VIVALDI_VERSION_DIR%window.html" >nul
+if errorlevel 1 goto :patch_failed
+
+REM Check that closing tags are present
+findstr /C:"</body>" "%VIVALDI_VERSION_DIR%window.html" >nul
+if errorlevel 1 goto :patch_failed
+
+findstr /C:"</html>" "%VIVALDI_VERSION_DIR%window.html" >nul
+if errorlevel 1 goto :patch_failed
+
+REM Check custom.js exists and has content
+if not exist "%VIVALDI_VERSION_DIR%custom.js" goto :patch_failed
+for %%A in ("%VIVALDI_VERSION_DIR%custom.js") do if %%~zA LSS 100 goto :patch_failed
+
+echo     Validation passed.
 echo.
 
 echo ========================================
@@ -253,3 +275,40 @@ echo.
 echo  To remove JS mods: run restore-vivaldi.bat
 echo.
 pause
+goto :eof
+
+REM ============================================================================
+REM Error Handler: Auto-rollback on patch failure
+REM ============================================================================
+:patch_failed
+echo.
+echo [X] ERROR: Patch validation failed!
+echo.
+echo     Attempting automatic rollback...
+echo.
+
+if exist "%VIVALDI_VERSION_DIR%window.bak.html" (
+    copy /y "%VIVALDI_VERSION_DIR%window.bak.html" "%VIVALDI_VERSION_DIR%window.html" >nul
+    if errorlevel 1 (
+        echo [X] CRITICAL: Rollback failed!
+        echo     Please manually restore from: %VIVALDI_VERSION_DIR%window.bak.html
+        echo     Or reinstall Vivaldi to fix.
+    ) else (
+        echo [OK] Rollback successful - original window.html restored.
+    )
+) else (
+    echo [!] No backup found - cannot rollback automatically.
+    echo     You may need to reinstall Vivaldi.
+)
+
+if exist "%VIVALDI_VERSION_DIR%custom.js" (
+    del "%VIVALDI_VERSION_DIR%custom.js" 2>nul
+    echo     Removed incomplete custom.js
+)
+
+echo.
+echo  Vivaldi should still work normally.
+echo  Please report this issue if it persists.
+echo.
+pause
+exit /b 1
