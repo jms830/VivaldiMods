@@ -40,14 +40,10 @@ Separated dropdown menu
 } */
 
 .UrlBar-AddressField:focus-within {
-  padding: 3px 15px 10px;
-  margin: -3px -15px -10px;
-  background: dark;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  border-radius: var(--radius, 8px);
-  z-index: 100000000;
   background-color: var(--colorBgLighter, #2a2a2a) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius, 8px);
+  z-index: 100000000;
 }
 
 .UrlBar-AddressField:focus-within .OmniDropdown{
@@ -320,6 +316,7 @@ button[title="显示输入记录"] {
 .mainbar .toolbar-mainbar button.ToolbarButton-Button {
   height: unset !important;
   min-width: unset !important;
+  align-self: center !important;
 }
 
 /* ========================================
@@ -328,7 +325,7 @@ button[title="显示输入记录"] {
 
 /* Mainbar styling - height REMOVED to fix blank space with native auto-hide (Vivaldi 7.8+) */
 .mainbar .toolbar-mainbar {
-  align-items: stretch;
+  align-items: center !important;  /* Center all toolbar items vertically */
   border: none !important;
 }
 /* padding: var(--mod-whitespace-y) !important; */

@@ -12,6 +12,7 @@ Extracted from AutoHide/tabbar.css for standalone use
   max-height: 35px !important;
   overflow: hidden !important;
   transition: all var(--animation-speed, 260ms) ease-out;
+  align-items: center !important;
 }
 
 /* Hide toolbar items except URL bar and workspace popup */

@@ -1,39 +1,41 @@
 /*
-ExtensionsPanel
-version 2025.01.20
-Author PaRr0tBoY (modified)
+Extensions - Native Pinning + Polish
 https://github.com/PaRr0tBoY/Awesome-Vivaldi
 */
 
 .toolbar-extensions {
-  gap: 0 !important;
-  padding: 8px !important;
-  margin: -4px;
+  gap: 2px !important;
+  align-items: center !important;
 }
 
 .toolbar-extensions .ExtensionIcon {
-  width: 0 !important;
-  height: 0 !important;
-  overflow: hidden;
-  padding: 0 !important;
-  margin: 0 !important;
-  opacity: 0;
-  transition: width 0.15s ease, height 0.15s ease, opacity 0.15s ease, padding 0.15s ease, margin 0.15s ease;
+  width: 20px !important;
+  height: 20px !important;
+  opacity: 0.7;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.toolbar-extensions:hover {
-  gap: 4px !important;
-}
-
-.toolbar-extensions:hover .ExtensionIcon {
-  width: 28px !important;
-  height: 28px !important;
-  padding: 4px !important;
+.toolbar-extensions .ExtensionIcon:hover {
   opacity: 1;
+  transform: scale(1.1);
+}
+
+.toolbar-extensions .ExtensionIcon button {
+  padding: 2px !important;
+}
+
+.toolbar-extensions .ExtensionIcon img,
+.toolbar-extensions .ExtensionIcon svg {
+  width: 16px !important;
+  height: 16px !important;
 }
 
 .extensionIconPopupMenu {
-  --popupWidth: 280px !important;
+  --popupWidth: 260px !important;
+  border-radius: var(--radius, 8px) !important;
+  background: var(--colorBgLighter, #2a2a2a) !important;
+  border: 1px solid var(--colorBorder, #3a3a3a) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
 }
 
 .extensionIconPopupMenu > .toolbar {
@@ -42,20 +44,41 @@ https://github.com/PaRr0tBoY/Awesome-Vivaldi
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: stretch;
+  padding: 4px !important;
+  gap: 2px !important;
 }
 
 .extensionIconPopupMenu .ExtensionDropdownIcon > button {
   justify-content: flex-start;
-  padding: 10px;
+  padding: 8px 12px !important;
+  border-radius: calc(var(--radius, 8px) - 2px) !important;
+  gap: 10px !important;
+}
+
+.extensionIconPopupMenu .ExtensionDropdownIcon > button:hover {
+  background: var(--colorBgAlphaHeavy, rgba(255,255,255,0.1)) !important;
 }
 
 .extensionIconPopupMenu .ExtensionDropdownIcon > button::after {
   content: attr(title);
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 13px;
+}
+
+.extensionIconPopupMenu .ExtensionDropdownIcon img,
+.extensionIconPopupMenu .ExtensionDropdownIcon svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0;
 }
 
 .button-toolbar > button > .button-badge {
-  top: auto;
-  right: 10px;
+  top: 0 !important;
+  right: 0 !important;
+  font-size: 9px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  padding: 0 3px !important;
+  border-radius: 7px !important;
 }

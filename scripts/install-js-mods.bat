@@ -110,7 +110,7 @@ echo. >> "%VIVALDI_VERSION_DIR%custom.js"
 
 set "MOD_COUNT=0"
 
-REM Add root-level JS files (tidyTabs.js, tidyTitles.js, cleartabs.js, etc.)
+REM Add root-level JS files (only *.js, skips *.js.disabled)
 for %%f in ("%JS_FOLDER%\*.js") do (
     echo     Adding: %%~nxf
     echo. >> "%VIVALDI_VERSION_DIR%custom.js"
@@ -118,6 +118,8 @@ for %%f in ("%JS_FOLDER%\*.js") do (
     type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
     set /a MOD_COUNT+=1
 )
+REM Note: files with .js.disabled extension are intentionally skipped
+echo     (Files ending in .js.disabled are skipped - enable by removing .disabled extension)
 
 REM Add Tam710562 mods (globalMediaControls, mdNotes, easyFiles, etc.)
 if exist "%JS_FOLDER%\Tam710562" (
