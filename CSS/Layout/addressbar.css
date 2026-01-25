@@ -10,7 +10,7 @@ Separated dropdown menu
 
 .UrlBar-AddressField {
   position: relative;
-  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: var(--radius, 8px);
   overflow: visible;
   isolation: isolate;
@@ -82,7 +82,7 @@ Separated dropdown menu
 
 .UrlBar-AddressField:focus-within,
 .OmniDropdown {
-  animation: expand 280ms ease;
+  animation: expand var(--animation-speed) ease;
 }
 
 .UrlBar-UrlField {
@@ -180,23 +180,23 @@ icons for blocked content and the bookmark button in the addressfield.
 /* https://forum.vivaldi.net/topic/31743/accent-transitions */
 /* Adds transition to address accent */
 #browser:not(.tabs-top) #header {
-    transition: background-color 0.7s;
+    transition: background-color var(--slow-animation-speed);
 }
 #browser.color-behind-tabs-off:not(.tabs-top) {
-    transition: background-color 0.7s;
+    transition: background-color var(--slow-animation-speed);
 }
 .color-behind-tabs-off .toolbar-mainbar {
-    transition: background-color 0.7s;
+    transition: background-color var(--slow-animation-speed);
 }
 .color-behind-tabs-off.address-top .toolbar-mainbar:after {
-    transition: background-color 0.7s;
+    transition: background-color var(--slow-animation-speed);
 }
 .color-behind-tabs-off.address-bottom .toolbar-mainbar {
-    transition: background-color 0.7s, box-shadow 0.7s;
+    transition: background-color var(--slow-animation-speed), box-shadow var(--slow-animation-speed);
 }
 .color-behind-tabs-off #tabs-container.top,
 .color-behind-tabs-off #tabs-container.bottom {
-    transition: border-color 0.7s;
+    transition: border-color var(--slow-animation-speed);
 }
 
 /* Port From Main.css */

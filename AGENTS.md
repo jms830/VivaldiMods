@@ -296,6 +296,264 @@ NeatDial.css:1 Failed to load resource: net::ERR_FAILED
 - `Other/Picture-in-Picture.js` → `Other/picture-in-picture.js`
 - `ClearTabs.js` → `cleartabs.js`
 
+## Code Standards & Best Practices
+
+### CSS Guidelines
+
+#### Use CSS Variables for Timing
+
+All animations and transitions MUST use the timing variables defined in `core.css`:
+
+```css
+:root {
+  --slow-animation-speed: 560ms;  /* Major transitions, panel slides */
+  --animation-speed: 260ms;        /* Default, most UI interactions */
+  --fast-animation-speed: 140ms;   /* Hover effects, micro-interactions */
+}
+```
+
+**Do:**
+```css
+transition: opacity var(--animation-speed) ease-out;
+```
+
+**Don't:**
+```css
+transition: opacity 0.3s ease-out;  /* Hardcoded - avoid */
+```
+
+#### Z-Index Scale (MANDATORY)
+
+Use semantic z-index values. NEVER use arbitrary large numbers.
+
+| Variable | Value | Use Case |
+|----------|-------|----------|
+| `--z-base` | 1 | Default stacking |
+| `--z-hover` | 10 | Hover states, highlights |
+| `--z-dropdown` | 100 | Dropdown menus, tooltips |
+| `--z-sticky` | 200 | Sticky headers, pinned elements |
+| `--z-modal` | 300 | Modals, dialogs |
+| `--z-popup` | 400 | Popups, popovers |
+| `--z-tooltip` | 500 | Tooltips (highest user content) |
+| `--z-overlay` | 1000 | Full-screen overlays |
+
+**Do:**
+```css
+.dropdown { z-index: var(--z-dropdown); }
+```
+
+**Don't:**
+```css
+.dropdown { z-index: 999999999 !important; }  /* Never do this */
+```
+
+#### Minimize `!important`
+
+Current codebase has 690+ `!important` declarations (tech debt). For new code:
+
+1. **First attempt**: Increase selector specificity
+2. **Second attempt**: Use `:where()` or `:is()` to manage specificity
+3. **Last resort**: Use `!important` with a comment explaining why
+
+**When `!important` is acceptable:**
+- Overriding Vivaldi's internal styles (they use `!important`)
+- Utility classes that must always win
+- Accessibility overrides
+
+**Document it:**
+```css
+/* !important required: Vivaldi sets this with !important internally */
+.my-override { display: none !important; }
+```
+
+#### File Size Limits
+
+- **Max 500 lines per CSS file** - Split larger files into logical modules
+- Current `tabbar.css` (1548 lines) is tech debt; new features should be separate files
+
+#### Color Variables
+
+Use Vivaldi's color system, never hardcode colors:
+
+```css
+/* Vivaldi provides these */
+var(--colorBg)           /* Background */
+var(--colorFg)           /* Foreground/text */
+var(--colorAccentBg)     /* Accent background */
+var(--colorAccentFg)     /* Accent foreground */
+var(--colorBorder)       /* Borders */
+var(--colorHighlightBg)  /* Selection/highlight */
+```
+
+### JavaScript Guidelines
+
+#### Cleanup Pattern (MANDATORY for all JS mods)
+
+Every JS mod MUST implement cleanup to prevent memory leaks:
+
+```javascript
+(function myMod() {
+  'use strict';
+
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => obs.disconnect());
+      this.timeouts.forEach(id => clearTimeout(id));
+      this.intervals.forEach(id => clearInterval(id));
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      // Reset arrays
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+    }
+  };
+
+  const init = () => {
+    // Use modState.addEventListener, modState.setTimeout, etc.
+    // instead of direct addEventListener, setTimeout, etc.
+    
+    window.addEventListener('beforeunload', () => modState.cleanup());
+  };
+
+  // Wait for browser element
+  setTimeout(function wait() {
+    if (document.getElementById('browser')) {
+      init();
+    } else {
+      setTimeout(wait, 300);
+    }
+  }, 300);
+})();
+```
+
+#### Interacting with Vivaldi's React UI
+
+Vivaldi's UI is React-based. Standard DOM events don't trigger React state updates.
+
+**Pattern for clicking React buttons:**
+```javascript
+const getReactProps = (element) => {
+  const key = Object.keys(element).find(k => k.startsWith('__reactProps'));
+  return element[key];
+};
+
+const simulateReactClick = (element) => {
+  const pointerDown = new PointerEvent('pointerdown', {
+    view: window, bubbles: true, cancelable: true,
+    buttons: 0, pointerType: 'mouse',
+  });
+  pointerDown.persist = () => {};  // Required for React event pooling
+  
+  const props = getReactProps(element);
+  if (props?.onPointerDown) {
+    props.onPointerDown(pointerDown);
+    element.dispatchEvent(new PointerEvent('pointerup', { ... }));
+    return true;
+  }
+  return false;
+};
+```
+
+**Key insights:**
+- React uses `onPointerDown`, not `onClick`, for toolbar buttons
+- Popup menus render via React portals at document root
+- Always check for `__reactProps` key on elements
+
+#### Avoid Polling When Possible
+
+**Don't:**
+```javascript
+setInterval(checkForChanges, 1000);  // Wasteful polling
+```
+
+**Do:**
+```javascript
+// Use MutationObserver for DOM changes
+modState.addObserver(document.body, (mutations) => {
+  // React to specific changes
+}, { childList: true, subtree: true });
+
+// Use chrome.tabs events for tab changes
+modState.addChromeListener(chrome.tabs, 'onActivated', handler);
+```
+
+#### Async Operations
+
+Cache expensive async results instead of fetching on every use:
+
+```javascript
+let cachedData = null;
+
+const refreshCache = () => {
+  vivaldi.prefs.get('some.pref', (data) => {
+    cachedData = data;
+  });
+};
+
+// Call refreshCache at init and on relevant events
+// Use cachedData in hot paths instead of re-fetching
+```
+
+### File Naming
+
+- **All lowercase**: `myfeature.css`, `mymod.js`
+- **Kebab-case for multi-word**: `workspace-buttons.css`
+- **No spaces or special characters**
+- **Reason**: Linux/WSL filesystems are case-sensitive; mismatched case breaks `@import`
+
+### Adding New Features Checklist
+
+1. [ ] CSS uses timing variables (`--animation-speed`, etc.)
+2. [ ] CSS uses z-index scale variables
+3. [ ] CSS avoids `!important` where possible (document if required)
+4. [ ] CSS file under 500 lines (split if larger)
+5. [ ] JS implements `modState` cleanup pattern
+6. [ ] JS uses event-driven updates, not polling
+7. [ ] Filename is lowercase
+8. [ ] Tested on both Windows and Linux/WSL
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc

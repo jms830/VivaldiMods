@@ -10,7 +10,7 @@ See: https://vivaldi.com/blog/how-to/pawel-shows-you-how-to-play-with-workspaces
 .toolbar-tabbar-after button.ToolbarButton-Button[title*="Workspace"]:hover {
   background: rgba(255, 255, 255, 0.1);
   border-radius: calc(var(--radius, 8px) * 0.7);
-  transition: background 0.2s ease;
+  transition: background var(--fast-animation-speed) ease;
 }
 
 /* Workspace button full width in sidebar */

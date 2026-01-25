@@ -3,6 +3,61 @@
   
   try {
 
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => obs.disconnect());
+      this.timeouts.forEach(id => clearTimeout(id));
+      this.intervals.forEach(id => clearInterval(id));
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+      console.log('[WorkspaceButtons] Cleanup complete');
+    }
+  };
+
   // Helper to get React props from a DOM element (same pattern as globalMediaControls.js)
   let reactPropsKey = null;
   const getReactProps = (element) => {
@@ -130,7 +185,7 @@
     if (!popupOpened) {
       console.log('[WorkspaceButtons] Failed to trigger popup button');
       isSwitching = false;
-      setTimeout(updateActiveState, 100);
+      modState.setTimeout(updateActiveState, 100);
       return;
     }
 
@@ -177,14 +232,14 @@
       }
       
       if (!popup && attempts < 30) {
-        setTimeout(() => findAndClickWorkspaceItem(attempts + 1), 50);
+        modState.setTimeout(() => findAndClickWorkspaceItem(attempts + 1), 50);
         return;
       }
       
       if (!popup) {
         console.log('[WorkspaceButtons] Popup menu did not appear');
         isSwitching = false;
-        setTimeout(updateActiveState, 100);
+        modState.setTimeout(updateActiveState, 100);
         return;
       }
 
@@ -221,17 +276,17 @@
           targetItem.click();
         }
         isSwitching = false;
-        setTimeout(updateActiveState, 200);
-        setTimeout(updateActiveState, 500);
+        modState.setTimeout(updateActiveState, 200);
+        modState.setTimeout(updateActiveState, 500);
       } else {
         console.log('[WorkspaceButtons] Could not find target workspace item');
         simulateButtonClick(workspacePopupButton);
         isSwitching = false;
-        setTimeout(updateActiveState, 200);
+        modState.setTimeout(updateActiveState, 200);
       }
     };
 
-    setTimeout(() => findAndClickWorkspaceItem(), 50);
+    modState.setTimeout(() => findAndClickWorkspaceItem(), 50);
   };
 
   const createButton = (workspace, index) => {
@@ -247,13 +302,13 @@
       button.textContent = workspace.name.charAt(0).toUpperCase();
     }
 
-    button.addEventListener('click', (e) => {
+    const clickHandler = (e) => {
       console.log('[WorkspaceButtons] DEBUG: Button clicked for workspace:', workspace.name, 'index:', index);
       e.preventDefault();
       e.stopPropagation();
-      // Defer to escape current event context - allows wsButton.click() to work properly
-      setTimeout(() => switchWorkspace(workspace.id, index), 0);
-    });
+      modState.setTimeout(() => switchWorkspace(workspace.id, index), 0);
+    };
+    modState.addEventListener(button, 'click', clickHandler);
 
     return button;
   };
@@ -425,11 +480,12 @@
     button.title = CONFIG.defaultWorkspaceName;
     button.innerHTML = CONFIG.defaultWorkspaceIcon;
 
-    button.addEventListener('click', (e) => {
+    const clickHandler = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      setTimeout(() => switchWorkspace(null, -1), 0);
-    });
+      modState.setTimeout(() => switchWorkspace(null, -1), 0);
+    };
+    modState.addEventListener(button, 'click', clickHandler);
 
     return button;
   };
@@ -440,11 +496,12 @@
     button.title = 'New Workspace';
     button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
 
-    button.addEventListener('click', (e) => {
+    const clickHandler = (e) => {
       e.preventDefault();
       e.stopPropagation();
       openNewWorkspaceDialog();
-    });
+    };
+    modState.addEventListener(button, 'click', clickHandler);
 
     return button;
   };
@@ -457,7 +514,7 @@
     
     if (workspaceButton) {
       workspaceButton.click();
-      setTimeout(() => {
+      modState.setTimeout(() => {
         const newButton = document.querySelector(
           '[class*="NewWorkspace"], button[title*="New"], [class*="add-workspace"], .WorkspacePopup button:last-child'
         );
@@ -513,7 +570,7 @@
     
     const tabbar = document.querySelector('#tabs-tabbar-container');
     if (!tabbar) {
-      setTimeout(init, 500);
+      modState.setTimeout(init, 500);
       return;
     }
 
@@ -522,37 +579,34 @@
 
     render();
 
-    setInterval(updateActiveState, CONFIG.checkInterval);
+    modState.setInterval(updateActiveState, CONFIG.checkInterval);
 
-    chrome.tabs.onActivated.addListener(() => {
-      setTimeout(updateActiveState, CONFIG.debounceDelay);
+    modState.addChromeListener(chrome.tabs, 'onActivated', () => {
+      modState.setTimeout(updateActiveState, CONFIG.debounceDelay);
     });
 
-    const observer = new MutationObserver((mutations) => {
+    modState.addObserver(document.body, (mutations) => {
       for (const mutation of mutations) {
         if (mutation.type === 'childList') {
           const containerEl = document.getElementById(CONFIG.containerId);
           if (!containerEl || !document.body.contains(containerEl)) {
-            setTimeout(render, 100);
+            modState.setTimeout(render, 100);
             break;
           }
         }
       }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    }, { childList: true, subtree: true });
+    
+    window.addEventListener('beforeunload', () => modState.cleanup());
   };
 
   if (document.readyState === 'complete') {
-    setTimeout(init, 500);
+    modState.setTimeout(init, 500);
   } else {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(init, 500));
+    modState.addEventListener(document, 'DOMContentLoaded', () => modState.setTimeout(init, 500));
   }
 
-  window.addEventListener('load', () => setTimeout(init, 1000));
+  modState.addEventListener(window, 'load', () => modState.setTimeout(init, 1000));
 
   } catch (e) {
     console.error('[WorkspaceButtons] Fatal error:', e);

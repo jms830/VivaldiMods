@@ -41,6 +41,56 @@
   let workspaceColors = {};
   let currentWorkspaceId = null;
   let colorPickerElement = null;
+  let cachedWorkspaceList = [];
+  
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => obs.disconnect());
+      this.timeouts.forEach(id => clearTimeout(id));
+      this.intervals.forEach(id => clearInterval(id));
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+      console.log('[WorkspaceColors] Cleanup complete');
+    }
+  };
 
   // Load saved colors from localStorage
   const loadColors = () => {
@@ -208,20 +258,21 @@
     });
 
     // Close on click outside
-    setTimeout(() => {
-      document.addEventListener('click', function closeOnOutside(e) {
+    modState.setTimeout(() => {
+      const closeOnOutside = (e) => {
         if (!picker.contains(e.target) && !anchorElement.contains(e.target)) {
           picker.remove();
           colorPickerElement = null;
           document.removeEventListener('click', closeOnOutside);
         }
-      });
+      };
+      document.addEventListener('click', closeOnOutside);
     }, 100);
   };
 
   // Add context menu to workspace buttons
   const setupContextMenu = () => {
-    document.addEventListener('contextmenu', (e) => {
+    const handler = (e) => {
       const button = e.target.closest('.workspace-quick-button, [data-workspace-id]');
       if (button) {
         const workspaceId = button.dataset.workspaceId;
@@ -231,7 +282,8 @@
           createColorPicker(workspaceId, button);
         }
       }
-    });
+    };
+    modState.addEventListener(document, 'contextmenu', handler);
   };
 
   // Get current workspace ID from active tab
@@ -252,30 +304,25 @@
     });
   };
 
-  // Handle workspace change
+  const refreshWorkspaceListCache = () => {
+    if (typeof vivaldi !== 'undefined' && vivaldi.prefs) {
+      vivaldi.prefs.get('vivaldi.workspaces.list', (list) => {
+        if (list) cachedWorkspaceList = list;
+      });
+    }
+  };
+
   const onWorkspaceChange = async () => {
     const newWorkspaceId = await detectCurrentWorkspace();
     
     if (newWorkspaceId !== currentWorkspaceId) {
       currentWorkspaceId = newWorkspaceId;
       
-      // Get workspace list to determine index for default color
-      let workspaceIndex = 0;
-      if (typeof vivaldi !== 'undefined' && vivaldi.prefs) {
-        vivaldi.prefs.get('vivaldi.workspaces.list', (list) => {
-          if (list) {
-            workspaceIndex = list.findIndex(w => w.id === currentWorkspaceId);
-            if (workspaceIndex === -1) workspaceIndex = 0;
-          }
-          
-          const color = getWorkspaceColor(currentWorkspaceId, workspaceIndex);
-          applyAccentColor(color);
-          console.log(`[WorkspaceColors] Switched to workspace ${currentWorkspaceId}, color: ${color}`);
-        });
-      } else {
-        const color = getWorkspaceColor(currentWorkspaceId, 0);
-        applyAccentColor(color);
-      }
+      let workspaceIndex = cachedWorkspaceList.findIndex(w => w.id === currentWorkspaceId);
+      if (workspaceIndex === -1) workspaceIndex = 0;
+      
+      const color = getWorkspaceColor(currentWorkspaceId, workspaceIndex);
+      applyAccentColor(color);
     }
   };
 
@@ -409,9 +456,9 @@
         position: relative;
       }
       
-      /* When workspace colors are active, ensure smooth transitions */
+      /* When workspace colors are active, fast transition for snappy feel */
       .workspace-colors-active #browser {
-        transition: --colorAccentBg 0.3s ease;
+        transition: --colorAccentBg 0.1s ease;
       }
     `;
     document.head.appendChild(style);
@@ -425,26 +472,26 @@
     injectStyles();
     setupContextMenu();
     
-    // Initial workspace detection
+    refreshWorkspaceListCache();
     await onWorkspaceChange();
     
     // Listen for tab changes (workspace switches)
-    chrome.tabs.onActivated.addListener(() => {
-      setTimeout(onWorkspaceChange, 50);
+    modState.addChromeListener(chrome.tabs, 'onActivated', () => {
+      modState.setTimeout(onWorkspaceChange, 50);
     });
     
     // Also listen for tab updates (in case workspace changes without tab switch)
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    modState.addChromeListener(chrome.tabs, 'onUpdated', (tabId, changeInfo, tab) => {
       if (changeInfo.status === 'complete' || changeInfo.vivExtData) {
-        setTimeout(onWorkspaceChange, 50);
+        modState.setTimeout(onWorkspaceChange, 50);
       }
     });
     
     // Initialize button indicators after a short delay (wait for workspaceButtons.js)
-    setTimeout(initButtonIndicators, 1000);
+    modState.setTimeout(initButtonIndicators, 1000);
     
     // Re-init indicators when DOM changes (new buttons added)
-    const observer = new MutationObserver((mutations) => {
+    modState.addObserver(document.body, (mutations) => {
       for (const mutation of mutations) {
         if (mutation.addedNodes.length > 0) {
           const hasWorkspaceButton = Array.from(mutation.addedNodes).some(
@@ -452,13 +499,14 @@
                     node.querySelector?.('.workspace-quick-button')
           );
           if (hasWorkspaceButton) {
-            setTimeout(initButtonIndicators, 100);
+            modState.setTimeout(initButtonIndicators, 100);
           }
         }
       }
-    });
+    }, { childList: true, subtree: true });
     
-    observer.observe(document.body, { childList: true, subtree: true });
+    // Register cleanup on page unload
+    window.addEventListener('beforeunload', () => modState.cleanup());
     
     console.log('[WorkspaceColors] Initialized successfully');
   };

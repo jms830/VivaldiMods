@@ -78,3 +78,9 @@ yarn-error.log*
 # ===================
 # OpenCode session exports
 ses_*.md
+
+# ===================
+# DISABLED MODS
+# ===================
+# User-disabled mods (not tracked - user preference)
+*.disabled

@@ -99,6 +99,16 @@ You may manage and config all your css mods and config them as well all in this 
   --animation-speed: 260ms;
   --fast-animation-speed: 140ms;
 
+  /* Z-Index Scale - use these instead of arbitrary numbers */
+  --z-base: 1;
+  --z-hover: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-popup: 400;
+  --z-tooltip: 500;
+  --z-overlay: 1000;
+
   --transition-delay-time-expand: 0ms;
   --transition-delay-time-collapse: 200ms;
 
