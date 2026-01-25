@@ -23,7 +23,7 @@ See: https://vivaldi.com/blog/how-to/pawel-shows-you-how-to-play-with-workspaces
 .workspace-popup,
 div[class*="WorkspacePopup"] {
   position: relative;
-  z-index: 2147483647 !important;
+  z-index: var(--z-overlay) !important;
   background: var(--colorBg, #1e1e1e) !important;
   background-color: var(--colorBg, #1e1e1e) !important;
   backdrop-filter: none !important;
@@ -47,7 +47,7 @@ div[class*="WorkspacePopup"] > * {
 
 /* Suppress pinned tab hover effects when workspace popup is open */
 body:has(.WorkspacePopup) #tabs-container .tab-strip .is-pinned .tab-wrapper {
-  z-index: 1 !important;
+  z-index: var(--z-base) !important;
   pointer-events: none;
 }
 
@@ -61,5 +61,5 @@ body:has(.WorkspacePopup) #tabs-container .tab-strip .is-pinned .tab-wrapper:hov
 body:has(.WorkspacePopup) .toolbar.toolbar-tabbar-before > *:not(.UrlBar-AddressField) {
   opacity: 0 !important;
   pointer-events: none !important;
-  z-index: 1 !important;
+  z-index: var(--z-base) !important;
 }

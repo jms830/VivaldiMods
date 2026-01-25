@@ -57,7 +57,7 @@ body:has(
   opacity: 1;
   min-height: 30px;
   max-height: 30px;
-  z-index: 300 !important;
+  z-index: var(--z-modal) !important;
   overflow: visible;
   transition: all var(--animation-speed, 260ms) ease-out;
 }

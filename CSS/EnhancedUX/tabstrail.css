@@ -40,7 +40,7 @@ Show trail on tab to highlight mouse hover action and active tabs
     transform var(--animation-speed) ease-out,
     opacity var(--animation-speed) ease-out;
   pointer-events: none;
-  z-index: 1;
+  z-index: var(--z-base);
   /* border-radius: 12px !important; */
 }
 
@@ -65,7 +65,7 @@ Show trail on tab to highlight mouse hover action and active tabs
     transform var(--animation-speed) ease-out,
     opacity var(--animation-speed) ease-out;
   pointer-events: none;
-  z-index: 2;
+  z-index: var(--z-base);
   /* border-radius: 12px !important; */
 }
 

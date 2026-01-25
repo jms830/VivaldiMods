@@ -24,18 +24,9 @@
     '#6366f1', // indigo
   ];
 
-  // Preset color palette for the picker
   const COLOR_PALETTE = [
-    // Row 1: Blues & Purples
-    '#3b82f6', '#2563eb', '#1d4ed8', '#6366f1', '#8b5cf6', '#a855f7',
-    // Row 2: Pinks & Reds
-    '#d946ef', '#ec4899', '#f43f5e', '#ef4444', '#dc2626', '#b91c1c',
-    // Row 3: Oranges & Yellows
-    '#f97316', '#ea580c', '#f59e0b', '#eab308', '#facc15', '#fde047',
-    // Row 4: Greens & Teals
-    '#84cc16', '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-    // Row 5: Neutrals
-    '#64748b', '#475569', '#334155', '#1e293b', '#0f172a', '#020617',
+    '#3b82f6', '#8b5cf6', '#ec4899', '#ef4444',
+    '#f97316', '#eab308', '#22c55e', '#06b6d4',
   ];
 
   let workspaceColors = {};
@@ -365,8 +356,8 @@
       
       .wcp-palette {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 6px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
         margin-bottom: 12px;
       }
       

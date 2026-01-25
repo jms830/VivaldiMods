@@ -6,6 +6,60 @@
 (() => {
   'use strict';
 
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => obs.disconnect());
+      this.timeouts.forEach(id => clearTimeout(id));
+      this.intervals.forEach(id => clearInterval(id));
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+    }
+  };
+
   const gnoh = {
     stream: {
       async compress(input, outputType = 'arrayBuffer', format = 'gzip') {
@@ -513,8 +567,8 @@
       pointerPosition.y = event.clientY;
     }
 
-    document.addEventListener('click', handleClick);
-    document.addEventListener('mousedown', handleMouseDown);
+    modState.addEventListener(document, 'click', handleClick);
+    modState.addEventListener(document, 'mousedown', handleMouseDown);
 
     function changeFile(dataTransfer) {
       fileInput.files = dataTransfer.files;
@@ -522,7 +576,7 @@
       fileInput.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
-    chrome.runtime.onMessage.addListener(async (info, sender, sendResponse) => {
+    const messageHandler = async (info, sender, sendResponse) => {
       if (info.type === nameKey) {
         switch (info.action) {
           case 'file':
@@ -547,12 +601,13 @@
             break;
         }
       }
-    });
+    };
+    modState.addChromeListener(chrome.runtime, 'onMessage', messageHandler);
   }
 
   async function simulatePaste() {
     return new Promise((resolve, reject) => {
-      document.addEventListener('paste', (e) => {
+      const pasteHandler = (e) => {
         e.preventDefault();
         const items = [];
         let isRealFile = true;
@@ -580,7 +635,8 @@
           items,
           isRealFile,
         });
-      }, { once: true });
+      };
+      modState.addEventListener(document, 'paste', pasteHandler, { once: true });
 
       document.execCommand('paste');
     });
@@ -923,9 +979,12 @@
       }
     }
 
-    const resizeObserver = new ResizeObserver(setPosition);
-    resizeObserver.observe(dialog.dialog);
-    disconnectResizeObserver = () => resizeObserver.unobserve(dialog.dialog);
+    const resizeObserver = modState.addObserver(dialog.dialog, setPosition, {});
+    const resizeObserverIndex = modState.observers.length - 1;
+    disconnectResizeObserver = () => {
+      resizeObserver.unobserve(dialog.dialog);
+      modState.observers.splice(resizeObserverIndex, 1);
+    };
 
     if (clipboardFiles.length) {
       const selectboxWrapperClipboard = gnoh.createElement('div', {
@@ -1003,7 +1062,7 @@
     }
   }
 
-  vivaldi.tabsPrivate.onWebviewClickCheck.addListener((windowId, mousedown, button, clientX, clientY) => {
+  const webviewClickHandler = (windowId, mousedown, button, clientX, clientY) => {
     if (
       windowId === vivaldiWindowId
       && mousedown
@@ -1012,9 +1071,10 @@
       pointerPosition.x = clientX;
       pointerPosition.y = clientY;
     }
-  });
+  };
+  modState.addChromeListener(vivaldi.tabsPrivate, 'onWebviewClickCheck', webviewClickHandler);
 
-  chrome.runtime.onMessage.addListener(async (info, sender, sendResponse) => {
+  const runtimeMessageHandler = async (info, sender, sendResponse) => {
     if (
       sender.tab.windowId === vivaldiWindowId
       && info.type === nameKey
@@ -1058,7 +1118,8 @@
           break;
       }
     }
-  });
+  };
+  modState.addChromeListener(chrome.runtime, 'onMessage', runtimeMessageHandler);
 
   gnoh.timeOut(() => {
     chrome.tabs.query({ windowId: window.vivaldiWindowId, windowType: 'normal' }, (tabs) => {
@@ -1074,7 +1135,7 @@
       });
     });
 
-    chrome.webNavigation.onCommitted.addListener((details) => {
+    const webNavHandler = (details) => {
       if (details.tabId !== -1) {
         chrome.scripting.executeScript({
           target: {
@@ -1085,6 +1146,10 @@
           args: [nameKey],
         });
       }
-    });
+    };
+    modState.addChromeListener(chrome.webNavigation, 'onCommitted', webNavHandler);
+    
+    // Register cleanup on beforeunload
+    window.addEventListener('beforeunload', () => modState.cleanup());
   }, () => window.vivaldiWindowId != null);
 })();

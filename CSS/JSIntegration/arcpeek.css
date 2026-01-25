@@ -29,15 +29,15 @@ Preview link content before opening
 }
 
 .dialog-container.open .dialog-tab {
-  animation: dialog-pop-in 0.3s ease forwards;
+  animation: dialog-pop-in var(--animation-speed) ease forwards;
 }
 
 .dialog-container.closing .dialog-tab {
-  animation: dialog-pop-out 0.25s ease forwards;
+  animation: dialog-pop-out var(--animation-speed) ease forwards;
 }
 
 #browser #webpage-stack:has(.dialog-container:hover) {
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  transition: transform var(--animation-speed) cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 body.dialog-open #browser #webpage-stack:has(.dialog-container:hover) {
@@ -54,7 +54,7 @@ body.dialog-open #browser #webpage-stack:has(.dialog-container:hover) {
 }
 
 .dialog-container {
-  z-index: 9999999999999999999999999999999999999;
+  z-index: var(--z-overlay);
   position: fixed;
   top: 0;
   right: 0;
@@ -84,7 +84,7 @@ body.dialog-open #browser #webpage-stack:has(.dialog-container:hover) {
       justify-content: center;
       gap: 0.5rem;
       color: white;
-      z-index: 9999999999999999999999999999999;
+      z-index: var(--z-overlay);
 
       .options-button {
         display: flex;
@@ -117,7 +117,7 @@ body.dialog-open #browser #webpage-stack:has(.dialog-container:hover) {
       left: calc(var(--radius) * 0.75);
       background-color: #0080ff;
       border-radius: var(--radius);
-      transition: width 0.2s linear;
+      transition: width var(--animation-speed) linear;
       overflow: hidden;
       position: relative;
 
@@ -134,7 +134,7 @@ body.dialog-open #browser #webpage-stack:has(.dialog-container:hover) {
         position: absolute;
         top: 0;
         left: -100%;
-        animation: dialog-tab-animate-progress-bar 1.5s linear infinite;
+        animation: dialog-tab-animate-progress-bar var(--slow-animation-speed) linear infinite;
       }
     }
 

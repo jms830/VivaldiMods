@@ -32,7 +32,7 @@ Hide bookmarkbar by default until you hover your mouse on the addressbar, set th
   
   .bookmark-bar .observer {
       position: absolute !important;
-      z-index: 4 !important;
+      z-index: var(--z-base) !important;
       width: 100% !important;
       /* border-bottom: solid 1px var(--colorBorder) !important; */
       clip-path: inset(0 0 100% 0) !important;
@@ -49,7 +49,7 @@ Hide bookmarkbar by default until you hover your mouse on the addressbar, set th
   &:has(.button-disabled-preview).address-top .bookmark-bar:is(.mainbar:not(:has(.OmniDropdown, nav.menu)):hover ~ *) .observer,
   .bookmark-bar:is(:focus-within, :hover) .observer {
       clip-path: inset(0 0 -1px 0) !important;
-      transition: clip-path 150ms cubic-bezier(0, 1, 0, 0.9) 50ms !important;
+      transition: clip-path var(--fast-animation-speed) cubic-bezier(0, 1, 0, 0.9) 50ms !important;
   }
   
   @container not style(--bookmark-bar-show-ctrlkey: true) {
@@ -57,7 +57,7 @@ Hide bookmarkbar by default until you hover your mouse on the addressbar, set th
       &.address-top .bookmark-bar:is(.mainbar:not(:has(.OmniDropdown, nav.menu)):hover ~ *) .observer,
       .bookmark-bar:is(:focus-within, :hover) .observer {
           clip-path: inset(0 0 -1px 0) !important;
-          transition: clip-path 150ms cubic-bezier(0, 1, 0, 0.9) 50ms !important;
+          transition: clip-path var(--fast-animation-speed) cubic-bezier(0, 1, 0, 0.9) 50ms !important;
       }
   }
   

@@ -6,6 +6,70 @@
 (async () => {
   'use strict';
 
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    vivaldiListeners: [],
+    
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    
+    addVivaldiListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.vivaldiListeners.push({ api, event, handler });
+    },
+    
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => obs.disconnect());
+      this.timeouts.forEach(id => clearTimeout(id));
+      this.intervals.forEach(id => clearInterval(id));
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.vivaldiListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+      this.vivaldiListeners = [];
+    }
+  };
+
   const gnoh = {
     i18n: {
       getMessageName(message, type) {
@@ -861,7 +925,7 @@
     });
   }
 
-  chrome.runtime.onMessage.addListener((info, sender, sendResponse) => {
+  const runtimeMessageHandler = (info, sender, sendResponse) => {
     if (info.type === messageType) {
       (async () => {
         const window = await chrome.windows.getLastFocused({ windowTypes: ['normal'] });
@@ -902,9 +966,11 @@
       })();
       return true;
     }
-  });
+  };
 
-  vivaldi.prefs.onChanged.addListener(async newValue => {
+  modState.addChromeListener(chrome.runtime, 'onMessage', runtimeMessageHandler);
+
+  const prefsChangedHandler = async (newValue) => {
     if (newValue.path === 'vivaldi.chained_commands.command_list') {
       const tabs = await chrome.tabs.query({ url: '*://forum.vivaldi.net/topic/*' });
       tabs.forEach(tab => {
@@ -914,7 +980,9 @@
         });
       });
     }
-  });
+  };
+
+  modState.addVivaldiListener(vivaldi.prefs, 'onChanged', prefsChangedHandler);
 
   function createButtonToolbar(attribute = {}, parent, inner, options) {
     return gnoh.createElement('button', gnoh.object.merge({
@@ -964,7 +1032,7 @@
     }, '.Setting--ChainedCommand.master-detail:not([data-import-export-command-chains="true"])');
   }
 
-  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  const tabsUpdatedHandler = (tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete') {
       if (tab.url === urls.quickCommands) {
         createSettings();
@@ -1092,7 +1160,9 @@
         });
       }
     }
-  });
+  };
+
+  modState.addChromeListener(chrome.tabs, 'onUpdated', tabsUpdatedHandler);
 
   gnoh.timeOut(async () => {
     if (document.querySelector('#main > .webpageview')) {
@@ -1109,4 +1179,11 @@
       }
     }
   }, '#main');
+
+  window.addEventListener('beforeunload', () => {
+    if (timeOut) {
+      timeOut.stop();
+    }
+    modState.cleanup();
+  });
 })();

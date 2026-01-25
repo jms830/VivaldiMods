@@ -330,7 +330,7 @@ body:has(.toolbar-editor) .button-toolbar.newtab,
 
 /* Hide button by default */
 body:not(:has(.toolbar-editor)) .button-toolbar.newtab {
-  z-index: 100 !important;
+  z-index: var(--z-dropdown) !important;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -343,7 +343,7 @@ body:not(:has(.toolbar-editor)) .button-toolbar.newtab {
 #tabs-container .button-toolbar.newtab {
   /* width: var(--Button-newtab-main-width); */
   width: 100% !important;
-  z-index: 100 !important;
+  z-index: var(--z-dropdown) !important;
   border-radius: 5px !important;
 }
 
@@ -354,7 +354,7 @@ body:not(:has(.toolbar-editor)) .button-toolbar.newtab {
   position: absolute !important;
   bottom: 10px !important;
   /* left: calc(50% - var(--Button-newtab-sub-width) / 2) !important; */
-  z-index: 100 !important;
+  z-index: var(--z-dropdown) !important;
   border-radius: 5px !important;
 }
 
@@ -531,19 +531,19 @@ body:not(:has(.toolbar-editor)) .button-toolbar.newtab {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius);
   pointer-events: none;
-  z-index: 0;
+  z-index: var(--z-base);
   background-color: rgba(119, 116, 116, 0.165);
 } */
 
 .toolbar-tabbar-after .button-toolbar:has(.ToolbarButton-Button) {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-base);
 }
 
 .toolbar-tabbar-after button.ToolbarButton-Button[title*="workspace"]:hover {
   background: rgba(255, 255, 255, 0.1);
   border-radius: calc(var(--radius) * 0.7);
-  transition: background 0.2s ease;
+  transition: background var(--animation-speed) ease;
 }
 
 /* Before toolbar: collapsed state */
@@ -584,7 +584,7 @@ body:has(
     opacity: 1;
     min-height: 30px;
     max-height: 30px;
-    z-index: 300 !important;
+    z-index: var(--z-modal) !important;
     overflow: visible;
     transition: all var(--animation-speed) ease-out;
   }
@@ -599,7 +599,7 @@ body:has(
   #main > .inner > div:has(#tabs-tabbar-container) {
     position: absolute;
     top: 0;
-    z-index: 2;
+    z-index: var(--z-base);
     opacity: 1;
     height: 100% !important;
   }
@@ -699,7 +699,7 @@ body:has(
     width: 100%;
     height: 100%;
     background-color: var(--colorBgAlpha);
-    z-index: 999999999999 !important;
+    z-index: var(--z-overlay) !important;
     pointer-events: none !important;
     opacity: 0;
     transition: opacity var(--animation-speed) ease-out;
@@ -1087,11 +1087,11 @@ body:has(#panel_switch)
 @container style(--fluid-blur-hibernate-tab: on) {
   .tab:not(.active) {
     filter: blur(4px) !important;
-    transition: filter 200ms linear !important;
+    transition: filter var(--animation-speed) linear !important;
   }
   .tab.active {
     filter: blur(0px) !important;
-    transition: filter 200ms linear !important;
+    transition: filter var(--animation-speed) linear !important;
   }
 }
 
@@ -1212,8 +1212,8 @@ body:has(#panel_switch)
   #panels-container > *,
   #panels > * {
     background-color: var(--tabbar-bg-color-collapse, var(--colorBg)) !important;
-    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1),
+                color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   #tabs-container,
@@ -1308,8 +1308,8 @@ body:has(#panel_switch)
     background-color: var(--immersive-bg-color,--colorAccentBg) !important;
     color: var(--immersive-text-color) !important;
     border: none !important;
-    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1),
+                color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   #tabs-container,
@@ -1395,8 +1395,8 @@ body:has(#panel_switch)
   #panels-container > *,
   #panels > * {
     background-color: transparent !important;
-    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1),
+                color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -1422,7 +1422,7 @@ body:has(#panel_switch)
       top: 0;
       bottom: 0;
       width: var(--tabs-container-collapse-width-default);
-      z-index: 5;
+      z-index: var(--z-base);
       background: transparent !important;
       pointer-events: none;
       transition: width var(--animation-speed) ease-out;

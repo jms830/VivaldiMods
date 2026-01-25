@@ -9,7 +9,7 @@
   top: 0 !important;
   bottom: 0 !important;
   margin-top: calc(var(--mod-mainbar-height) + 6px);
-  z-index: 999 !important;
+  z-index: var(--z-overlay) !important;
   pointer-events: auto !important;
   transition:
     opacity 280ms ease-out,
@@ -96,6 +96,6 @@ body:has(:is(.toolbar-editor, .addwebpanel-wrapper))
   width: 40px !important;
   opacity: 1 !important;
   visibility: visible !important;
-  transition: opacity 280ms ease-out, visibility 280ms ease-out;
+  transition: opacity var(--animation-speed) ease-out, visibility var(--animation-speed) ease-out;
 }
 */

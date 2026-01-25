@@ -4,6 +4,60 @@
 (async function vivaldiHistorySummary() {
   "use strict";
 
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => obs.disconnect());
+      this.timeouts.forEach(id => clearTimeout(id));
+      this.intervals.forEach(id => clearInterval(id));
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+    }
+  };
+
   // EDIT START
   // Command chain identifier (inspect UI and input your own)
   // This is the ID of the button you want to use to trigger the summary.
@@ -353,7 +407,7 @@
           "Vivaldi History Summary: Button found and event attached.",
         );
         // 绑定主函数
-        btn[i].addEventListener("click", main);
+        modState.addEventListener(btn[i], "click", main);
         // 添加一个自定义class，防止重复绑定
         btn[i].classList.add("vhs-summary-btn");
       }
@@ -367,14 +421,13 @@
       const check = document.getElementById("browser");
       if (check) return resolve(check);
       else {
-        const startup = new MutationObserver(() => {
+        const startup = modState.addObserver(document.body, () => {
           const el = document.getElementById("browser");
           if (el) {
             startup.disconnect();
             resolve(el);
           }
-        });
-        startup.observe(document.body, { childList: true, subtree: true });
+        }, { childList: true, subtree: true });
       }
     });
   };
@@ -384,14 +437,17 @@
   };
 
   await wait().then((browser) => {
-    const lazy_obs = new MutationObserver(() => {
+    const lazy_obs = modState.addObserver(browser, () => {
       lazy_obs.disconnect();
-      setTimeout(() => {
+      modState.setTimeout(() => {
         setupButton(browser);
         lazy(browser, lazy_obs);
       }, 666); // 延迟执行，确保UI完全渲染
-    });
+    }, { childList: true, subtree: true });
     setupButton(browser);
     lazy(browser, lazy_obs);
+    
+    // Register cleanup on beforeunload
+    window.addEventListener('beforeunload', () => modState.cleanup());
   });
 })();

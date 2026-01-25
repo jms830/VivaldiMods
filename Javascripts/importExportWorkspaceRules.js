@@ -9,6 +9,60 @@
 (async () => {
   'use strict';
 
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => obs.disconnect());
+      this.timeouts.forEach(id => clearTimeout(id));
+      this.intervals.forEach(id => clearInterval(id));
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+    }
+  };
+
   const gnoh = {
     uuid: {
       generate(ids) {
@@ -150,10 +204,10 @@
     toast.style.cssText = `position: fixed; top: 20px; right: 20px; padding: 12px 16px; border-radius: 6px; color: white; font-size: 13px; z-index: 999999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 400px; background: ${type === 'success' ? '#2e7d32' : type === 'error' ? '#c62828' : '#1565c0'};`;
     browserDoc.body.appendChild(toast);
     
-    setTimeout(() => {
+    modState.setTimeout(() => {
       toast.style.transition = 'opacity 0.3s';
       toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 300);
+      modState.setTimeout(() => toast.remove(), 300);
     }, 5000);
     
     console.log(`[WorkspaceRules] Toast (${type}): ${message}`);
@@ -350,11 +404,12 @@
     });
   }
 
-  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  const tabUpdateHandler = (tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && tab.url?.includes('settings.html') && tab.url?.includes('tabs')) {
-      setTimeout(createWorkspaceRulesButtons, 500);
+      modState.setTimeout(createWorkspaceRulesButtons, 500);
     }
-  });
+  };
+  modState.addChromeListener(chrome.tabs, 'onUpdated', tabUpdateHandler);
 
   gnoh.timeOut(async () => {
     const rules = await getWorkspaceRules();
@@ -363,7 +418,7 @@
     if (document.querySelector('#main > .webpageview')) {
       const tabsMenuItem = getMenuItem('Tabs');
       if (tabsMenuItem) {
-        tabsMenuItem.addEventListener('click', () => setTimeout(createWorkspaceRulesButtons, 300));
+        modState.addEventListener(tabsMenuItem, 'click', () => modState.setTimeout(createWorkspaceRulesButtons, 300));
       }
     } else {
       const tabs = await chrome.tabs.query({ active: true, windowId: vivaldiWindowId });
@@ -371,6 +426,9 @@
         createWorkspaceRulesButtons();
       }
     }
+    
+    // Register cleanup on beforeunload
+    window.addEventListener('beforeunload', () => modState.cleanup());
   }, '#main');
 
   console.log('[WorkspaceRules] Ready - buttons appear in Settings > Tabs > Workspaces');

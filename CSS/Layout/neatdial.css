@@ -90,10 +90,10 @@ Toggle speeddial visibility by toggle 'add speeddial button'.
 /* Position search engine icon above search field */
 .SpeedDialView-Head .SearchEngineSelect-Icon {
 	position: absolute;
-	top: -60px;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 10;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-hover);
 }
 
 .SpeedDialView-Head .SearchEngineSelect-Icon .button-toolbar {

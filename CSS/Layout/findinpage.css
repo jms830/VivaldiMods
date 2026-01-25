@@ -13,7 +13,7 @@ Floating find in page panel, as it should be.
   margin: 0 auto !important;
   padding: 0.1rem 0.3rem;
   border-radius: var(--radius);
-  z-index: 1;
+  z-index: var(--z-base);
 }
 
 .button-toolbar.button-narrow {
