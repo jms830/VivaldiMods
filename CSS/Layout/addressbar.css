@@ -326,10 +326,9 @@ button[title="显示输入记录"] {
    MAINBAR & ADDRESS FIELD STYLING
    ======================================== */
 
-/* Mainbar styling */
+/* Mainbar styling - height REMOVED to fix blank space with native auto-hide (Vivaldi 7.8+) */
 .mainbar .toolbar-mainbar {
   align-items: stretch;
-  height: var(--mod-mainbar-height) !important;
   border: none !important;
 }
 /* padding: var(--mod-whitespace-y) !important; */

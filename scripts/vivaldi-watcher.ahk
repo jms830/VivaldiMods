@@ -23,22 +23,27 @@
 vivaldiPath := A_AppData . "\..\Local\Vivaldi\Application"
 
 ; Path to the JS mods installer script
-; Auto-detect: if this script is in the repo's scripts/ folder, use that
-; Otherwise, set this manually to your revivarc-vivaldi repo location
+; Prefers PowerShell (.ps1) over batch (.bat) for better WSL path support
 installerScript := ""
 
-; Try to auto-detect installer path
-if FileExist(A_ScriptDir "\install-js-mods.bat") {
-    ; We're running from the repo's scripts/ folder
+; Try to auto-detect installer path (prefer .ps1 over .bat)
+; Check for PowerShell script first
+if FileExist(A_ScriptDir "\install-js-mods.ps1") {
+    installerScript := A_ScriptDir "\install-js-mods.ps1"
+} else if FileExist(A_ScriptDir "\install-js-mods.bat") {
     installerScript := A_ScriptDir "\install-js-mods.bat"
+} else if FileExist(A_ScriptDir "\..\revivarc-vivaldi\scripts\install-js-mods.ps1") {
+    installerScript := A_ScriptDir "\..\revivarc-vivaldi\scripts\install-js-mods.ps1"
 } else if FileExist(A_ScriptDir "\..\revivarc-vivaldi\scripts\install-js-mods.bat") {
-    ; We're in a sibling AutoHotkey folder, repo is nearby
     installerScript := A_ScriptDir "\..\revivarc-vivaldi\scripts\install-js-mods.bat"
 } else {
-    ; Fallback: check common locations
+    ; Fallback: check common locations (prefer .ps1)
     for _, path in [
+        A_MyDocuments "\github\revivarc-vivaldi\scripts\install-js-mods.ps1",
         A_MyDocuments "\github\revivarc-vivaldi\scripts\install-js-mods.bat",
+        A_MyDocuments "\..\github\revivarc-vivaldi\scripts\install-js-mods.ps1",
         A_MyDocuments "\..\github\revivarc-vivaldi\scripts\install-js-mods.bat",
+        "C:\Users\" A_UserName "\github\revivarc-vivaldi\scripts\install-js-mods.ps1",
         "C:\Users\" A_UserName "\github\revivarc-vivaldi\scripts\install-js-mods.bat"
     ] {
         if FileExist(path) {
@@ -65,9 +70,9 @@ if !DirExist(vivaldiPath) {
 
 if !FileExist(installerScript) {
     ; Offer to let user browse for it
-    result := MsgBox("JS mods installer script not found.`n`nWould you like to browse for install-js-mods.bat?", "Vivaldi Watcher", "YesNo")
+    result := MsgBox("JS mods installer script not found.`n`nWould you like to browse for install-js-mods.ps1 or .bat?", "Vivaldi Watcher", "YesNo")
     if result = "Yes" {
-        selectedFile := FileSelect(1, A_MyDocuments, "Select install-js-mods.bat", "Batch Files (*.bat)")
+        selectedFile := FileSelect(1, A_MyDocuments, "Select install-js-mods.ps1 or .bat", "Scripts (*.ps1;*.bat)")
         if selectedFile {
             installerScript := selectedFile
             ; Save to config for next time
@@ -134,8 +139,14 @@ CheckForNewVersion() {
         
         TrayTip("Vivaldi Updated!", "New version detected: " currentVersion "`nApplying JS mods...", 1)
         
-        ; Run the installer
-        RunWait(installerScript)
+        ; Run the installer (handle both .ps1 and .bat)
+        if (installerScript ~= "\.ps1$") {
+            ; PowerShell script - run with pwsh/powershell, -Silent flag for no prompts
+            RunWait('powershell.exe -ExecutionPolicy Bypass -File "' installerScript '" -Silent')
+        } else {
+            ; Batch script - run with --silent flag
+            RunWait(installerScript ' --silent')
+        }
         
         TrayTip("JS Mods Applied", "Vivaldi " currentVersion " has been patched.`nPlease restart Vivaldi.", 1)
         
@@ -150,6 +161,6 @@ A_TrayMenu.Add("Check Now", (*) => CheckForNewVersion())
 A_TrayMenu.Add("Run Installer", (*) => Run(installerScript))
 A_TrayMenu.Add()
 A_TrayMenu.Add("Open Vivaldi Folder", (*) => Run(vivaldiPath))
-A_TrayMenu.Add("Open Scripts Folder", (*) => Run(StrReplace(installerScript, "\install-js-mods.bat", "")))
+A_TrayMenu.Add("Open Scripts Folder", (*) => Run(RegExReplace(installerScript, "\\install-js-mods\.(ps1|bat)$", "")))
 A_TrayMenu.Add()
 A_TrayMenu.Add("Exit", (*) => ExitApp())

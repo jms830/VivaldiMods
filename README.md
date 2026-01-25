@@ -31,8 +31,8 @@ Arc-style theming for Vivaldi Browser. This repo is a fork of [Awesome-Vivaldi](
 
 1. Toggle the modules you want
 2. Adjust settings (sidebar width, animations, etc.)
-3. Download your customized `Core.css`
-4. Replace `CSS/Core.css` in this repo with it
+3. Download your customized `core.css`
+4. Replace `CSS/core.css` in this repo with it
 5. Run `scripts/install.bat` or point Vivaldi to `CSS/` manually
 
 ## Repository Structure
@@ -40,7 +40,7 @@ Arc-style theming for Vivaldi Browser. This repo is a fork of [Awesome-Vivaldi](
 ```
 revivarc-vivaldi/
 ├── CSS/                    # CSS mods (point Vivaldi here)
-│   ├── Core.css            # Entry point - imports all modules
+│   ├── core.css            # Entry point - imports all modules
 │   ├── AutoHide/           # Auto-hide features
 │   ├── Layout/             # Core layouts
 │   ├── EnhancedUX/         # Visual enhancements
@@ -122,7 +122,7 @@ We maintain targeted fixes on top of Awesome-Vivaldi. See [docs/customizations.m
 
 ## Configuration Variables
 
-Edit these in `CSS/Core.css` or use the configurator:
+Edit these in `CSS/core.css` or use the configurator:
 
 | Variable | Default | Description |
 |----------|---------|-------------|

@@ -31,7 +31,7 @@ set "CSS_FOLDER=%REPO_ROOT%\CSS"
 set "VIVALDI_PREFS=%LOCALAPPDATA%\Vivaldi\User Data\Default\Preferences"
 
 REM === Verify CSS folder exists ===
-if not exist "%CSS_FOLDER%\Core.css" (
+if not exist "%CSS_FOLDER%\core.css" (
     echo [X] ERROR: CSS folder not found at:
     echo     %CSS_FOLDER%
     echo.
@@ -57,12 +57,12 @@ echo [OK] Found Vivaldi installation
 echo.
 
 REM === Check if Vivaldi is running ===
+set "VIVALDI_RUNNING=0"
 tasklist /FI "IMAGENAME eq vivaldi.exe" 2>nul | find /I "vivaldi.exe" >nul
 if not errorlevel 1 (
-    echo [!] Vivaldi is currently running.
-    echo     Please close Vivaldi, then press any key to continue...
+    set "VIVALDI_RUNNING=1"
+    echo [!] Vivaldi is currently running - will need restart after install.
     echo.
-    pause >nul
 )
 
 REM === Update Vivaldi preferences ===
@@ -120,14 +120,22 @@ echo ========================================
 echo.
 echo  CSS Folder: %CSS_FOLDER%
 echo.
+if "%VIVALDI_RUNNING%"=="1" (
+    echo  IMPORTANT: RESTART VIVALDI to apply changes!
+    echo.
+)
 echo  Next steps:
 echo  1. Enable CSS mods in vivaldi://experiments (if not already)
-echo  2. Restart Vivaldi
+if "%VIVALDI_RUNNING%"=="1" (
+    echo  2. RESTART Vivaldi
+) else (
+    echo  2. Start Vivaldi
+)
 echo  3. (Optional) Run install-js-mods.bat for JavaScript mods
 echo.
 echo  To customize which modules are enabled:
-echo  - Edit CSS/Core.css directly, or
+echo  - Edit CSS/core.css directly, or
 echo  - Use the configurator at https://jms830.github.io/VivaldiMods/
-echo    and replace CSS/Core.css with the downloaded file
+echo    and replace CSS/core.css with the downloaded file
 echo.
 pause

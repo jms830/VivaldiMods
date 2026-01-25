@@ -128,7 +128,7 @@ Currently only support 3x3 tabs grid.
     background-color: var(--colorAccentBg, rgba(255, 255, 255, 0.2)) !important;
     overflow: hidden;
     position: relative;
-    z-index: 100000000;
+    z-index: 30;
     width: calc(
       var(--pinned-column-count) * 100% + (var(--pinned-column-count) - 1) *
         var(--pinned-gap)

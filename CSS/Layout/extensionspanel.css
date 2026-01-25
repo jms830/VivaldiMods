@@ -7,31 +7,30 @@ https://github.com/PaRr0tBoY/Awesome-Vivaldi
 
 .toolbar-extensions {
   gap: 0 !important;
+  padding: 8px !important;
+  margin: -4px;
 }
 
 .toolbar-extensions .ExtensionIcon {
-  transform: scale(0);
-  transform-origin: center;
-  transition: transform 0.2s ease-in-out;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0;
+  transition: width 0.15s ease, height 0.15s ease, opacity 0.15s ease, padding 0.15s ease, margin 0.15s ease;
 }
 
 .toolbar-extensions:hover {
-  gap: var(--densityGap) !important;
+  gap: 4px !important;
 }
 
 .toolbar-extensions:hover .ExtensionIcon {
-  transform: scale(1);
+  width: 28px !important;
+  height: 28px !important;
+  padding: 4px !important;
+  opacity: 1;
 }
-
-/* ========================================
-   EXTENSIONS MENU STYLING
-   ======================================== */
-
-.toolbar-extensions {
-  /* scrollbar-width: none; */
-  gap: var(--densityGap);
-}
-/*============================================================================*/
 
 .extensionIconPopupMenu {
   --popupWidth: 280px !important;

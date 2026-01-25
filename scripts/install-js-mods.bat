@@ -81,12 +81,12 @@ echo [OK] Found Vivaldi version folder: %VIVALDI_VERSION_DIR%
 echo.
 
 REM === Check if Vivaldi is running ===
+set "VIVALDI_RUNNING=0"
 tasklist /FI "IMAGENAME eq vivaldi.exe" 2>nul | find /I "vivaldi.exe" >nul
 if not errorlevel 1 (
-    echo [!] Vivaldi is currently running.
-    echo     Please close Vivaldi, then press any key to continue...
+    set "VIVALDI_RUNNING=1"
+    echo [!] Vivaldi is currently running - will need restart after install.
     echo.
-    pause >nul
 )
 
 REM === Backup window.html ===
@@ -110,7 +110,7 @@ echo. >> "%VIVALDI_VERSION_DIR%custom.js"
 
 set "MOD_COUNT=0"
 
-REM Add root-level JS files (tidyTabs.js, tidyTitles.js, ClearTabs.js, etc.)
+REM Add root-level JS files (tidyTabs.js, tidyTitles.js, cleartabs.js, etc.)
 for %%f in ("%JS_FOLDER%\*.js") do (
     echo     Adding: %%~nxf
     echo. >> "%VIVALDI_VERSION_DIR%custom.js"
@@ -176,6 +176,9 @@ if exist "%JS_FOLDER%\Other" (
 
 echo.
 echo     Total mods added: %MOD_COUNT%
+if exist "%JS_FOLDER%\aminought\chroma.min.js" (
+    echo     ^(includes 1 dependency library^)
+)
 echo.
 
 REM === Patch window.html ===
@@ -263,15 +266,21 @@ echo.
 goto :after_watcher
 
 :skip_watcher
-echo  IMPORTANT:
-echo  - Restart Vivaldi to apply changes
-echo  - Re-run this script after Vivaldi updates!
+if "%VIVALDI_RUNNING%"=="1" (
+    echo  IMPORTANT: RESTART VIVALDI to apply changes!
+    echo.
+)
+echo  NOTE: Re-run this script after Vivaldi updates!
 echo.
 echo  TIP: Install the AutoHotkey watcher to auto-patch on updates:
 echo       run: install-js-mods.bat (without --silent)
 echo.
 
 :after_watcher
+if "%VIVALDI_RUNNING%"=="1" (
+    echo  *** REMINDER: RESTART VIVALDI NOW ***
+    echo.
+)
 echo  To remove JS mods: run restore-vivaldi.bat
 echo.
 pause
