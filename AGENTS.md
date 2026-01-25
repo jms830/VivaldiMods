@@ -554,6 +554,30 @@ const refreshCache = () => {
 7. [ ] Filename is lowercase
 8. [ ] Tested on both Windows and Linux/WSL
 
+## Known Tech Debt
+
+### `!important` Declarations (692 total)
+
+Most are **necessary** to override Vivaldi's internal styles. Distribution by file:
+
+| File | Count | Status |
+|------|-------|--------|
+| `AutoHide/tabbar.css` | 249 | Legacy (disabled by default) |
+| `Layout/favouritetabs.css` | 154 | Required for pinned tabs |
+| `Layout/addressbar.css` | 38 | Required for URL bar styling |
+| `Layout/nativeautohidepolish.css` | 28 | Required for native auto-hide |
+| Other files | 223 | Mixed necessity |
+
+**Policy**: Do not remove existing `!important` without testing. Vivaldi's internal CSS uses `!important` extensively, so our overrides must match.
+
+### Large Files
+
+| File | Lines | Status |
+|------|-------|--------|
+| `AutoHide/tabbar.css` | 1,548 | Legacy, well-organized with @container queries |
+
+**Policy**: `tabbar.css` is disabled by default (Vivaldi 7.8+ has native auto-hide). Keep as-is for users who need custom auto-hide behavior.
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc
