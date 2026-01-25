@@ -336,8 +336,62 @@
     return iconUrl;
   }
 
+  function normalizeSvg(svgContent) {
+    let svg = svgContent.trim();
+    
+    // Parse SVG to manipulate attributes
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svg, 'image/svg+xml');
+    const svgEl = doc.querySelector('svg');
+    
+    if (!svgEl) return svg;
+    
+    // Ensure viewBox exists (default to 0 0 24 24 for Material icons)
+    if (!svgEl.getAttribute('viewBox')) {
+      svgEl.setAttribute('viewBox', '0 0 24 24');
+    }
+    
+    // Remove explicit width/height to allow CSS sizing
+    svgEl.removeAttribute('width');
+    svgEl.removeAttribute('height');
+    
+    // Replace fill colors with currentColor for theme adaptability
+    // This makes icons visible on both dark and light themes
+    const elementsWithFill = svgEl.querySelectorAll('[fill]');
+    elementsWithFill.forEach(el => {
+      const fill = el.getAttribute('fill');
+      // Keep 'none' fills (for strokes) but convert colors to currentColor
+      if (fill && fill !== 'none' && fill !== 'currentColor') {
+        el.setAttribute('fill', 'currentColor');
+      }
+    });
+    
+    // Also handle stroke colors
+    const elementsWithStroke = svgEl.querySelectorAll('[stroke]');
+    elementsWithStroke.forEach(el => {
+      const stroke = el.getAttribute('stroke');
+      if (stroke && stroke !== 'none' && stroke !== 'currentColor') {
+        el.setAttribute('stroke', 'currentColor');
+      }
+    });
+    
+    // If no fill is set on the root svg or path, add fill="currentColor"
+    const paths = svgEl.querySelectorAll('path, circle, rect, polygon, polyline, ellipse, line');
+    paths.forEach(path => {
+      if (!path.getAttribute('fill') && !path.getAttribute('stroke')) {
+        path.setAttribute('fill', 'currentColor');
+      }
+    });
+    
+    // Serialize back to string
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(svgEl);
+  }
+
   function svgToDataUrl(svgContent) {
-    const encoded = encodeURIComponent(svgContent)
+    // Normalize the SVG first
+    const normalizedSvg = normalizeSvg(svgContent);
+    const encoded = encodeURIComponent(normalizedSvg)
       .replace(/'/g, '%27')
       .replace(/"/g, '%22');
     return `data:image/svg+xml,${encoded}`;
