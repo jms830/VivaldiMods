@@ -37,7 +37,7 @@ You may manage and config all your css mods and config them as well all in this 
 /* Import JSIntegration folder CSS files */
 @import "JSIntegration/cleartabs.css";
 @import "JSIntegration/tidytabs.css";
-/* @import "JSIntegration/arcpeek.css"; */
+@import "JSIntegration/arcpeek.css";
 @import "JSIntegration/accentmod.css";
 @import "JSIntegration/workspacebuttons.css";
 

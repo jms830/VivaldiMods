@@ -1,6 +1,6 @@
 # Current Setup - Jordan's Vivaldi 7.8 Configuration
 
-Last updated: 2026-01-13
+Last updated: 2026-01-25
 
 ## Overview
 
@@ -121,11 +121,13 @@ Location: `C:\Users\jordans\AppData\Local\Vivaldi\Application\7.8.3916.3\resourc
 | workspaceButtons.js | Quick workspace switching buttons | 18KB |
 
 ### JS Mods NOT Installed (Available in repo)
+- dialogTab.js - Arc Peek / link preview in floating dialog (now enabled)
 - colorTabs.js - Color tab borders by favicon
 - accentMod.js - Dynamic accent colors  
 - tabScroll.js - Scroll through tabs
 - activateTabOnHover.js - Switch tabs on hover
 - immersiveAddressbar.js - Immersive mode (requires --fluid-theme: immersive)
+- commandChainIcons.js - Custom icons for command chains (new Jan 2026)
 
 ## New Modules Created (2026-01-13)
 
