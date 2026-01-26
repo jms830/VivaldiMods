@@ -277,6 +277,9 @@
   const THEME_SCHEDULE_PATH = 'vivaldi.theme.schedule';
   const SETTINGS_URL = 'chrome-extension://mpognobbkildjkofajifpdfhcoklimli/components/settings/settings.html?path=qc';
   const THUMBNAILS_PATH = 'VivaldiThumbnails';
+  const ICONIFY_API = 'https://api.iconify.design';
+  
+  const iconSearchCache = new Map();
 
   const icons = {
     setIcon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5m4.5 2A3.5 3.5 0 0 1 13 8.5c0 1.06-.47 2-1.21 2.64l3.07 3.07-1.41 1.41-3.07-3.07A3.5 3.5 0 0 1 9.5 13 3.5 3.5 0 0 1 6 9.5 3.5 3.5 0 0 1 9.5 5m0 2A1.5 1.5 0 0 0 8 8.5a1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 9.5 7Z"/></svg>',
@@ -458,6 +461,53 @@
   }
 
   // ============================================
+  // ICONIFY API FUNCTIONS
+  // ============================================
+
+  async function searchIconifyIcons(query, limit = 64) {
+    if (!query || query.length < 2) return [];
+    
+    const cacheKey = `search:${query}:${limit}`;
+    if (iconSearchCache.has(cacheKey)) {
+      return iconSearchCache.get(cacheKey);
+    }
+    
+    try {
+      const url = `${ICONIFY_API}/search?query=${encodeURIComponent(query)}&prefix=mdi&limit=${limit}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Search failed');
+      
+      const data = await response.json();
+      const results = data.icons || [];
+      iconSearchCache.set(cacheKey, results);
+      return results;
+    } catch (err) {
+      console.error('[CommandChainIcons] Icon search failed:', err);
+      return [];
+    }
+  }
+
+  async function fetchIconifySvg(iconName) {
+    const cacheKey = `svg:${iconName}`;
+    if (iconSearchCache.has(cacheKey)) {
+      return iconSearchCache.get(cacheKey);
+    }
+    
+    try {
+      const url = `${ICONIFY_API}/${iconName}.svg?height=24`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Fetch failed');
+      
+      const svg = await response.text();
+      iconSearchCache.set(cacheKey, svg);
+      return svg;
+    } catch (err) {
+      console.error('[CommandChainIcons] Icon fetch failed:', err);
+      return null;
+    }
+  }
+
+  // ============================================
   // UI FUNCTIONS
   // ============================================
 
@@ -535,6 +585,26 @@
     const tabsContainer = gnoh.createElement('div', { class: 'cci-tabs' }, gridSection);
     const gridContainer = gnoh.createElement('div', { class: 'cci-grid-container' }, gridSection);
     
+    let searchTimeout = null;
+    let currentSearchQuery = '';
+    
+    const renderIconButton = (grid, name, svg, onSelect) => {
+      const btn = gnoh.createElement('button', {
+        class: 'cci-icon-btn',
+        html: svg,
+        title: name,
+        events: {
+          click: (e) => {
+            e.preventDefault();
+            grid.querySelectorAll('.cci-icon-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            onSelect(svg);
+          }
+        }
+      }, grid);
+      return btn;
+    };
+    
     const renderGrid = (category) => {
       gridContainer.innerHTML = '';
       const grid = gnoh.createElement('div', { class: 'cci-icon-grid' }, gridContainer);
@@ -544,20 +614,10 @@
         const svg = ICON_LIBRARY[name];
         if (!svg) return;
         
-        const btn = gnoh.createElement('button', {
-          class: 'cci-icon-btn',
-          html: svg,
-          title: name,
-          events: {
-            click: (e) => {
-              e.preventDefault();
-              grid.querySelectorAll('.cci-icon-btn').forEach(b => b.classList.remove('selected'));
-              btn.classList.add('selected');
-              updatePreview(svg);
-              customInput.value = svg;
-            }
-          }
-        }, grid);
+        const btn = renderIconButton(grid, name, svg, (svg) => {
+          updatePreview(svg);
+          customInput.value = svg;
+        });
         
         if (selectedIcon === svg) {
           btn.classList.add('selected');
@@ -565,9 +625,86 @@
       });
     };
     
-    Object.keys(ICON_CATEGORIES).forEach((cat, index) => {
+    const renderSearchUI = () => {
+      gridContainer.innerHTML = '';
+      
+      const searchWrapper = gnoh.createElement('div', { class: 'cci-search-wrapper' }, gridContainer);
+      const searchInput = gnoh.createElement('input', {
+        type: 'text',
+        class: 'cci-search-input',
+        placeholder: 'Search 7000+ Material Design Icons...',
+        value: currentSearchQuery,
+        events: {
+          input: (e) => {
+            currentSearchQuery = e.target.value;
+            if (searchTimeout) clearTimeout(searchTimeout);
+            searchTimeout = modState.setTimeout(() => performSearch(currentSearchQuery), 300);
+          }
+        }
+      }, searchWrapper);
+      
+      const resultsContainer = gnoh.createElement('div', { class: 'cci-search-results' }, gridContainer);
+      
+      if (currentSearchQuery.length >= 2) {
+        performSearch(currentSearchQuery);
+      } else {
+        resultsContainer.innerHTML = '<div class="cci-search-hint">Type at least 2 characters to search</div>';
+      }
+      
+      searchInput.focus();
+      
+      async function performSearch(query) {
+        if (query.length < 2) {
+          resultsContainer.innerHTML = '<div class="cci-search-hint">Type at least 2 characters to search</div>';
+          return;
+        }
+        
+        resultsContainer.innerHTML = '<div class="cci-search-loading">Searching...</div>';
+        
+        const iconNames = await searchIconifyIcons(query, 64);
+        
+        if (iconNames.length === 0) {
+          resultsContainer.innerHTML = '<div class="cci-search-hint">No icons found for "' + query + '"</div>';
+          return;
+        }
+        
+        resultsContainer.innerHTML = '';
+        const grid = gnoh.createElement('div', { class: 'cci-icon-grid' }, resultsContainer);
+        
+        for (const fullName of iconNames) {
+          const shortName = fullName.replace('mdi:', '');
+          const svg = await fetchIconifySvg(fullName);
+          if (!svg) continue;
+          
+          renderIconButton(grid, shortName, svg, (svg) => {
+            updatePreview(svg);
+            customInput.value = svg;
+          });
+        }
+        
+        gnoh.createElement('div', { 
+          class: 'cci-search-count',
+          text: `Found ${iconNames.length} icons`
+        }, resultsContainer);
+      }
+    };
+    
+    const searchTab = gnoh.createElement('button', {
+      class: 'cci-tab cci-tab-search active',
+      html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg> Search',
+      events: {
+        click: (e) => {
+          e.preventDefault();
+          tabsContainer.querySelectorAll('.cci-tab').forEach(t => t.classList.remove('active'));
+          searchTab.classList.add('active');
+          renderSearchUI();
+        }
+      }
+    }, tabsContainer);
+    
+    Object.keys(ICON_CATEGORIES).forEach((cat) => {
       const tab = gnoh.createElement('button', {
-        class: 'cci-tab' + (index === 0 ? ' active' : ''),
+        class: 'cci-tab',
         text: cat,
         events: {
           click: (e) => {
@@ -580,7 +717,7 @@
       }, tabsContainer);
     });
     
-    renderGrid(Object.keys(ICON_CATEGORIES)[0]);
+    renderSearchUI();
     
     const customSection = gnoh.createElement('div', { class: 'cci-custom-section' }, content);
     gnoh.createElement('label', { text: 'Or paste custom SVG:' }, customSection);
@@ -1140,6 +1277,61 @@
     
     .cci-btn-apply:hover {
       filter: brightness(1.1);
+    }
+    
+    /* Search tab */
+    .cci-tab-search {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .cci-tab-search svg {
+      flex-shrink: 0;
+    }
+    
+    .cci-search-wrapper {
+      margin-bottom: 12px;
+    }
+    
+    .cci-search-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--colorBorder, #333);
+      border-radius: var(--radiusHalf, 4px);
+      background: var(--colorBgIntense, #252525);
+      color: var(--colorFg, #fff);
+      font-size: 13px;
+    }
+    
+    .cci-search-input:focus {
+      outline: none;
+      border-color: var(--colorAccentBg, #3b82f6);
+    }
+    
+    .cci-search-input::placeholder {
+      color: var(--colorFgFaded, #666);
+    }
+    
+    .cci-search-results {
+      min-height: 100px;
+    }
+    
+    .cci-search-hint,
+    .cci-search-loading {
+      padding: 20px;
+      text-align: center;
+      color: var(--colorFgFaded, #666);
+      font-size: 12px;
+    }
+    
+    .cci-search-count {
+      padding: 8px;
+      text-align: center;
+      color: var(--colorFgFaded, #666);
+      font-size: 11px;
+      border-top: 1px solid var(--colorBorder, #333);
+      margin-top: 8px;
     }
   `, 'command-chain-icons');
 
