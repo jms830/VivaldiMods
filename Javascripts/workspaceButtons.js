@@ -9,6 +9,7 @@
     timeouts: [],
     intervals: [],
     chromeListeners: [],
+    vivaldiListeners: [],
     
     addEventListener(target, event, handler, options) {
       target.addEventListener(event, handler, options);
@@ -39,6 +40,11 @@
       this.chromeListeners.push({ api, event, handler });
     },
     
+    addVivaldiListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.vivaldiListeners.push({ api, event, handler });
+    },
+    
     cleanup() {
       this.listeners.forEach(({ target, event, handler, options }) => {
         target.removeEventListener(event, handler, options);
@@ -49,11 +55,15 @@
       this.chromeListeners.forEach(({ api, event, handler }) => {
         api[event].removeListener(handler);
       });
+      this.vivaldiListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
       this.listeners = [];
       this.observers = [];
       this.timeouts = [];
       this.intervals = [];
       this.chromeListeners = [];
+      this.vivaldiListeners = [];
       console.log('[WorkspaceButtons] Cleanup complete');
     }
   };
@@ -116,7 +126,7 @@
     buttonClass: 'workspace-quick-button',
     activeClass: 'workspace-active',
     addButtonClass: 'workspace-add-button',
-    checkInterval: 3000,
+    checkInterval: 10000,
     debounceDelay: 100,
     maxVisible: 8,
     minButtonSize: 24,
@@ -128,7 +138,6 @@
 
   let currentWorkspaceId = null;
   let workspaceList = [];
-  let workspaceListCache = [];
   let container = null;
   let isInitialized = false;
   let isSwitching = false;
@@ -533,7 +542,6 @@
 
   const render = async () => {
     workspaceList = await getWorkspaceList();
-    workspaceListCache = JSON.parse(JSON.stringify(workspaceList));
 
     injectStyles();
     container = createContainer();
@@ -567,26 +575,10 @@
     await updateActiveState();
   };
 
-  const checkWorkspaceChanges = async () => {
-    const freshList = await getWorkspaceList();
-    
-    if (freshList.length !== workspaceListCache.length) {
-      console.log('[WorkspaceButtons] Workspace count changed, re-rendering');
+  const onWorkspacePrefsChanged = (change) => {
+    if (change.path === 'vivaldi.workspaces.list') {
+      console.log('[WorkspaceButtons] Workspace list changed, re-rendering');
       modState.setTimeout(render, 100);
-      return;
-    }
-    
-    for (let i = 0; i < freshList.length; i++) {
-      const fresh = freshList[i];
-      const cached = workspaceListCache[i];
-      
-      if (!cached || fresh.id !== cached.id || 
-          fresh.name !== cached.name || 
-          fresh.icon !== cached.icon) {
-        console.log('[WorkspaceButtons] Workspace changed, re-rendering');
-        modState.setTimeout(render, 100);
-        return;
-      }
     }
   };
 
@@ -606,7 +598,9 @@
 
     modState.setInterval(updateActiveState, CONFIG.checkInterval);
     
-    modState.setInterval(checkWorkspaceChanges, 5000);
+    if (typeof vivaldi !== 'undefined' && vivaldi.prefs?.onChanged) {
+      modState.addVivaldiListener(vivaldi.prefs, 'onChanged', onWorkspacePrefsChanged);
+    }
 
     modState.addChromeListener(chrome.tabs, 'onActivated', () => {
       modState.setTimeout(updateActiveState, CONFIG.debounceDelay);
