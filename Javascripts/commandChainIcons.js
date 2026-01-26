@@ -336,60 +336,80 @@
     return iconUrl;
   }
 
-  function normalizeSvg(svgContent) {
-    let svg = svgContent.trim();
-    
-    // Parse SVG to manipulate attributes
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svg, 'image/svg+xml');
-    const svgEl = doc.querySelector('svg');
-    
-    if (!svgEl) return svg;
-    
-    // Ensure viewBox exists (default to 0 0 24 24 for Material icons)
-    if (!svgEl.getAttribute('viewBox')) {
-      svgEl.setAttribute('viewBox', '0 0 24 24');
+  function getThemeForegroundColor() {
+    const selectors = [
+      '.toolbar-mainbar .button-toolbar',
+      '.toolbar .button-toolbar',
+      '.toolbar .toolbar-button',
+      '.toolbar',
+      '#browser',
+      'body'
+    ];
+
+    for (const selector of selectors) {
+      const el = document.querySelector(selector);
+      if (!el) continue;
+      const computed = getComputedStyle(el);
+      const colorVar = computed.getPropertyValue('--colorFg').trim();
+      if (colorVar) return colorVar;
+      const color = computed.color?.trim();
+      if (color && color !== 'rgba(0, 0, 0, 0)') return color;
     }
-    
-    // Remove explicit width/height to allow CSS sizing
-    svgEl.removeAttribute('width');
-    svgEl.removeAttribute('height');
-    
-    // Replace fill colors with currentColor for theme adaptability
-    // This makes icons visible on both dark and light themes
-    const elementsWithFill = svgEl.querySelectorAll('[fill]');
-    elementsWithFill.forEach(el => {
-      const fill = el.getAttribute('fill');
-      // Keep 'none' fills (for strokes) but convert colors to currentColor
-      if (fill && fill !== 'none' && fill !== 'currentColor') {
-        el.setAttribute('fill', 'currentColor');
+
+    return '#ffffff';
+  }
+
+  function normalizeSvg(svgContent, fillColor = null) {
+    try {
+      let svg = svgContent.trim();
+      
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svg, 'image/svg+xml');
+      const svgEl = doc.querySelector('svg');
+      
+      if (!svgEl) return svg;
+      
+      if (!svgEl.getAttribute('viewBox')) {
+        svgEl.setAttribute('viewBox', '0 0 24 24');
       }
-    });
-    
-    // Also handle stroke colors
-    const elementsWithStroke = svgEl.querySelectorAll('[stroke]');
-    elementsWithStroke.forEach(el => {
-      const stroke = el.getAttribute('stroke');
-      if (stroke && stroke !== 'none' && stroke !== 'currentColor') {
-        el.setAttribute('stroke', 'currentColor');
-      }
-    });
-    
-    // If no fill is set on the root svg or path, add fill="currentColor"
-    const paths = svgEl.querySelectorAll('path, circle, rect, polygon, polyline, ellipse, line');
-    paths.forEach(path => {
-      if (!path.getAttribute('fill') && !path.getAttribute('stroke')) {
-        path.setAttribute('fill', 'currentColor');
-      }
-    });
-    
-    // Serialize back to string
-    const serializer = new XMLSerializer();
-    return serializer.serializeToString(svgEl);
+      
+      svgEl.removeAttribute('width');
+      svgEl.removeAttribute('height');
+      
+      const color = fillColor || getThemeForegroundColor();
+      
+      const elementsWithFill = svgEl.querySelectorAll('[fill]');
+      elementsWithFill.forEach(el => {
+        const fill = el.getAttribute('fill');
+        if (fill && fill !== 'none') {
+          el.setAttribute('fill', color);
+        }
+      });
+      
+      const elementsWithStroke = svgEl.querySelectorAll('[stroke]');
+      elementsWithStroke.forEach(el => {
+        const stroke = el.getAttribute('stroke');
+        if (stroke && stroke !== 'none') {
+          el.setAttribute('stroke', color);
+        }
+      });
+      
+      const paths = svgEl.querySelectorAll('path, circle, rect, polygon, polyline, ellipse, line');
+      paths.forEach(path => {
+        if (!path.getAttribute('fill') && !path.getAttribute('stroke')) {
+          path.setAttribute('fill', color);
+        }
+      });
+      
+      const serializer = new XMLSerializer();
+      return serializer.serializeToString(svgEl);
+    } catch (err) {
+      console.error('[CommandChainIcons] SVG normalization failed:', err);
+      return svgContent;
+    }
   }
 
   function svgToDataUrl(svgContent) {
-    // Normalize the SVG first
     const normalizedSvg = normalizeSvg(svgContent);
     const encoded = encodeURIComponent(normalizedSvg)
       .replace(/'/g, '%27')
@@ -1133,28 +1153,39 @@
   gnoh.timeOut(async () => {
     console.log('[CommandChainIcons] Initializing...');
     
-    if (document.querySelector('#main > .webpageview')) {
-      const menuItem = document.evaluate(
-        '//div[contains(concat(" ", normalize-space(@class), " "), " tree-row ") and contains(., "Quick Commands")]',
-        document, null, XPathResult.ANY_TYPE, null
-      ).iterateNext();
+    try {
+      if (document.querySelector('#main > .webpageview')) {
+        console.log('[CommandChainIcons] Found webpageview, looking for Quick Commands menu item');
+        const menuItem = document.evaluate(
+          '//div[contains(concat(" ", normalize-space(@class), " "), " tree-row ") and contains(., "Quick Commands")]',
+          document, null, XPathResult.ANY_TYPE, null
+        ).iterateNext();
+        
+        if (menuItem) {
+          console.log('[CommandChainIcons] Found Quick Commands menu item, adding click listener');
+          modState.addEventListener(menuItem, 'click', () => modState.setTimeout(createSettings, 300));
+        } else {
+          console.log('[CommandChainIcons] Quick Commands menu item not found');
+        }
+      } else {
+        console.log('[CommandChainIcons] No webpageview, checking if on settings page');
+        const tabs = await chrome.tabs.query({ active: true, windowId: vivaldiWindowId });
+        console.log('[CommandChainIcons] Active tab:', tabs[0]?.url);
+        if (tabs.length && tabs[0].url?.includes('settings.html') && tabs[0].url?.includes('path=qc')) {
+          console.log('[CommandChainIcons] On Quick Commands settings page, calling createSettings');
+          createSettings();
+        }
+      }
       
-      if (menuItem) {
-        modState.addEventListener(menuItem, 'click', () => modState.setTimeout(createSettings, 300));
-      }
-    } else {
-      const tabs = await chrome.tabs.query({ active: true, windowId: vivaldiWindowId });
-      if (tabs.length && tabs[0].url?.includes('settings.html') && tabs[0].url?.includes('path=qc')) {
-        createSettings();
-      }
+      window.addEventListener('beforeunload', () => {
+        if (timeOut) timeOut.stop();
+        closeIconPicker();
+        modState.cleanup();
+      });
+      
+      console.log('[CommandChainIcons] Initialized - button appears in Settings > Quick Commands');
+    } catch (err) {
+      console.error('[CommandChainIcons] Initialization error:', err);
     }
-    
-    window.addEventListener('beforeunload', () => {
-      if (timeOut) timeOut.stop();
-      closeIconPicker();
-      modState.cleanup();
-    });
-    
-    console.log('[CommandChainIcons] Initialized - button appears in Settings > Quick Commands');
   }, '#main');
 })();
