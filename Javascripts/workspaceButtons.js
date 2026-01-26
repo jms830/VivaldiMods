@@ -116,7 +116,7 @@
     buttonClass: 'workspace-quick-button',
     activeClass: 'workspace-active',
     addButtonClass: 'workspace-add-button',
-    checkInterval: 1000,
+    checkInterval: 3000,
     debounceDelay: 100,
     maxVisible: 8,
     minButtonSize: 24,

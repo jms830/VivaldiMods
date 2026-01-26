@@ -30,8 +30,8 @@ You may manage and config all your css mods and config them as well all in this 
 
 /* Import EnhancedUX folder CSS files */
 @import "EnhancedUX/btnhoveranime.css";
-@import "EnhancedUX/tabstrail.css";
-@import "EnhancedUX/quietify.css";
+/* @import "EnhancedUX/tabstrail.css"; */
+/* @import "EnhancedUX/quietify.css"; */
 @import "EnhancedUX/selectabletext.css";
 
 /* Import JSIntegration folder CSS files */

@@ -74,5 +74,5 @@
 			clearInterval(startupCheckInterval);
 			init();
 		}
-	});
+	}, 100);  // Poll every 100ms instead of tight loop (~4ms)
 })();
