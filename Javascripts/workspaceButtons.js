@@ -128,6 +128,7 @@
 
   let currentWorkspaceId = null;
   let workspaceList = [];
+  let workspaceListCache = [];
   let container = null;
   let isInitialized = false;
   let isSwitching = false;
@@ -532,6 +533,7 @@
 
   const render = async () => {
     workspaceList = await getWorkspaceList();
+    workspaceListCache = JSON.parse(JSON.stringify(workspaceList));
 
     injectStyles();
     container = createContainer();
@@ -565,6 +567,29 @@
     await updateActiveState();
   };
 
+  const checkWorkspaceChanges = async () => {
+    const freshList = await getWorkspaceList();
+    
+    if (freshList.length !== workspaceListCache.length) {
+      console.log('[WorkspaceButtons] Workspace count changed, re-rendering');
+      modState.setTimeout(render, 100);
+      return;
+    }
+    
+    for (let i = 0; i < freshList.length; i++) {
+      const fresh = freshList[i];
+      const cached = workspaceListCache[i];
+      
+      if (!cached || fresh.id !== cached.id || 
+          fresh.name !== cached.name || 
+          fresh.icon !== cached.icon) {
+        console.log('[WorkspaceButtons] Workspace changed, re-rendering');
+        modState.setTimeout(render, 100);
+        return;
+      }
+    }
+  };
+
   const init = () => {
     if (isInitialized) return;
     
@@ -580,6 +605,8 @@
     render();
 
     modState.setInterval(updateActiveState, CONFIG.checkInterval);
+    
+    modState.setInterval(checkWorkspaceChanges, 5000);
 
     modState.addChromeListener(chrome.tabs, 'onActivated', () => {
       modState.setTimeout(updateActiveState, CONFIG.debounceDelay);
