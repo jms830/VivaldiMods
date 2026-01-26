@@ -27,17 +27,18 @@
   const SETTINGS_KEY = 'vivaldi-peek-settings';
   
   const DEFAULT_SETTINGS = {
-    // Trigger settings
-    ctrlClickToPeek: false,        // Ctrl+Click opens peek instead of new tab
-    externalDomainAutoPeek: false, // Links to different domains auto-peek
-    sidebarLinksPeek: false,       // Links from web panels auto-peek
-    // Visual settings
+    ctrlClickToPeek: false,
+    ctrlShiftClickToPeek: false,
+    externalDomainAutoPeek: false,
+    sidebarLinksPeek: false,
+    longHoverAutoPeek: false,
+    longHoverDelay: 800,
+    hoverSpaceToPeek: false,
     rightClickHoldTime: 400,
     rightClickHoldDelay: 200,
     progressRingRadius: 20,
     progressRingWidth: 3,
     ringColor: "#40E0D0",
-    // Icon settings
     showLinkIcon: true,
     linkIconInteractionOnHover: true,
     showIconDelay: 250,
@@ -101,7 +102,6 @@
   // Initialize settings
   SettingsManager.load();
 
-  // Build ICON_CONFIG from settings
   const ICON_CONFIG = {
       linkIcon: SettingsManager.get('showLinkIcon') ? "fa-solid fa-arrow-up-right-from-square" : "",
       linkIconInteractionOnHover: SettingsManager.get('linkIconInteractionOnHover'),
@@ -112,10 +112,13 @@
       progressRingRadius: SettingsManager.get('progressRingRadius'),
       progressRingWidth: SettingsManager.get('progressRingWidth'),
       ringColor: SettingsManager.get('ringColor'),
-      // Auto-peek settings (passed to injected handler)
       ctrlClickToPeek: SettingsManager.get('ctrlClickToPeek'),
+      ctrlShiftClickToPeek: SettingsManager.get('ctrlShiftClickToPeek'),
       externalDomainAutoPeek: SettingsManager.get('externalDomainAutoPeek'),
       sidebarLinksPeek: SettingsManager.get('sidebarLinksPeek'),
+      longHoverAutoPeek: SettingsManager.get('longHoverAutoPeek'),
+      longHoverDelay: SettingsManager.get('longHoverDelay'),
+      hoverSpaceToPeek: SettingsManager.get('hoverSpaceToPeek'),
     },
     CONTEXT_MENU_CONFIG = {
       menuPrefix: "[Peek]",
@@ -861,6 +864,13 @@
           return;
         }
 
+        if (this.config.ctrlShiftClickToPeek && event.ctrlKey && event.shiftKey && !event.altKey) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.#callDialog(event);
+          return;
+        }
+
         if (this.config.externalDomainAutoPeek && this.#isExternalLink(link.href)) {
           if (!event.ctrlKey && !event.shiftKey && !event.altKey) {
             event.preventDefault();
@@ -1056,6 +1066,125 @@
               this.visibilityDelayTimer = null;
             }
           }
+        }
+      });
+
+      if (this.config.longHoverAutoPeek) {
+        this.#setupLongHoverHandler();
+      }
+
+      if (this.config.hoverSpaceToPeek) {
+        this.#setupHoverSpaceHandler();
+      }
+    }
+
+    #setupLongHoverHandler() {
+      let hoverTimer = null;
+      let currentLink = null;
+      let progressRing = null;
+
+      const clearHoverState = () => {
+        if (hoverTimer) {
+          clearTimeout(hoverTimer);
+          hoverTimer = null;
+        }
+        if (progressRing) {
+          progressRing.remove();
+          progressRing = null;
+        }
+        currentLink = null;
+      };
+
+      const createProgressRing = (x, y) => {
+        const size = 40;
+        const ring = document.createElement('div');
+        ring.style.cssText = `
+          position: fixed;
+          left: ${x - size/2}px;
+          top: ${y - size/2}px;
+          width: ${size}px;
+          height: ${size}px;
+          z-index: 10000;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.15s ease;
+        `;
+        ring.innerHTML = `
+          <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform: rotate(-90deg);">
+            <circle cx="${size/2}" cy="${size/2}" r="${size/2 - 4}" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="3"/>
+            <circle cx="${size/2}" cy="${size/2}" r="${size/2 - 4}" fill="none" stroke="${this.config.ringColor}" stroke-width="3" 
+              stroke-dasharray="${Math.PI * (size - 8)}" stroke-dashoffset="${Math.PI * (size - 8)}" stroke-linecap="round"
+              style="transition: stroke-dashoffset ${this.config.longHoverDelay}ms linear;"/>
+          </svg>
+        `;
+        document.body.appendChild(ring);
+        requestAnimationFrame(() => {
+          ring.style.opacity = '1';
+          const progressCircle = ring.querySelector('circle:last-child');
+          if (progressCircle) progressCircle.style.strokeDashoffset = '0';
+        });
+        return ring;
+      };
+
+      document.addEventListener('mouseover', (event) => {
+        const link = this.#getLinkElement(event);
+        if (!link || link === currentLink) return;
+        
+        clearHoverState();
+        currentLink = link;
+        
+        const showDelay = 150;
+        setTimeout(() => {
+          if (currentLink === link) {
+            progressRing = createProgressRing(event.clientX, event.clientY);
+          }
+        }, showDelay);
+
+        hoverTimer = setTimeout(() => {
+          if (currentLink === link && !this.dialogTriggered) {
+            clearHoverState();
+            this.#callDialog(event);
+          }
+        }, this.config.longHoverDelay);
+      });
+
+      document.addEventListener('mouseout', (event) => {
+        const link = this.#getLinkElement(event);
+        if (link === currentLink) {
+          clearHoverState();
+        }
+      });
+
+      document.addEventListener('mousedown', clearHoverState);
+      document.addEventListener('wheel', clearHoverState);
+    }
+
+    #setupHoverSpaceHandler() {
+      let hoveredLink = null;
+      let lastHoverEvent = null;
+
+      document.addEventListener('mouseover', (event) => {
+        const link = this.#getLinkElement(event);
+        if (link) {
+          hoveredLink = link;
+          lastHoverEvent = event;
+        }
+      });
+
+      document.addEventListener('mouseout', (event) => {
+        const link = this.#getLinkElement(event);
+        if (link === hoveredLink) {
+          hoveredLink = null;
+          lastHoverEvent = null;
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.code === 'Space' && hoveredLink && !this.dialogTriggered) {
+          event.preventDefault();
+          this.#callDialog(lastHoverEvent);
+          hoveredLink = null;
+          lastHoverEvent = null;
         }
       });
     }
@@ -1539,6 +1668,24 @@
                 <span class="peek-toggle-desc">Instead of opening a new tab</span>
               </label>
               <label class="peek-settings-toggle">
+                <input type="checkbox" data-setting="ctrlShiftClickToPeek" ${settings.ctrlShiftClickToPeek ? 'checked' : ''}>
+                <span class="peek-toggle-slider"></span>
+                <span class="peek-toggle-label">Ctrl+Shift+Click opens Peek</span>
+                <span class="peek-toggle-desc">Alternative modifier combo</span>
+              </label>
+              <label class="peek-settings-toggle">
+                <input type="checkbox" data-setting="longHoverAutoPeek" ${settings.longHoverAutoPeek ? 'checked' : ''}>
+                <span class="peek-toggle-slider"></span>
+                <span class="peek-toggle-label">Long hover auto-peek</span>
+                <span class="peek-toggle-desc">Hover over link to auto-open Peek</span>
+              </label>
+              <label class="peek-settings-toggle">
+                <input type="checkbox" data-setting="hoverSpaceToPeek" ${settings.hoverSpaceToPeek ? 'checked' : ''}>
+                <span class="peek-toggle-slider"></span>
+                <span class="peek-toggle-label">Hover + Space opens Peek</span>
+                <span class="peek-toggle-desc">Hover link, press Space to peek</span>
+              </label>
+              <label class="peek-settings-toggle">
                 <input type="checkbox" data-setting="externalDomainAutoPeek" ${settings.externalDomainAutoPeek ? 'checked' : ''}>
                 <span class="peek-toggle-slider"></span>
                 <span class="peek-toggle-label">External links auto-peek</span>
@@ -1572,6 +1719,11 @@
                 <span class="peek-range-label">Right-click hold time</span>
                 <input type="range" data-setting="rightClickHoldTime" min="200" max="1000" step="50" value="${settings.rightClickHoldTime}">
                 <span class="peek-range-value">${settings.rightClickHoldTime}ms</span>
+              </label>
+              <label class="peek-settings-range">
+                <span class="peek-range-label">Long hover delay</span>
+                <input type="range" data-setting="longHoverDelay" min="400" max="2000" step="100" value="${settings.longHoverDelay}">
+                <span class="peek-range-value">${settings.longHoverDelay}ms</span>
               </label>
               <label class="peek-settings-range">
                 <span class="peek-range-label">Icon show delay</span>
