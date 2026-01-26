@@ -578,6 +578,84 @@ Most are **necessary** to override Vivaldi's internal styles. Distribution by fi
 
 **Policy**: `tabbar.css` is disabled by default (Vivaldi 7.8+ has native auto-hide). Keep as-is for users who need custom auto-hide behavior.
 
+### Command Chain Icons: SVG Color for Dark/Light Themes (Jan 2026)
+
+**Symptom**: Custom icons set via the Command Chain Icon Picker appear dark/black on dark themes instead of matching toolbar button colors (white).
+
+**Root Cause**: SVG icons use `fill="currentColor"` which works in inline SVGs but **NOT in data URLs**. When an SVG is encoded as a data URL (`data:image/svg+xml,...`) and used in an `<img>` tag or CSS background, `currentColor` has no CSS context to inherit from and defaults to black.
+
+**What DOESN'T Work**:
+- `fill="currentColor"` in data URL SVGs - no inheritance context
+- CSS `filter` on the image - unreliable across themes
+- `--colorFg` from `:root` - may not reflect actual toolbar button color
+
+**What WORKS**:
+```javascript
+function getThemeForegroundColor() {
+  const selectors = [
+    '.toolbar-mainbar .button-toolbar',
+    '.toolbar .button-toolbar',
+    '.toolbar .toolbar-button',
+    '.toolbar',
+    '#browser',
+    'body'
+  ];
+
+  for (const selector of selectors) {
+    const el = document.querySelector(selector);
+    if (!el) continue;
+    const computed = getComputedStyle(el);
+    const colorVar = computed.getPropertyValue('--colorFg').trim();
+    if (colorVar) return colorVar;
+    const color = computed.color?.trim();
+    if (color && color !== 'rgba(0, 0, 0, 0)') return color;
+  }
+
+  return '#ffffff';
+}
+
+function normalizeSvg(svgContent, fillColor = null) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgContent, 'image/svg+xml');
+  const svgEl = doc.querySelector('svg');
+  
+  if (!svgEl) return svgContent;
+  
+  // Ensure consistent sizing
+  if (!svgEl.getAttribute('viewBox')) {
+    svgEl.setAttribute('viewBox', '0 0 24 24');
+  }
+  svgEl.removeAttribute('width');
+  svgEl.removeAttribute('height');
+  
+  // Replace ALL fills with actual theme color (not currentColor)
+  const color = fillColor || getThemeForegroundColor();
+  
+  svgEl.querySelectorAll('[fill]').forEach(el => {
+    if (el.getAttribute('fill') !== 'none') {
+      el.setAttribute('fill', color);
+    }
+  });
+  
+  // Add fill to paths without explicit fill
+  svgEl.querySelectorAll('path, circle, rect, polygon').forEach(path => {
+    if (!path.getAttribute('fill') && !path.getAttribute('stroke')) {
+      path.setAttribute('fill', color);
+    }
+  });
+  
+  return new XMLSerializer().serializeToString(svgEl);
+}
+```
+
+**Key Insights**:
+1. Sample actual toolbar button color, not just CSS variables from root
+2. Replace `currentColor` with the actual hex/rgb value before encoding
+3. Icons need to be re-saved after theme changes (color is baked into data URL)
+4. Normalize `viewBox` and remove explicit dimensions for consistent sizing
+
+**File**: `Javascripts/commandChainIcons.js`
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc
