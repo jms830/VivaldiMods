@@ -1,5 +1,5 @@
 /**
- * v5
+ * v6
  * Opens links in a dialog, either by key combinations, holding the middle mouse button or context menu
  * Forum link: https://forum.vivaldi.net/topic/92501/open-in-dialog-mod?_=1717490394230
  *
@@ -13,18 +13,109 @@
  *   - progressRingRadius: Progress ring radius (20px)
  *   - progressRingWidth: Progress ring stroke width (3px)
  *   - ringColor: Progress ring color ("default" for gradient or specific color value like "#ff0000")
+ *
+ * v6 additions: Settings modal with configurable auto-peek options
+ * - Ctrl+Click to peek (instead of new tab)
+ * - External domain links auto-peek
+ * - Sidebar/panel links auto-peek
+ * - Settings persist via localStorage
  */
 (() => {
+  // ============================================
+  // Settings Manager - Persistent Configuration
+  // ============================================
+  const SETTINGS_KEY = 'vivaldi-peek-settings';
+  
+  const DEFAULT_SETTINGS = {
+    // Trigger settings
+    ctrlClickToPeek: false,        // Ctrl+Click opens peek instead of new tab
+    externalDomainAutoPeek: false, // Links to different domains auto-peek
+    sidebarLinksPeek: false,       // Links from web panels auto-peek
+    // Visual settings
+    rightClickHoldTime: 400,
+    rightClickHoldDelay: 200,
+    progressRingRadius: 20,
+    progressRingWidth: 3,
+    ringColor: "#40E0D0",
+    // Icon settings
+    showLinkIcon: true,
+    linkIconInteractionOnHover: true,
+    showIconDelay: 250,
+    showDialogOnHoverDelay: 100,
+  };
+
+  const SettingsManager = {
+    _settings: null,
+    _listeners: [],
+
+    load() {
+      try {
+        const stored = localStorage.getItem(SETTINGS_KEY);
+        this._settings = stored ? { ...DEFAULT_SETTINGS, ...JSON.parse(stored) } : { ...DEFAULT_SETTINGS };
+      } catch (e) {
+        console.warn('Failed to load peek settings:', e);
+        this._settings = { ...DEFAULT_SETTINGS };
+      }
+      return this._settings;
+    },
+
+    save() {
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(this._settings));
+        this._notifyListeners();
+      } catch (e) {
+        console.warn('Failed to save peek settings:', e);
+      }
+    },
+
+    get(key) {
+      if (!this._settings) this.load();
+      return this._settings[key];
+    },
+
+    set(key, value) {
+      if (!this._settings) this.load();
+      this._settings[key] = value;
+      this.save();
+    },
+
+    getAll() {
+      if (!this._settings) this.load();
+      return { ...this._settings };
+    },
+
+    reset() {
+      this._settings = { ...DEFAULT_SETTINGS };
+      this.save();
+    },
+
+    onChange(callback) {
+      this._listeners.push(callback);
+    },
+
+    _notifyListeners() {
+      this._listeners.forEach(cb => cb(this._settings));
+    }
+  };
+
+  // Initialize settings
+  SettingsManager.load();
+
+  // Build ICON_CONFIG from settings
   const ICON_CONFIG = {
-      linkIcon: "fa-solid fa-arrow-up-right-from-square", // if set, an icon shows up after links - example values 'fa-solid fa-up-right-from-square', 'fa-solid fa-circle-info', 'fa-regular fa-square' search for other icons: https://fontawesome.com/search?o=r&ic=free&s=solid&ip=classic
-      linkIconInteractionOnHover: true, // if false, you have to click the icon to show the dialog - if true, the dialog shows on mouseenter
-      showIconDelay: 250, // set to 0 to disable - delays showing the icon on hovering a link
-      showDialogOnHoverDelay: 100, // set to 0 to disable - delays showing the dialog on hovering the linkIcon
-      rightClickHoldTime: 400, // Long-press duration (in milliseconds) to open dialogTab
-      rightClickHoldDelay: 200, // Long-press the right button to delay the display of the progress ring (milliseconds)
-      progressRingRadius: 20, // Radius of the progress ring
-      progressRingWidth: 3, // The line width of the progress ring
-      ringColor: "#40E0D0", // Progress ring color: Specify a color value (e.g., "#ff0000") or use "default" for a gradient color.
+      linkIcon: SettingsManager.get('showLinkIcon') ? "fa-solid fa-arrow-up-right-from-square" : "",
+      linkIconInteractionOnHover: SettingsManager.get('linkIconInteractionOnHover'),
+      showIconDelay: SettingsManager.get('showIconDelay'),
+      showDialogOnHoverDelay: SettingsManager.get('showDialogOnHoverDelay'),
+      rightClickHoldTime: SettingsManager.get('rightClickHoldTime'),
+      rightClickHoldDelay: SettingsManager.get('rightClickHoldDelay'),
+      progressRingRadius: SettingsManager.get('progressRingRadius'),
+      progressRingWidth: SettingsManager.get('progressRingWidth'),
+      ringColor: SettingsManager.get('ringColor'),
+      // Auto-peek settings (passed to injected handler)
+      ctrlClickToPeek: SettingsManager.get('ctrlClickToPeek'),
+      externalDomainAutoPeek: SettingsManager.get('externalDomainAutoPeek'),
+      sidebarLinksPeek: SettingsManager.get('sidebarLinksPeek'),
     },
     CONTEXT_MENU_CONFIG = {
       menuPrefix: "[Peek]",
@@ -45,6 +136,7 @@
   class DialogMod {
     webviews = new Map();
     iconUtils = new IconUtils();
+    settingsModal = new SettingsModal(this.iconUtils);
     searchEngineUtils = new SearchEngineUtils(
       (url) => this.dialogTab(url),
       (engineId, searchText) => this.dialogTabSearch(engineId, searchText),
@@ -55,9 +147,6 @@
       "Ctrl+Shift+F": this.searchForSelectedText.bind(this),
       Esc: () => this.closeLastDialog(),
     };
-    // 'https://clearthis.page/?u='; stopped service?
-    // change also in dialog.css => &:has(webview[src^="READER_VIEW_URL"]) .reader-view-toggle
-    // alternative => https://www.smry.ai/proxy?url=
     READER_VIEW_URL =
       "https://app.web-highlights.com/reader/open-website-in-reader-mode?url=";
 
@@ -505,6 +594,11 @@
               content: this.iconUtils.backgroundTab,
               action: this.openNewTab.bind(this, inputId, false),
             },
+            {
+              content: this.iconUtils.settings,
+              action: () => this.settingsModal.show(),
+              cls: "settings-toggle",
+            },
           ];
 
         buttons.forEach((button) =>
@@ -741,15 +835,52 @@
       this.isLongPress = false;
     }
 
-    /**
-     * Richtet die Maus-Event-Listener ein
-     */
+    #isExternalLink(href) {
+      try {
+        const linkUrl = new URL(href, window.location.origin);
+        return linkUrl.hostname !== window.location.hostname;
+      } catch {
+        return false;
+      }
+    }
+
     #setupMouseHandling() {
       let holdTimerForMiddleClick;
       let holdTimerForRightClick;
 
+      document.addEventListener("click", (event) => {
+        if (event.button !== 0) return;
+        
+        const link = this.#getLinkElement(event);
+        if (!link) return;
+
+        if (this.config.ctrlClickToPeek && event.ctrlKey && !event.shiftKey && !event.altKey) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.#callDialog(event);
+          return;
+        }
+
+        if (this.config.externalDomainAutoPeek && this.#isExternalLink(link.href)) {
+          if (!event.ctrlKey && !event.shiftKey && !event.altKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.#callDialog(event);
+            return;
+          }
+        }
+
+        if (this.config.sidebarLinksPeek && this.fromPanel) {
+          if (!event.ctrlKey && !event.shiftKey && !event.altKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.#callDialog(event);
+            return;
+          }
+        }
+      }, true);
+
       document.addEventListener("pointerdown", (event) => {
-        // Check if the Ctrl key, Alt key, and mouse button were pressed
         if (event.altKey && [0, 1].includes(event.button)) {
           this.#callDialog(event);
         } else if (event.button === 1) {
@@ -1241,7 +1372,6 @@
    * @class
    */
   class IconUtils {
-    // Static icons
     static SVG = {
       ellipsis:
         '<svg xmlns="http://www.w3.org/2000/svg" height="2em" viewBox="0 0 448 512"><path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/></svg>',
@@ -1251,6 +1381,10 @@
         '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32H320zM80 32C35.8 32 0 67.8 0 112V432c0 44.2 35.8 80 80 80H400c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32V432c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16H192c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z"/></svg>',
       backgroundTab:
         '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M384 32c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H384zM160 144c-13.3 0-24 10.7-24 24s10.7 24 24 24h94.1L119 327c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l135-135V328c0 13.3 10.7 24 24 24s24-10.7 24-24V168c0-13.3-10.7-24-24-24H160z"/></svg>',
+      settings:
+        '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"/></svg>',
+      close:
+        '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>',
     };
 
     // Vivaldi icons
@@ -1362,6 +1496,384 @@
 
     get backgroundTab() {
       return this.getIcon("backgroundTab");
+    }
+
+    get settings() {
+      return this.getIcon("settings");
+    }
+
+    get close() {
+      return this.getIcon("close");
+    }
+  }
+
+  class SettingsModal {
+    #escHandler = null;
+    
+    constructor(iconUtils) {
+      this.iconUtils = iconUtils;
+      this.modal = null;
+    }
+
+    show() {
+      if (this.modal) return;
+
+      const settings = SettingsManager.getAll();
+      
+      this.modal = document.createElement('div');
+      this.modal.className = 'peek-settings-modal';
+      this.modal.innerHTML = `
+        <div class="peek-settings-backdrop"></div>
+        <div class="peek-settings-content">
+          <div class="peek-settings-header">
+            <h2>Peek Settings</h2>
+            <button class="peek-settings-close">${this.iconUtils.close}</button>
+          </div>
+          <div class="peek-settings-body">
+            <section class="peek-settings-section">
+              <h3>Auto-Peek Triggers</h3>
+              <label class="peek-settings-toggle">
+                <input type="checkbox" data-setting="ctrlClickToPeek" ${settings.ctrlClickToPeek ? 'checked' : ''}>
+                <span class="peek-toggle-slider"></span>
+                <span class="peek-toggle-label">Ctrl+Click opens Peek</span>
+                <span class="peek-toggle-desc">Instead of opening a new tab</span>
+              </label>
+              <label class="peek-settings-toggle">
+                <input type="checkbox" data-setting="externalDomainAutoPeek" ${settings.externalDomainAutoPeek ? 'checked' : ''}>
+                <span class="peek-toggle-slider"></span>
+                <span class="peek-toggle-label">External links auto-peek</span>
+                <span class="peek-toggle-desc">Links to different domains open in Peek</span>
+              </label>
+              <label class="peek-settings-toggle">
+                <input type="checkbox" data-setting="sidebarLinksPeek" ${settings.sidebarLinksPeek ? 'checked' : ''}>
+                <span class="peek-toggle-slider"></span>
+                <span class="peek-toggle-label">Sidebar links auto-peek</span>
+                <span class="peek-toggle-desc">Links from web panels open in Peek</span>
+              </label>
+            </section>
+            <section class="peek-settings-section">
+              <h3>Link Icon</h3>
+              <label class="peek-settings-toggle">
+                <input type="checkbox" data-setting="showLinkIcon" ${settings.showLinkIcon ? 'checked' : ''}>
+                <span class="peek-toggle-slider"></span>
+                <span class="peek-toggle-label">Show hover icon on links</span>
+                <span class="peek-toggle-desc">Display peek icon when hovering links</span>
+              </label>
+              <label class="peek-settings-toggle">
+                <input type="checkbox" data-setting="linkIconInteractionOnHover" ${settings.linkIconInteractionOnHover ? 'checked' : ''}>
+                <span class="peek-toggle-slider"></span>
+                <span class="peek-toggle-label">Open on icon hover</span>
+                <span class="peek-toggle-desc">Otherwise requires clicking the icon</span>
+              </label>
+            </section>
+            <section class="peek-settings-section">
+              <h3>Timing</h3>
+              <label class="peek-settings-range">
+                <span class="peek-range-label">Right-click hold time</span>
+                <input type="range" data-setting="rightClickHoldTime" min="200" max="1000" step="50" value="${settings.rightClickHoldTime}">
+                <span class="peek-range-value">${settings.rightClickHoldTime}ms</span>
+              </label>
+              <label class="peek-settings-range">
+                <span class="peek-range-label">Icon show delay</span>
+                <input type="range" data-setting="showIconDelay" min="0" max="500" step="50" value="${settings.showIconDelay}">
+                <span class="peek-range-value">${settings.showIconDelay}ms</span>
+              </label>
+            </section>
+            <section class="peek-settings-section">
+              <h3>Appearance</h3>
+              <label class="peek-settings-color">
+                <span class="peek-color-label">Progress ring color</span>
+                <input type="color" data-setting="ringColor" value="${settings.ringColor}">
+              </label>
+            </section>
+          </div>
+          <div class="peek-settings-footer">
+            <button class="peek-settings-reset">Reset to Defaults</button>
+            <span class="peek-settings-note">Changes apply after page reload</span>
+          </div>
+        </div>
+      `;
+
+      this.#injectStyles();
+      this.#attachListeners();
+      
+      document.body.appendChild(this.modal);
+      requestAnimationFrame(() => this.modal.classList.add('open'));
+    }
+
+    hide() {
+      if (!this.modal) return;
+      
+      this.modal.classList.remove('open');
+      setTimeout(() => {
+        this.modal?.remove();
+        this.modal = null;
+      }, 200);
+    }
+
+    #injectStyles() {
+      if (document.getElementById('peek-settings-styles')) return;
+      
+      const style = document.createElement('style');
+      style.id = 'peek-settings-styles';
+      style.textContent = `
+        .peek-settings-modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 2147483647;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        .peek-settings-modal.open {
+          opacity: 1;
+        }
+        .peek-settings-backdrop {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+        }
+        .peek-settings-content {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(0.95);
+          background: var(--colorBg, #1e1e1e);
+          border: 1px solid var(--colorBorder, #444);
+          border-radius: 12px;
+          width: 420px;
+          max-height: 80vh;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          transition: transform 0.2s ease;
+        }
+        .peek-settings-modal.open .peek-settings-content {
+          transform: translate(-50%, -50%) scale(1);
+        }
+        .peek-settings-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px 20px;
+          border-bottom: 1px solid var(--colorBorder, #444);
+        }
+        .peek-settings-header h2 {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--colorFg, #fff);
+        }
+        .peek-settings-close {
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 8px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--colorFg, #fff);
+          transition: background 0.15s;
+        }
+        .peek-settings-close:hover {
+          background: var(--colorBgAlphaHeavy, rgba(255,255,255,0.1));
+        }
+        .peek-settings-close svg {
+          width: 16px;
+          height: 16px;
+          fill: currentColor;
+        }
+        .peek-settings-body {
+          padding: 16px 20px;
+          overflow-y: auto;
+          flex: 1;
+        }
+        .peek-settings-section {
+          margin-bottom: 20px;
+        }
+        .peek-settings-section:last-child {
+          margin-bottom: 0;
+        }
+        .peek-settings-section h3 {
+          margin: 0 0 12px 0;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: var(--colorFgFaded, #888);
+        }
+        .peek-settings-toggle {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          grid-template-rows: auto auto;
+          gap: 0 12px;
+          align-items: center;
+          padding: 10px 0;
+          cursor: pointer;
+          border-bottom: 1px solid var(--colorBorder, #333);
+        }
+        .peek-settings-toggle:last-of-type {
+          border-bottom: none;
+        }
+        .peek-settings-toggle input {
+          display: none;
+        }
+        .peek-toggle-slider {
+          grid-row: span 2;
+          width: 44px;
+          height: 24px;
+          background: var(--colorBgDark, #333);
+          border-radius: 12px;
+          position: relative;
+          transition: background 0.2s;
+        }
+        .peek-toggle-slider::after {
+          content: '';
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          width: 18px;
+          height: 18px;
+          background: #fff;
+          border-radius: 50%;
+          transition: transform 0.2s;
+        }
+        .peek-settings-toggle input:checked + .peek-toggle-slider {
+          background: var(--colorAccentBg, #0078d4);
+        }
+        .peek-settings-toggle input:checked + .peek-toggle-slider::after {
+          transform: translateX(20px);
+        }
+        .peek-toggle-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--colorFg, #fff);
+        }
+        .peek-toggle-desc {
+          font-size: 12px;
+          color: var(--colorFgFaded, #888);
+          grid-column: 2;
+        }
+        .peek-settings-range {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 8px 16px;
+          align-items: center;
+          padding: 10px 0;
+        }
+        .peek-range-label {
+          font-size: 14px;
+          color: var(--colorFg, #fff);
+        }
+        .peek-range-value {
+          font-size: 12px;
+          color: var(--colorFgFaded, #888);
+          min-width: 50px;
+          text-align: right;
+        }
+        .peek-settings-range input[type="range"] {
+          grid-column: span 2;
+          width: 100%;
+          height: 4px;
+          -webkit-appearance: none;
+          background: var(--colorBgDark, #333);
+          border-radius: 2px;
+          cursor: pointer;
+        }
+        .peek-settings-range input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 16px;
+          height: 16px;
+          background: var(--colorAccentBg, #0078d4);
+          border-radius: 50%;
+          cursor: pointer;
+        }
+        .peek-settings-color {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 0;
+        }
+        .peek-color-label {
+          font-size: 14px;
+          color: var(--colorFg, #fff);
+        }
+        .peek-settings-color input[type="color"] {
+          width: 40px;
+          height: 28px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          background: transparent;
+        }
+        .peek-settings-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 20px;
+          border-top: 1px solid var(--colorBorder, #444);
+          background: var(--colorBgDark, #181818);
+        }
+        .peek-settings-reset {
+          background: transparent;
+          border: 1px solid var(--colorBorder, #444);
+          color: var(--colorFg, #fff);
+          padding: 8px 16px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 13px;
+          transition: background 0.15s;
+        }
+        .peek-settings-reset:hover {
+          background: var(--colorBgAlphaHeavy, rgba(255,255,255,0.1));
+        }
+        .peek-settings-note {
+          font-size: 11px;
+          color: var(--colorFgFaded, #666);
+          font-style: italic;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    #attachListeners() {
+      this.modal.querySelector('.peek-settings-backdrop').addEventListener('click', () => this.hide());
+      this.modal.querySelector('.peek-settings-close').addEventListener('click', () => this.hide());
+      
+      this.modal.querySelectorAll('input[data-setting]').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const key = e.target.dataset.setting;
+          let value;
+          
+          if (e.target.type === 'checkbox') {
+            value = e.target.checked;
+          } else if (e.target.type === 'range') {
+            value = parseInt(e.target.value, 10);
+            const valueDisplay = e.target.parentElement.querySelector('.peek-range-value');
+            if (valueDisplay) valueDisplay.textContent = value + 'ms';
+          } else if (e.target.type === 'color') {
+            value = e.target.value;
+          }
+          
+          SettingsManager.set(key, value);
+        });
+      });
+
+      this.modal.querySelector('.peek-settings-reset').addEventListener('click', () => {
+        SettingsManager.reset();
+        this.hide();
+        setTimeout(() => this.show(), 250);
+      });
+
+      this.#escHandler = (e) => {
+        if (e.key === 'Escape') this.hide();
+      };
+      document.addEventListener('keydown', this.#escHandler);
     }
   }
 })();
