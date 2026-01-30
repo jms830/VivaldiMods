@@ -10,6 +10,8 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
 
 .tab-strip .separator {
   position: relative;
+  min-height: 24px !important;
+  padding: 4px 0 !important;
 }
 
 .tab-strip .separator .tidy-tabs-below-button {
@@ -29,7 +31,7 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
   left: 8px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: var(--z-dropdown);
+  z-index: var(--z-dropdown, 100);
   background-color: rgba(74, 158, 255, 0.15);
   border: 1px solid rgba(74, 158, 255, 0.3);
   white-space: nowrap;
@@ -44,7 +46,7 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
   left: 60px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: var(--z-dropdown);
+  z-index: var(--z-dropdown, 100);
   pointer-events: none;
 }
 

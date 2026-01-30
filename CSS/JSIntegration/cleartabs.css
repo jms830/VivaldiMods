@@ -9,7 +9,8 @@ Clear Unpinned Tabs with one button, must install with ClearTabs.js
 /* Clear Tabs Button Styles */
 .tab-strip .separator {
   position: relative;
-  /* margin-left: calc(var(--densityGap) * -2); */
+  min-height: 24px !important;
+  padding: 4px 0 !important;
 }
 
 .tab-strip .separator .clear-tabs-below-button {
@@ -29,7 +30,7 @@ Clear Unpinned Tabs with one button, must install with ClearTabs.js
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: var(--z-dropdown);
+  z-index: var(--z-dropdown, 100);
   background-color: rgba(255, 107, 107, 0.15);
   border: 1px solid rgba(255, 107, 107, 0.3);
   white-space: nowrap;
