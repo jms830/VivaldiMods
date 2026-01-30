@@ -99,7 +99,7 @@
             margin: 0 8px;
             border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: background-color var(--transition-fast), color var(--transition-fast);
             color: var(--text-muted);
             text-decoration: none;
             font-size: 12px;
@@ -150,7 +150,7 @@
             font-size: 11px;
             font-weight: 500;
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
         }
         
         .preset-btn:hover { 
@@ -171,7 +171,7 @@
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -240,7 +240,7 @@
             border: 0.5px solid var(--border);
             border-radius: var(--radius);
             overflow: hidden;
-            transition: all var(--transition-fast);
+            transition: background-color var(--transition-fast), border-color var(--transition-fast);
         }
         
         .feature-card:hover { 
@@ -314,7 +314,7 @@
             position: relative;
             flex-shrink: 0;
             margin-top: 2px;
-            transition: all var(--transition-fast);
+            transition: background-color var(--transition-fast), border-color var(--transition-fast);
         }
         
         .checkbox:hover { 
@@ -472,7 +472,7 @@
             color: var(--text);
             font-size: 12px;
             font-variant-numeric: tabular-nums;
-            transition: all var(--transition-fast);
+            transition: background-color var(--transition-fast), border-color var(--transition-fast);
         }
         
         .input-row input:hover {
@@ -506,7 +506,7 @@
             border: 0.5px solid var(--border-hover);
             border-radius: 50%;
             position: relative;
-            transition: all var(--transition-fast);
+            transition: border-color var(--transition-fast);
         }
         
         .radio:hover { border-color: var(--accent); }
@@ -539,7 +539,7 @@
             align-items: center;
             gap: 8px;
             opacity: 0;
-            transition: all var(--transition);
+            transition: transform var(--transition), opacity var(--transition);
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
@@ -670,7 +670,7 @@
             padding: 4px;
             line-height: 1;
             border-radius: var(--radius-sm);
-            transition: all var(--transition-fast);
+            transition: color var(--transition-fast), background-color var(--transition-fast);
         }
         
         .modal-close:hover { 
@@ -698,7 +698,7 @@
             color: var(--text);
             font-size: 12px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
         }
         
         .platform-tab:hover { border-color: var(--accent); }
@@ -834,7 +834,7 @@
             opacity: 0;
             visibility: hidden;
             transform: translateY(8px);
-            transition: all var(--transition-fast);
+            transition: opacity var(--transition-fast), visibility var(--transition-fast), transform var(--transition-fast);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
@@ -877,6 +877,39 @@
         
         @media (max-width: 800px) {
             .sticky-footer { left: 0; padding: 12px 16px; }
+        }
+        
+        /* Loading spinner for buttons */
+        .btn.loading {
+            position: relative;
+            color: transparent !important;
+            pointer-events: none;
+        }
+        
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            top: 50%;
+            left: 50%;
+            margin: -7px 0 0 -7px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: btn-spinner 0.6s linear infinite;
+        }
+        
+        .btn-primary.loading::after {
+            border-top-color: white;
+        }
+        
+        .btn-secondary.loading::after {
+            border-top-color: var(--text);
+        }
+        
+        @keyframes btn-spinner {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -1597,6 +1630,33 @@
                         <div style="display: flex; gap: 8px; justify-content: flex-end;">
                             <button class="btn btn-secondary" id="cancelJsEnableBtn">Cancel</button>
                             <button class="btn btn-primary" id="confirmJsEnableBtn" style="background: var(--orange);">Enable JS Mods</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reset Confirmation Modal -->
+            <div class="modal" id="resetModal" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+                <div class="modal-content" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h3 id="resetModalTitle">Reset All Settings?</h3>
+                        <button class="modal-close" id="closeResetModalBtn">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="margin-bottom: 16px; color: var(--text);">
+                            This will reset all your configurator settings to defaults:
+                        </p>
+                        <ul style="margin: 0 0 16px 20px; color: var(--text-muted); font-size: 12px;">
+                            <li style="margin-bottom: 4px;">All module selections</li>
+                            <li style="margin-bottom: 4px;">JS mod selections</li>
+                            <li style="margin-bottom: 4px;">Sizing and advanced options</li>
+                        </ul>
+                        <p style="margin-bottom: 20px; color: var(--warning); font-size: 12px;">
+                            ⚠️ This cannot be undone.
+                        </p>
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <button class="btn btn-secondary" id="cancelResetBtn">Cancel</button>
+                            <button class="btn btn-primary" id="confirmResetBtn" style="background: var(--error);">Reset Everything</button>
                         </div>
                     </div>
                 </div>
@@ -2903,9 +2963,21 @@ pause
         document.addEventListener('DOMContentLoaded', () => {
             initConfig();
             
+            // Cache DOM references for performance
+            const DOM = {
+                presetBtns: document.querySelectorAll('.preset-btn'),
+                moduleCards: document.querySelectorAll('.feature-card[data-module]'),
+                jsmodCards: document.querySelectorAll('.feature-card[data-jsmod]'),
+                configCheckboxes: document.querySelectorAll('.config-row .checkbox[data-var]'),
+                radios: document.querySelectorAll('.radio[data-value]'),
+                advancedDropdown: document.getElementById('advancedDropdown'),
+                toggleJsBtn: document.getElementById('toggleJsBtn'),
+                resetBtn: document.getElementById('resetBtn')
+            };
+            
             // Declare these early so they can be used throughout
-            const advancedDropdown = document.getElementById('advancedDropdown');
-            const toggleJsBtn = document.getElementById('toggleJsBtn');
+            const advancedDropdown = DOM.advancedDropdown;
+            const toggleJsBtn = DOM.toggleJsBtn;
             
             // CSS module card checkboxes
             document.querySelectorAll('.feature-card[data-module]').forEach(card => {
@@ -2921,7 +2993,7 @@ pause
                     config.modules[card.dataset.module] = isChecked;
                     syncCssJsSelection(card.dataset.module, isChecked);
                     saveConfig();
-                    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+                    DOM.presetBtns.forEach(btn => btn.classList.remove('active'));
                 };
                 
                 cb.addEventListener('click', handleToggle);
@@ -2955,7 +3027,7 @@ pause
                     config.jsmods[card.dataset.jsmod] = isChecked;
                     syncJsCssSelection(card.dataset.jsmod, isChecked);
                     saveConfig();
-                    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+                    DOM.presetBtns.forEach(btn => btn.classList.remove('active'));
                 };
                 
                 cb.addEventListener('click', handleToggle);
@@ -3000,7 +3072,7 @@ pause
                     cb.setAttribute('aria-checked', cb.classList.contains('checked'));
                     config.vars[cb.dataset.var] = cb.classList.contains('checked') ? 'on' : 'off';
                     saveConfig();
-                    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+                    DOM.presetBtns.forEach(btn => btn.classList.remove('active'));
                 };
                 cb.addEventListener('click', handleClick);
                 cb.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } });
@@ -3024,12 +3096,30 @@ pause
             });
             
             // Download & Reset
-            document.getElementById('downloadBtn').addEventListener('click', () => {
-                downloadFile(generateCoreCss(), 'Core.css');
-                showToast('Core.css downloaded');
-                advancedDropdown.classList.remove('open');
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.addEventListener('click', () => {
+                downloadBtn.classList.add('loading');
+                setTimeout(() => {
+                    downloadFile(generateCoreCss(), 'Core.css');
+                    showToast('Core.css downloaded');
+                    advancedDropdown.classList.remove('open');
+                    downloadBtn.classList.remove('loading');
+                }, 100);
             });
-            document.getElementById('resetBtn').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                document.getElementById('resetModal').classList.add('show');
+            });
+            
+            document.getElementById('closeResetModalBtn').addEventListener('click', () => {
+                document.getElementById('resetModal').classList.remove('show');
+            });
+            document.getElementById('cancelResetBtn').addEventListener('click', () => {
+                document.getElementById('resetModal').classList.remove('show');
+            });
+            document.getElementById('confirmResetBtn').addEventListener('click', () => {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            });
             
             // JS Toggle Button
             function updateJsToggleBtn() {
@@ -3079,26 +3169,35 @@ pause
             });
             
             // All-in-One Installer (ZIP)
-            document.getElementById('downloadAllInOneBtn').addEventListener('click', async () => {
+            const downloadAllBtn = document.getElementById('downloadAllInOneBtn');
+            downloadAllBtn.addEventListener('click', async () => {
+                downloadAllBtn.classList.add('loading');
                 try {
                     await generateAllInOneInstaller();
                     showToast('ZIP downloaded! Extract and run install.bat');
                 } catch (err) {
                     console.error('Failed to generate ZIP:', err);
                     showToast('Failed to create ZIP file');
+                } finally {
+                    downloadAllBtn.classList.remove('loading');
                 }
             });
             
             // JS Mod buttons
-            document.getElementById('downloadJsInstallerBtn').addEventListener('click', () => {
+            const jsInstallerDownloadBtn = document.getElementById('downloadJsInstallerBtn');
+            jsInstallerDownloadBtn.addEventListener('click', () => {
                 const mods = getEnabledJsMods();
                 if (mods.length === 0) {
                     showToast('No JS mods selected');
                     return;
                 }
-                downloadFile(generateJsInstallerBat(), 'install-js-mods.bat', 'text/plain');
-                showToast('JS installer downloaded');
-                advancedDropdown.classList.remove('open');
+                jsInstallerDownloadBtn.classList.add('loading');
+                setTimeout(() => {
+                    downloadFile(generateJsInstallerBat(), 'install-js-mods.bat', 'text/plain');
+                    showToast('JS installer downloaded');
+                    advancedDropdown.classList.remove('open');
+                    jsInstallerDownloadBtn.classList.remove('loading');
+                }, 100);
             });
             
             // JS enable modal
@@ -3151,17 +3250,24 @@ pause
                 });
             });
             
-            // Update nav on scroll
+            // Update nav on scroll (throttled with requestAnimationFrame)
             const sections = document.querySelectorAll('.section');
+            const navItems = document.querySelectorAll('.nav-item');
             const mainContent = document.querySelector('.main-content');
+            let scrollRAF = null;
+            
             mainContent.addEventListener('scroll', () => {
-                let current = '';
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop - mainContent.offsetTop;
-                    if (mainContent.scrollTop >= sectionTop - 100) current = section.id;
-                });
-                document.querySelectorAll('.nav-item').forEach(nav => {
-                    nav.classList.toggle('active', nav.dataset.section === current);
+                if (scrollRAF) return;
+                scrollRAF = requestAnimationFrame(() => {
+                    let current = '';
+                    sections.forEach(section => {
+                        const sectionTop = section.offsetTop - mainContent.offsetTop;
+                        if (mainContent.scrollTop >= sectionTop - 100) current = section.id;
+                    });
+                    navItems.forEach(nav => {
+                        nav.classList.toggle('active', nav.dataset.section === current);
+                    });
+                    scrollRAF = null;
                 });
             });
         });
