@@ -61,3 +61,30 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
   background-color: rgba(74, 158, 255, 0.3) !important;
   border-color: rgba(74, 158, 255, 0.5) !important;
 }
+
+.tidy-tabs-below-button::after {
+  content: 'Right-click for options';
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  padding: 4px 8px;
+  background: var(--colorBg, #1e1e1e);
+  border: 1px solid var(--colorBorder, #444);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: normal;
+  color: var(--colorFg, #ccc);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: var(--z-tooltip, 500);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.tidy-tabs-below-button:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  transition-delay: 0.5s;
+}

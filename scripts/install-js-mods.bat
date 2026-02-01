@@ -110,6 +110,15 @@ echo. >> "%VIVALDI_VERSION_DIR%custom.js"
 
 set "MOD_COUNT=0"
 
+REM FIRST: Add chroma.min.js (dependency for colorTabs.js - must load before root files)
+if exist "%JS_FOLDER%\aminought\chroma.min.js" (
+    echo     Adding: aminought/chroma.min.js ^(dependency - must load first^)
+    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+    echo // === aminought/chroma.min.js ^(DEPENDENCY - must load first^) === >> "%VIVALDI_VERSION_DIR%custom.js"
+    type "%JS_FOLDER%\aminought\chroma.min.js" >> "%VIVALDI_VERSION_DIR%custom.js"
+    set /a MOD_COUNT+=1
+)
+
 REM Add root-level JS files (only *.js, skips *.js.disabled)
 for %%f in ("%JS_FOLDER%\*.js") do (
     echo     Adding: %%~nxf
@@ -132,14 +141,16 @@ if exist "%JS_FOLDER%\Tam710562" (
     )
 )
 
-REM Add aminought mods (colorTabs, ybAddressBar)
+REM Add aminought mods (colorTabs, ybAddressBar) - skip chroma.min.js (already added above)
 if exist "%JS_FOLDER%\aminought" (
     for %%f in ("%JS_FOLDER%\aminought\*.js") do (
-        echo     Adding: aminought/%%~nxf
-        echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-        echo // === aminought/%%~nxf === >> "%VIVALDI_VERSION_DIR%custom.js"
-        type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
-        set /a MOD_COUNT+=1
+        if /I not "%%~nxf"=="chroma.min.js" (
+            echo     Adding: aminought/%%~nxf
+            echo. >> "%VIVALDI_VERSION_DIR%custom.js"
+            echo // === aminought/%%~nxf === >> "%VIVALDI_VERSION_DIR%custom.js"
+            type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
+            set /a MOD_COUNT+=1
+        )
     )
 )
 
@@ -178,9 +189,7 @@ if exist "%JS_FOLDER%\Other" (
 
 echo.
 echo     Total mods added: %MOD_COUNT%
-if exist "%JS_FOLDER%\aminought\chroma.min.js" (
-    echo     ^(includes 1 dependency library^)
-)
+echo     ^(chroma.min.js dependency loaded first for colorTabs.js^)
 echo.
 
 REM === Patch window.html ===

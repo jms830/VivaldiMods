@@ -6,6 +6,187 @@
 	
 	const STORAGE_KEY = 'tidyTabs_config';
 	
+	// ==================== Prompt Templates ====================
+	// Variables: {TAB_DATA_LIST}, {EXISTING_STACKS_LIST}, {LANGUAGE}, {OTHERS_NAME}
+	
+	const PROMPT_TEMPLATES = {
+		default: {
+			name: 'Default (JSON Output)',
+			description: 'Original TidyTabs prompt with JSON output format',
+			template: `**Instructions:**
+
+Below are existing tab stack information and tabs to be grouped:
+
+Existing tab stacks (title and ID):
+{EXISTING_STACKS_LIST}
+
+Tabs to be grouped (id, title, domain):
+{TAB_DATA_LIST}
+
+**Follow these rules to group tabs:**
+
+# Priority: Assign tabs to existing stacks
+
+1. If a tab's information is semantically related to an existing stack's title, add it to that stack: In the JSON output, match the tab's (tab_ids) to the existing stack's title (name) [VERY IMPORTANT];
+
+If no semantically related existing stack is found, then consider creating a new stack
+
+# Requirements for creating new stacks:
+
+2. **Group by content theme**: When creating new stacks, categorize based on semantic similarity of tab titles.
+
+3. **Group names must be specific**:
+- Group names should be concise and specific, analyze tab titles and determine if they form a specific topic, group and name accordingly
+- Examples: "css overflow", "javascript async issues", "xxx API collection"
+- Avoid generic titles like "xxx tutorials", "xxx resources", "resource search"
+- Allow more generic grouping only when refined to a single remaining tab
+- **All group names must use {LANGUAGE} language**
+
+4. **Each group must contain at least 2 tabs**. A single tab cannot form a group.
+
+5. Conditions for creating and adding to "Others" stack:
+	1. Tabs in stacks with only one tab should be added to the "Others" stack ({OTHERS_NAME})
+	2. Tabs that cannot be grouped with any other tabs should be added to "Others"
+	3. When existing stacks **do not contain** an "Others" stack, create one even if it has no tabs
+
+6. Each tab can only appear in one group.
+
+7. Output **strictly valid JSON format only**, nothing else:
+Avoid the following:
+* Empty elements (e.g. [5, , 7])
+* Missing quotes or commas
+* tab_ids containing only single tab groups (e.g. "tab_ids": [6]) [VERY IMPORTANT]
+* ***No additional explanatory text, comments, or extra content in output*** [VERY IMPORTANT]
+
+**Output example (must strictly follow):**
+
+{
+  "groups": [
+    {
+      "name": "Group name",
+      "tab_ids": [0, 1, 2]
+    },
+    {
+      "name": "Group name 2",
+      "tab_ids": [3, 4]
+    },
+    {
+      "name": "{OTHERS_NAME}",
+      "tab_ids": [5, 6]
+    }
+  ]
+}
+`
+		},
+		
+		zen: {
+			name: 'Zen Browser Style',
+			description: 'Strict consistency, prioritizes existing categories, line-based output',
+			template: `Analyze the following numbered list of tab data (Title, URL, Description) and assign a concise category (1-2 words, Title Case) for EACH tab.
+
+Existing Categories (Use these EXACT names if a tab fits):
+{EXISTING_STACKS_LIST}
+
+---
+Instructions for Assignment:
+1.  **Prioritize Existing:** For each tab below, determine if it clearly belongs to one of the 'Existing Categories'. Base this primarily on the URL/Domain, then Title/Description. If it fits, you MUST use the EXACT category name provided in the 'Existing Categories' list. DO NOT create a minor variation (e.g., if 'Project Docs' exists, use that, don't create 'Project Documentation').
+2.  **Assign New Category (If Necessary):** Only if a tab DOES NOT fit an existing category, assign the best NEW concise category (1-2 words, Title Case).
+    *   PRIORITIZE the URL/Domain (e.g., 'GitHub', 'YouTube', 'StackOverflow').
+    *   Use Title/Description for specifics or generic domains.
+3.  **Consistency is CRITICAL:** Use the EXACT SAME category name for all tabs belonging to the same logical group (whether assigned an existing or a new category). If multiple tabs point to 'google.com/search?q=recipes', categorize them consistently (e.g., 'Google Search' or 'Recipes', but use the same one for all).
+4.  **Format:** 1-2 words, Title Case.
+5.  **Language:** All category names must be in {LANGUAGE}.
+
+---
+Input Tab Data:
+{TAB_DATA_LIST}
+
+---
+Instructions for Output:
+1. Output ONLY the category names.
+2. Provide EXACTLY ONE category name per line.
+3. The number of lines in your output MUST EXACTLY MATCH the number of tabs in the Input Tab Data list above.
+4. DO NOT include numbering, explanations, apologies, markdown formatting, or any surrounding text like "Output:" or backticks.
+5. Just the list of categories, separated by newlines.
+---
+
+Output:`
+		},
+		
+		domain: {
+			name: 'Domain-Focused',
+			description: 'Groups primarily by website/domain, good for browsing sessions',
+			template: `Group the following browser tabs by their primary domain or website.
+
+Existing Groups (reuse these exact names when applicable):
+{EXISTING_STACKS_LIST}
+
+Tabs to categorize:
+{TAB_DATA_LIST}
+
+**Grouping Rules:**
+
+1. **Domain Priority**: Group tabs primarily by their base domain (e.g., all GitHub tabs together, all YouTube tabs together)
+2. **Reuse Existing**: If a tab belongs to a domain that matches an existing group, use that EXACT group name
+3. **Naming Convention**: Use the site's common name in Title Case (e.g., "GitHub", "Stack Overflow", "Google Docs")
+4. **Minimum Group Size**: Each group must have at least 2 tabs
+5. **Miscellaneous**: Tabs that don't fit any domain pattern go to "{OTHERS_NAME}"
+6. **Language**: Use {LANGUAGE} for group names
+
+**Output Format** (strict JSON, no additional text):
+
+{
+  "groups": [
+    {"name": "GitHub", "tab_ids": [0, 1, 5]},
+    {"name": "YouTube", "tab_ids": [2, 3]},
+    {"name": "{OTHERS_NAME}", "tab_ids": [4, 6]}
+  ]
+}
+`
+		},
+		
+		semantic: {
+			name: 'Semantic Topics',
+			description: 'Groups by content topic/theme regardless of domain',
+			template: `Analyze these browser tabs and group them by their semantic topic or theme, regardless of which website they're from.
+
+Existing Topic Groups (reuse these exact names when applicable):
+{EXISTING_STACKS_LIST}
+
+Tabs to categorize:
+{TAB_DATA_LIST}
+
+**Grouping Rules:**
+
+1. **Topic Over Domain**: Focus on WHAT the content is about, not WHERE it's hosted
+   - A React tutorial on YouTube and a React doc on MDN should be in the same "React" group
+2. **Specific Topics**: Be specific with topic names
+   - Good: "React Hooks", "CSS Grid", "Python async"
+   - Bad: "Programming", "Tutorials", "Learning"
+3. **Reuse Existing**: If content matches an existing group's topic, use that EXACT group name
+4. **Minimum 2 Tabs**: Each group needs at least 2 tabs
+5. **Uncategorizable**: Tabs that don't fit any topic go to "{OTHERS_NAME}"
+6. **Language**: All group names in {LANGUAGE}
+
+**Output Format** (strict JSON only):
+
+{
+  "groups": [
+    {"name": "React Hooks", "tab_ids": [0, 3, 7]},
+    {"name": "CSS Layout", "tab_ids": [1, 4]},
+    {"name": "{OTHERS_NAME}", "tab_ids": [2, 5, 6]}
+  ]
+}
+`
+		},
+		
+		custom: {
+			name: 'Custom Prompt',
+			description: 'Your own custom prompt template',
+			template: '' // Will be populated from CONFIG.customPrompt
+		}
+	};
+	
 	const DEFAULT_CONFIG = {
 		// API Provider: 'gemini', 'openai', 'glm', 'openrouter', 'custom'
 		provider: 'gemini',
@@ -15,7 +196,7 @@
 			gemini: {
 				url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
 				key: '',
-				model: 'gemini-2.0-flash'
+				model: 'gemini-3-flash-preview'
 			},
 			openai: {
 				url: 'https://api.openai.com/v1/chat/completions',
@@ -59,7 +240,11 @@
 			reattach: 500,
 			debounce: 150,
 			autoStack: 1000
-		}
+		},
+		
+		// Prompt settings
+		selectedTemplate: 'default',
+		customPrompt: ''
 	};
 	
 	// Load config from localStorage or use defaults
@@ -109,11 +294,28 @@
 	
 	// ==================== Settings UI ====================
 	
+	const getTemplateOptions = () => {
+		return Object.entries(PROMPT_TEMPLATES).map(([key, tmpl]) => ({
+			key,
+			name: tmpl.name,
+			description: tmpl.description
+		}));
+	};
+
+	const getCurrentTemplateContent = () => {
+		const templateKey = CONFIG.selectedTemplate || 'default';
+		if (templateKey === 'custom') {
+			return CONFIG.customPrompt || '';
+		}
+		return PROMPT_TEMPLATES[templateKey]?.template || PROMPT_TEMPLATES.default.template;
+	};
+	
 	const showSettingsDialog = () => {
 		const existing = document.getElementById('tidytabs-settings-dialog');
 		if (existing) existing.remove();
 		
 		const api = getApiConfig();
+		const templateOptions = getTemplateOptions();
 		const dialog = document.createElement('div');
 		dialog.id = 'tidytabs-settings-dialog';
 		dialog.innerHTML = `
@@ -129,13 +331,43 @@
 					border-radius: 8px;
 					padding: 20px;
 					z-index: 999999;
-					min-width: 400px;
+					min-width: 500px;
+					max-width: 700px;
+					max-height: 85vh;
+					overflow-y: auto;
 					box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 					font-family: system-ui, -apple-system, sans-serif;
 				}
 				#tidytabs-settings-dialog h2 {
 					margin: 0 0 15px 0;
 					font-size: 16px;
+				}
+				#tidytabs-settings-dialog .tabs {
+					display: flex;
+					gap: 0;
+					border-bottom: 1px solid var(--colorBorder, #444);
+					margin-bottom: 15px;
+				}
+				#tidytabs-settings-dialog .tab-btn {
+					padding: 10px 20px;
+					background: transparent;
+					border: none;
+					color: var(--colorFg, #fff);
+					opacity: 0.6;
+					cursor: pointer;
+					font-size: 13px;
+					border-bottom: 2px solid transparent;
+					margin-bottom: -1px;
+				}
+				#tidytabs-settings-dialog .tab-btn.active {
+					opacity: 1;
+					border-bottom-color: var(--colorAccentBg, #0078d4);
+				}
+				#tidytabs-settings-dialog .tab-content {
+					display: none;
+				}
+				#tidytabs-settings-dialog .tab-content.active {
+					display: block;
 				}
 				#tidytabs-settings-dialog label {
 					display: block;
@@ -144,14 +376,35 @@
 					opacity: 0.8;
 				}
 				#tidytabs-settings-dialog select,
-				#tidytabs-settings-dialog input {
+				#tidytabs-settings-dialog input,
+				#tidytabs-settings-dialog textarea {
 					width: 100%;
-					padding: 8px;
+					padding: 10px 12px;
 					border: 1px solid var(--colorBorder, #444);
 					border-radius: 4px;
 					background: var(--colorBgDark, #2d2d2d);
 					color: var(--colorFg, #fff);
 					font-size: 13px;
+					font-family: system-ui, -apple-system, sans-serif;
+					box-sizing: border-box;
+					line-height: 1.5;
+				}
+				#tidytabs-settings-dialog select {
+					height: 42px !important;
+					min-height: 42px !important;
+					padding: 0 30px 0 12px !important;
+					line-height: 42px !important;
+					appearance: none;
+					-webkit-appearance: none;
+					background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+					background-repeat: no-repeat;
+					background-position: right 10px center;
+				}
+				#tidytabs-settings-dialog textarea {
+					font-family: 'Consolas', 'Monaco', monospace;
+					font-size: 11px;
+					line-height: 1.4;
+					resize: vertical;
 				}
 				#tidytabs-settings-dialog .buttons {
 					margin-top: 20px;
@@ -174,37 +427,103 @@
 					background: var(--colorBgDark, #3d3d3d);
 					color: var(--colorFg, #fff);
 				}
+				#tidytabs-settings-dialog .btn-small {
+					padding: 4px 10px;
+					font-size: 11px;
+				}
 				#tidytabs-settings-dialog .hint {
 					font-size: 11px;
 					opacity: 0.6;
 					margin-top: 4px;
 				}
+				#tidytabs-settings-dialog .template-desc {
+					font-size: 11px;
+					opacity: 0.7;
+					margin: 5px 0 10px;
+					font-style: italic;
+				}
+				#tidytabs-settings-dialog .prompt-actions {
+					display: flex;
+					gap: 8px;
+					margin-top: 8px;
+				}
+				#tidytabs-settings-dialog .variables-hint {
+					font-size: 10px;
+					opacity: 0.5;
+					margin-top: 8px;
+					padding: 8px;
+					background: var(--colorBgDark, #2d2d2d);
+					border-radius: 4px;
+				}
+				#tidytabs-settings-dialog .variables-hint code {
+					background: rgba(255,255,255,0.1);
+					padding: 1px 4px;
+					border-radius: 2px;
+				}
 			</style>
 			<h2>TidyTabs Settings</h2>
 			
-			<label>AI Provider</label>
-			<select id="tt-provider">
-				<option value="gemini" ${CONFIG.provider === 'gemini' ? 'selected' : ''}>Google Gemini</option>
-				<option value="openai" ${CONFIG.provider === 'openai' ? 'selected' : ''}>OpenAI</option>
-				<option value="openrouter" ${CONFIG.provider === 'openrouter' ? 'selected' : ''}>OpenRouter (free tier available)</option>
-				<option value="glm" ${CONFIG.provider === 'glm' ? 'selected' : ''}>GLM (Zhipu AI)</option>
-				<option value="custom" ${CONFIG.provider === 'custom' ? 'selected' : ''}>Custom OpenAI-compatible</option>
-			</select>
-			
-			<label>API Key</label>
-			<input type="password" id="tt-apikey" value="${api.key || ''}" placeholder="Enter your API key">
-			<div class="hint">
-				Get free key: 
-				<a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--colorAccentFg, #4fc3f7)">Gemini</a> |
-				<a href="https://openrouter.ai/keys" target="_blank" style="color: var(--colorAccentFg, #4fc3f7)">OpenRouter</a>
+			<div class="tabs">
+				<button class="tab-btn active" data-tab="api">API</button>
+				<button class="tab-btn" data-tab="prompts">Prompts</button>
 			</div>
 			
-			<label>Model</label>
-			<input type="text" id="tt-model" value="${api.model || ''}" placeholder="e.g., gemini-2.0-flash">
+			<!-- API Tab -->
+			<div class="tab-content active" id="tab-api">
+				<label>AI Provider</label>
+				<select id="tt-provider">
+					<option value="gemini" ${CONFIG.provider === 'gemini' ? 'selected' : ''}>Google Gemini</option>
+					<option value="openai" ${CONFIG.provider === 'openai' ? 'selected' : ''}>OpenAI</option>
+					<option value="openrouter" ${CONFIG.provider === 'openrouter' ? 'selected' : ''}>OpenRouter (free tier available)</option>
+					<option value="glm" ${CONFIG.provider === 'glm' ? 'selected' : ''}>GLM (Zhipu AI)</option>
+					<option value="custom" ${CONFIG.provider === 'custom' ? 'selected' : ''}>Custom OpenAI-compatible</option>
+				</select>
+				
+				<label>API Key</label>
+				<input type="password" id="tt-apikey" value="${api.key || ''}" placeholder="Enter your API key">
+				<div class="hint">
+					Get free key: 
+					<a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--colorAccentFg, #4fc3f7)">Gemini</a> |
+					<a href="https://openrouter.ai/keys" target="_blank" style="color: var(--colorAccentFg, #4fc3f7)">OpenRouter</a>
+				</div>
+				
+				<label>Model</label>
+				<input type="text" id="tt-model" value="${api.model || ''}" placeholder="e.g., gemini-2.0-flash">
+				
+				<div id="tt-custom-url" style="display: ${CONFIG.provider === 'custom' ? 'block' : 'none'}">
+					<label>API URL</label>
+					<input type="text" id="tt-url" value="${api.url || ''}" placeholder="https://api.example.com/v1/chat/completions">
+				</div>
+			</div>
 			
-			<div id="tt-custom-url" style="display: ${CONFIG.provider === 'custom' ? 'block' : 'none'}">
-				<label>API URL</label>
-				<input type="text" id="tt-url" value="${api.url || ''}" placeholder="https://api.example.com/v1/chat/completions">
+			<!-- Prompts Tab -->
+			<div class="tab-content" id="tab-prompts">
+				<label>Prompt Template</label>
+				<select id="tt-template">
+					${templateOptions.map(opt => `
+						<option value="${opt.key}" ${CONFIG.selectedTemplate === opt.key ? 'selected' : ''}>${opt.name}</option>
+					`).join('')}
+				</select>
+				<div class="template-desc" id="tt-template-desc">
+					${PROMPT_TEMPLATES[CONFIG.selectedTemplate || 'default']?.description || ''}
+				</div>
+				
+				<label>Prompt Content <span style="opacity: 0.5">(editable for Custom template)</span></label>
+				<textarea id="tt-prompt-content" rows="15" ${CONFIG.selectedTemplate !== 'custom' ? 'readonly' : ''}>${getCurrentTemplateContent()}</textarea>
+				
+				<div class="prompt-actions">
+					<button class="btn-secondary btn-small" id="tt-copy-to-custom">Copy to Custom</button>
+					<button class="btn-secondary btn-small" id="tt-reset-prompt">Reset to Default</button>
+					<button class="btn-secondary btn-small" id="tt-import-rules">Import Tab Groups Rules</button>
+				</div>
+				
+				<div class="variables-hint">
+					<strong>Available variables:</strong><br>
+					<code>{TAB_DATA_LIST}</code> - List of tabs to categorize<br>
+					<code>{EXISTING_STACKS_LIST}</code> - Current tab stacks<br>
+					<code>{LANGUAGE}</code> - Browser UI language<br>
+					<code>{OTHERS_NAME}</code> - "Others" in current language
+				</div>
 			</div>
 			
 			<div class="buttons">
@@ -215,11 +534,27 @@
 		
 		document.body.appendChild(dialog);
 		
+		// Tab switching
+		dialog.querySelectorAll('.tab-btn').forEach(btn => {
+			btn.addEventListener('click', () => {
+				dialog.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+				dialog.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+				btn.classList.add('active');
+				document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+			});
+		});
+		
+		// API Tab elements
 		const providerSelect = document.getElementById('tt-provider');
 		const apikeyInput = document.getElementById('tt-apikey');
 		const modelInput = document.getElementById('tt-model');
 		const urlInput = document.getElementById('tt-url');
 		const customUrlDiv = document.getElementById('tt-custom-url');
+		
+		// Prompts Tab elements
+		const templateSelect = document.getElementById('tt-template');
+		const templateDesc = document.getElementById('tt-template-desc');
+		const promptContent = document.getElementById('tt-prompt-content');
 		
 		providerSelect.addEventListener('change', () => {
 			const provider = providerSelect.value;
@@ -228,6 +563,41 @@
 			apikeyInput.value = providerConfig.key || '';
 			modelInput.value = providerConfig.model || '';
 			if (urlInput) urlInput.value = providerConfig.url || '';
+		});
+		
+		templateSelect.addEventListener('change', () => {
+			const key = templateSelect.value;
+			const tmpl = PROMPT_TEMPLATES[key];
+			templateDesc.textContent = tmpl?.description || '';
+			
+			if (key === 'custom') {
+				promptContent.value = CONFIG.customPrompt || '';
+				promptContent.removeAttribute('readonly');
+			} else {
+				promptContent.value = tmpl?.template || '';
+				promptContent.setAttribute('readonly', 'readonly');
+			}
+		});
+		
+		document.getElementById('tt-copy-to-custom').addEventListener('click', () => {
+			CONFIG.customPrompt = promptContent.value;
+			templateSelect.value = 'custom';
+			templateSelect.dispatchEvent(new Event('change'));
+			promptContent.removeAttribute('readonly');
+		});
+		
+		document.getElementById('tt-reset-prompt').addEventListener('click', () => {
+			const key = templateSelect.value;
+			if (key === 'custom') {
+				CONFIG.customPrompt = '';
+				promptContent.value = '';
+			} else {
+				promptContent.value = PROMPT_TEMPLATES[key]?.template || '';
+			}
+		});
+		
+		document.getElementById('tt-import-rules').addEventListener('click', () => {
+			showImportRulesDialog();
 		});
 		
 		document.getElementById('tt-cancel').addEventListener('click', () => dialog.remove());
@@ -240,10 +610,202 @@
 				key: apikeyInput.value,
 				model: modelInput.value || DEFAULT_CONFIG.api[provider].model
 			};
+			
+			CONFIG.selectedTemplate = templateSelect.value;
+			if (templateSelect.value === 'custom') {
+				CONFIG.customPrompt = promptContent.value;
+			}
+			
 			saveConfig(CONFIG);
 			dialog.remove();
-			showNotification('Settings saved! Reload to apply.', 'info');
+			showNotification('Settings saved!', 'info');
 		});
+	};
+	
+	const showImportRulesDialog = () => {
+		const existing = document.getElementById('tidytabs-import-dialog');
+		if (existing) existing.remove();
+		
+		const dialog = document.createElement('div');
+		dialog.id = 'tidytabs-import-dialog';
+		dialog.innerHTML = `
+			<style>
+				#tidytabs-import-dialog {
+					position: fixed;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					background: var(--colorBg, #1e1e1e);
+					color: var(--colorFg, #fff);
+					border: 1px solid var(--colorBorder, #444);
+					border-radius: 8px;
+					padding: 20px;
+					z-index: 1000000;
+					min-width: 500px;
+					max-width: 600px;
+					box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+					font-family: system-ui, -apple-system, sans-serif;
+				}
+				#tidytabs-import-dialog h3 {
+					margin: 0 0 10px 0;
+					font-size: 14px;
+				}
+				#tidytabs-import-dialog textarea {
+					width: 100%;
+					height: 200px;
+					padding: 8px;
+					border: 1px solid var(--colorBorder, #444);
+					border-radius: 4px;
+					background: var(--colorBgDark, #2d2d2d);
+					color: var(--colorFg, #fff);
+					font-family: 'Consolas', 'Monaco', monospace;
+					font-size: 11px;
+					box-sizing: border-box;
+					resize: vertical;
+				}
+				#tidytabs-import-dialog .hint {
+					font-size: 11px;
+					opacity: 0.6;
+					margin: 8px 0;
+				}
+				#tidytabs-import-dialog .buttons {
+					margin-top: 15px;
+					display: flex;
+					gap: 10px;
+					justify-content: flex-end;
+				}
+				#tidytabs-import-dialog button {
+					padding: 8px 16px;
+					border: none;
+					border-radius: 4px;
+					cursor: pointer;
+					font-size: 13px;
+				}
+				#tidytabs-import-dialog .btn-primary {
+					background: var(--colorAccentBg, #0078d4);
+					color: white;
+				}
+				#tidytabs-import-dialog .btn-secondary {
+					background: var(--colorBgDark, #3d3d3d);
+					color: var(--colorFg, #fff);
+				}
+			</style>
+			<h3>Import Tab Groups Rules</h3>
+			<div class="hint">
+				Paste your Tab Groups extension JSON rules below. They will be converted into predefined categories for the AI prompt.
+			</div>
+			<textarea id="tt-rules-json" placeholder='{"rule-xxx": {"groupName": "...", "urlMatches": [...]}}'></textarea>
+			<div class="buttons">
+				<button class="btn-secondary" id="tt-import-cancel">Cancel</button>
+				<button class="btn-primary" id="tt-import-convert">Convert & Apply</button>
+			</div>
+		`;
+		
+		document.body.appendChild(dialog);
+		
+		document.getElementById('tt-import-cancel').addEventListener('click', () => dialog.remove());
+		
+		document.getElementById('tt-import-convert').addEventListener('click', () => {
+			const rulesJson = document.getElementById('tt-rules-json').value.trim();
+			if (!rulesJson) {
+				showNotification('Please paste your Tab Groups rules JSON', 'error');
+				return;
+			}
+			
+			try {
+				const rules = JSON.parse(rulesJson);
+				const prompt = convertRulesToPrompt(rules);
+				
+				CONFIG.customPrompt = prompt;
+				CONFIG.selectedTemplate = 'custom';
+				saveConfig(CONFIG);
+				
+				dialog.remove();
+				
+				const promptContent = document.getElementById('tt-prompt-content');
+				const templateSelect = document.getElementById('tt-template');
+				if (promptContent && templateSelect) {
+					templateSelect.value = 'custom';
+					promptContent.value = prompt;
+					promptContent.removeAttribute('readonly');
+					document.getElementById('tt-template-desc').textContent = PROMPT_TEMPLATES.custom.description;
+				}
+				
+				showNotification('Rules imported! Custom prompt created.', 'info');
+			} catch (e) {
+				console.error('Error parsing rules:', e);
+				showNotification('Invalid JSON format. Check console for details.', 'error');
+			}
+		});
+	};
+	
+	const convertRulesToPrompt = (rules) => {
+		const categories = [];
+		
+		Object.entries(rules).forEach(([key, rule]) => {
+			if (key === 'meta' || !rule.enabled || !rule.groupName) return;
+			
+			const patterns = [];
+			
+			if (rule.urlMatches) {
+				rule.urlMatches.forEach(match => {
+					if (match.method === 'includes' && match.target === 'hostname') {
+						patterns.push(`hostname contains "${match.value}"`);
+					} else if (match.method === 'startsWith') {
+						patterns.push(`URL starts with "${match.value}"`);
+					} else if (match.method === 'endsWith' && match.target === 'hostname') {
+						patterns.push(`hostname ends with "${match.value}"`);
+					}
+				});
+			}
+			
+			if (rule.titleMatches) {
+				rule.titleMatches.forEach(match => {
+					if (match.method === 'includes') {
+						patterns.push(`title contains "${match.value}"`);
+					}
+				});
+			}
+			
+			if (patterns.length > 0) {
+				categories.push({
+					name: rule.groupName,
+					patterns: patterns.slice(0, 5)
+				});
+			}
+		});
+		
+		const categoryList = categories.map(c => 
+			`- "${c.name}": ${c.patterns.join(', ')}`
+		).join('\n');
+		
+		return `You are a tab categorization assistant. Categorize the following browser tabs into groups.
+
+**PREDEFINED CATEGORIES (use these exact names when a tab matches):**
+${categoryList}
+
+**EXISTING TAB STACKS (reuse these exact names if applicable):**
+{EXISTING_STACKS_LIST}
+
+**TABS TO CATEGORIZE:**
+{TAB_DATA_LIST}
+
+**RULES:**
+1. If a tab matches a predefined category's patterns, use that EXACT category name
+2. If a tab matches an existing stack, use that EXACT stack name  
+3. If no match, create a specific new category (1-2 words, Title Case)
+4. Each group must have at least 2 tabs
+5. Ungroupable tabs go to "{OTHERS_NAME}"
+6. Use {LANGUAGE} for all category names
+
+**OUTPUT FORMAT (strict JSON only):**
+{
+  "groups": [
+    {"name": "Category Name", "tab_ids": [0, 1, 2]},
+    {"name": "{OTHERS_NAME}", "tab_ids": [3]}
+  ]
+}
+`;
 	};
 	
 	// Expose settings dialog globally
@@ -482,8 +1044,64 @@
 
 	// ==================== AI Grouping ====================
 
-	// Build AI prompt for tab grouping
+	const getSelectedTemplate = () => {
+		const templateKey = CONFIG.selectedTemplate || 'default';
+		if (templateKey === 'custom' && CONFIG.customPrompt) {
+			return CONFIG.customPrompt;
+		}
+		return PROMPT_TEMPLATES[templateKey]?.template || PROMPT_TEMPLATES.default.template;
+	};
+
+	const isZenStyleTemplate = () => {
+		const templateKey = CONFIG.selectedTemplate || 'default';
+		return templateKey === 'zen';
+	};
+
+	const buildPromptFromTemplate = (tabs, existingStacks, languageName) => {
+		const template = getSelectedTemplate();
+		const othersName = getOthersName();
+		
+		const tabsInfo = tabs.map((tab, index) => ({
+			id: index,
+			title: tab.title || 'Untitled',
+			domain: getHostname(tab.url),
+			url: tab.url
+		}));
+
+		const isZen = isZenStyleTemplate();
+		
+		let tabDataList;
+		if (isZen) {
+			tabDataList = tabsInfo.map((t, index) =>
+				`${index + 1}.\nTitle: "${t.title}"\nURL: "${t.url}"\nDescription: "N/A"`
+			).join('\n\n');
+		} else {
+			tabDataList = tabsInfo.map(t => `${t.id}. ${t.title} (${t.domain})`).join('\n');
+		}
+
+		let existingStacksList;
+		if (isZen) {
+			existingStacksList = Array.isArray(existingStacks) && existingStacks.length > 0
+				? existingStacks.map(s => `- ${s.name || 'Unnamed'}`).join('\n')
+				: 'None';
+		} else {
+			existingStacksList = Array.isArray(existingStacks) && existingStacks.length > 0
+				? existingStacks.map((s, i) => `${i}. Stack title: ${s.name || 'Unnamed stack'} (ID: ${s.id})`).join('\n')
+				: 'None';
+		}
+
+		return template
+			.replace(/\{TAB_DATA_LIST\}/g, tabDataList)
+			.replace(/\{EXISTING_STACKS_LIST\}/g, existingStacksList)
+			.replace(/\{LANGUAGE\}/g, languageName)
+			.replace(/\{OTHERS_NAME\}/g, othersName);
+	};
+
 	const buildAIPrompt = (tabs, existingStacks, languageName) => {
+		return buildPromptFromTemplate(tabs, existingStacks, languageName);
+	};
+
+	const buildAIPromptLegacy = (tabs, existingStacks, languageName) => {
 		const tabsInfo = tabs.map((tab, index) => ({
 			id: index,
 			title: tab.title || 'Untitled',
@@ -564,33 +1182,111 @@ Avoid the following:
 `;
 	};
 
-	// Parse and validate AI response
-	const parseAIResponse = (content) => {
+	const parseAIResponse = (content, tabs) => {
+		if (isZenStyleTemplate()) {
+			return parseZenStyleResponse(content, tabs);
+		}
+		return parseJSONResponse(content);
+	};
+
+	const parseJSONResponse = (content) => {
+		console.log('Raw AI response:', content);
+		
 		let jsonStr = content.trim();
 		
-		// Remove possible markdown code block markers
-		const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-		if (jsonMatch) {
-			jsonStr = jsonMatch[1].trim();
+		// Try to extract from markdown code blocks (various formats)
+		const codeBlockPatterns = [
+			/```json\s*([\s\S]*?)\s*```/i,
+			/```\s*([\s\S]*?)\s*```/,
+			/`([\s\S]*?)`/
+		];
+		
+		for (const pattern of codeBlockPatterns) {
+			const match = content.match(pattern);
+			if (match && match[1].includes('{')) {
+				jsonStr = match[1].trim();
+				break;
+			}
 		}
 		
-		// Extract JSON from surrounding text
+		// Extract JSON object from surrounding text
 		const firstBrace = jsonStr.indexOf('{');
 		const lastBrace = jsonStr.lastIndexOf('}');
-		if (firstBrace !== -1 && lastBrace !== -1) {
+		if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
 			jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
 		}
 		
-		console.log('Extracted JSON string:', jsonStr);
+		// Fix common JSON issues
+		jsonStr = jsonStr
+			.replace(/,\s*]/g, ']')  // trailing commas in arrays
+			.replace(/,\s*}/g, '}')  // trailing commas in objects
+			.replace(/'/g, '"')       // single quotes to double quotes
+			.replace(/(\w+):/g, '"$1":')  // unquoted keys (careful - might break valid JSON)
+			.replace(/""+/g, '"');    // fix double-double quotes
+		
+		// If keys got double-quoted, fix that
+		jsonStr = jsonStr.replace(/""(\w+)""/g, '"$1"');
+		
+		console.log('Cleaned JSON string:', jsonStr);
 		
 		try {
 			return JSON.parse(jsonStr);
 		} catch (parseError) {
 			console.error('JSON parse error:', parseError);
 			console.error('Failed JSON string:', jsonStr);
-			showNotification('AI returned invalid data format, cannot parse JSON. Check console for details.');
+			
+			// Last resort: try to extract groups array manually
+			const groupsMatch = jsonStr.match(/"groups"\s*:\s*\[([\s\S]*)\]/);
+			if (groupsMatch) {
+				try {
+					const fixedJson = '{"groups":[' + groupsMatch[1] + ']}';
+					console.log('Attempting manual fix:', fixedJson);
+					return JSON.parse(fixedJson);
+				} catch (e) {
+					console.error('Manual fix also failed:', e);
+				}
+			}
+			
+			showNotification('AI returned invalid JSON. Check DevTools console (F12) for details.');
 			return null;
 		}
+	};
+
+	const parseZenStyleResponse = (content, tabs) => {
+		const lines = content.trim().split('\n').map(line => line.trim()).filter(Boolean);
+		
+		console.log('Zen-style response lines:', lines);
+		
+		if (lines.length !== tabs.length) {
+			console.warn(`Zen parser: Expected ${tabs.length} categories, got ${lines.length}`);
+			if (lines.length < tabs.length) {
+				while (lines.length < tabs.length) {
+					lines.push(getOthersName());
+				}
+			} else {
+				lines.length = tabs.length;
+			}
+		}
+		
+		const categoryMap = new Map();
+		lines.forEach((category, index) => {
+			const normalizedCategory = category.replace(/^[\d.\-*]+\s*/, '').trim();
+			if (!categoryMap.has(normalizedCategory)) {
+				categoryMap.set(normalizedCategory, []);
+			}
+			categoryMap.get(normalizedCategory).push(index);
+		});
+		
+		const groups = [];
+		categoryMap.forEach((tabIds, name) => {
+			groups.push({
+				name: name || getOthersName(),
+				tab_ids: tabIds
+			});
+		});
+		
+		console.log('Zen-style parsed groups:', groups);
+		return { groups };
 	};
 
 	// Validate AI grouping result
@@ -752,7 +1448,7 @@ Avoid the following:
 			const content = data.choices[0].message.content;
 			console.log('API content:', content);
 			
-			const result = parseAIResponse(content);
+			const result = parseAIResponse(content, tabs);
 			if (!result) return null;
 			
 			if (!validateAIGroups(result)) return null;
@@ -772,8 +1468,9 @@ Avoid the following:
 			return groupedTabs;
 			
 		} catch (error) {
-			console.error('Error calling GLM API:', error);
-			showNotification(`Error calling GLM API: ${error.message}`);
+			const providerName = CONFIG.provider || 'AI';
+			console.error(`Error calling ${providerName} API:`, error);
+			showNotification(`Error calling ${providerName} API: ${error.message}`);
 			return null;
 		}
 	};
@@ -933,7 +1630,6 @@ Avoid the following:
 
 	// ==================== UI Components ====================
 
-	// Create Tidy button
 	const createTidyButton = () => {
 		const button = document.createElement('div');
 		button.className = CLASSES.BUTTON;
@@ -1016,15 +1712,17 @@ Avoid the following:
 			<style>
 				#tidytabs-context-menu {
 					position: fixed;
-					background: var(--colorBg, #252525);
-					border: 1px solid var(--colorBorder, #444);
-					border-radius: 6px;
-					padding: 4px 0;
+					background: var(--colorBgAlphaHeavy, var(--colorBg, #252525));
+					backdrop-filter: blur(20px);
+					-webkit-backdrop-filter: blur(20px);
+					border: 1px solid var(--colorBorder, rgba(255,255,255,0.1));
+					border-radius: var(--radius, 8px);
+					padding: 6px;
 					z-index: 999999;
-					min-width: 160px;
-					box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+					min-width: 180px;
+					box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
 					font-family: system-ui, -apple-system, sans-serif;
-					font-size: 13px;
+					font-size: 12px;
 				}
 				#tidytabs-context-menu .menu-item {
 					padding: 8px 12px;
@@ -1032,25 +1730,48 @@ Avoid the following:
 					color: var(--colorFg, #fff);
 					display: flex;
 					align-items: center;
-					gap: 8px;
+					gap: 10px;
+					border-radius: calc(var(--radius, 8px) - 2px);
+					transition: background 0.15s ease;
 				}
 				#tidytabs-context-menu .menu-item:hover {
-					background: var(--colorHighlightBg, #3d3d3d);
+					background: var(--colorAccentBg, var(--colorHighlightBg, rgba(255,255,255,0.1)));
+					color: var(--colorAccentFg, var(--colorFg, #fff));
 				}
 				#tidytabs-context-menu .menu-item .icon {
-					width: 16px;
+					width: 18px;
 					text-align: center;
+					font-size: 14px;
+					opacity: 0.9;
 				}
-				#tidytabs-context-menu .separator {
+				#tidytabs-context-menu .menu-item .label {
+					flex: 1;
+				}
+				#tidytabs-context-menu .menu-item .shortcut {
+					font-size: 10px;
+					opacity: 0.5;
+					margin-left: auto;
+				}
+				#tidytabs-context-menu .menu-separator {
 					height: 1px;
-					background: var(--colorBorder, #444);
-					margin: 4px 0;
+					background: var(--colorBorder, rgba(255,255,255,0.1));
+					margin: 6px 8px;
 				}
 			</style>
-			<div class="menu-item" data-action="tidy"><span class="icon">📑</span> Tidy Tabs Below</div>
-			<div class="menu-item" data-action="tidy-ai"><span class="icon">✨</span> Tidy with AI</div>
-			<div class="separator"></div>
-			<div class="menu-item" data-action="settings"><span class="icon">⚙️</span> Settings...</div>
+			<div class="menu-item" data-action="tidy">
+				<span class="icon">📑</span>
+				<span class="label">Tidy by Domain</span>
+			</div>
+			<div class="menu-item" data-action="tidy-ai">
+				<span class="icon">✨</span>
+				<span class="label">Tidy with AI</span>
+			</div>
+			<div class="menu-separator"></div>
+			<div class="menu-item" data-action="settings">
+				<span class="icon">⚙️</span>
+				<span class="label">Settings</span>
+				<span class="shortcut">Ctrl+Click</span>
+			</div>
 		`;
 		
 		menu.style.left = `${x}px`;

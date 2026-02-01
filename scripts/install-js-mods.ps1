@@ -115,7 +115,8 @@ $CustomJsContent = @"
 function Add-JsFiles {
     param(
         [string]$Folder,
-        [string]$Prefix = ""
+        [string]$Prefix = "",
+        [string]$SkipFile = ""
     )
     
     $script:ModCount = $ModCount
@@ -123,6 +124,11 @@ function Add-JsFiles {
     if (Test-Path $Folder) {
         # Add active mods (*.js files only, not *.js.disabled)
         Get-ChildItem -Path $Folder -Filter "*.js" -File | ForEach-Object {
+            # Skip specified file (e.g., chroma.min.js already added as dependency)
+            if ($SkipFile -and $_.Name -eq $SkipFile) {
+                return
+            }
+            
             $DisplayName = if ($Prefix) { "$Prefix/$($_.Name)" } else { $_.Name }
             Write-Host "     Adding: $DisplayName" -ForegroundColor Green
             
@@ -141,27 +147,29 @@ function Add-JsFiles {
     }
 }
 
+# FIRST: Add chroma.min.js (dependency for colorTabs.js - must load before root files)
+$ChromaPath = Join-Path $JsFolder "aminought\chroma.min.js"
+if (Test-Path $ChromaPath) {
+    Write-Host "     Adding: aminought/chroma.min.js (dependency - must load first)" -ForegroundColor Green
+    $script:CustomJsContent += "`n// === aminought/chroma.min.js (DEPENDENCY - must load first) ===`n"
+    $script:CustomJsContent += (Get-Content $ChromaPath -Raw -Encoding UTF8)
+    $script:CustomJsContent += "`n"
+    $script:ModCount++
+}
+
 # Add root-level JS files
 Add-JsFiles -Folder $JsFolder
 
-# Add subfolder mods
+# Add subfolder mods (skip chroma.min.js since already added)
 $Subfolders = @("Tam710562", "aminought", "luetage", "PageAction", "Other")
 foreach ($Subfolder in $Subfolders) {
     $SubfolderPath = Join-Path $JsFolder $Subfolder
-    Add-JsFiles -Folder $SubfolderPath -Prefix $Subfolder
+    Add-JsFiles -Folder $SubfolderPath -Prefix $Subfolder -SkipFile "chroma.min.js"
 }
 
 Write-Host ""
 Write-Host "     Total mods added: $ModCount"
-
-# Count dependencies
-$DependencyCount = 0
-if (Test-Path (Join-Path $JsFolder "aminought/chroma.min.js")) {
-    $DependencyCount++
-}
-if ($DependencyCount -gt 0) {
-    Write-Host "     (includes $DependencyCount dependency library)" -ForegroundColor DarkGray
-}
+Write-Host "     (chroma.min.js dependency loaded first for colorTabs.js)" -ForegroundColor DarkGray
 Write-Host ""
 
 # Write custom.js
