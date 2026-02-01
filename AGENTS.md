@@ -720,6 +720,37 @@ function normalizeSvg(svgContent, fillColor = null) {
 
 **File**: `Javascripts/commandChainIcons.js`
 
+---
+
+### TidyTabs: Non-Default Prompt Templates Fail (Jan 2026)
+
+**Symptom**: TidyTabs AI grouping works with the default prompt template, but fails with other templates (Domain-Focused, Semantic Topics, Custom). Console shows "AI returned invalid JSON" errors.
+
+**Root Cause**: The `parseJSONResponse()` function had a regex that blindly quoted ALL word characters followed by colons:
+```javascript
+.replace(/(\w+):/g, '"$1":')
+```
+
+This was intended to fix unquoted keys like `{name: "value"}`, but it ALSO corrupted already-valid JSON:
+- Input: `{"name": "test"}`
+- After regex: `{""name"": "test"}` ← INVALID
+
+The subsequent "fix" `.replace(/""+/g, '"')` was incomplete and couldn't fully recover.
+
+**Fix**: Replace the greedy regex with a pattern that only matches ACTUALLY unquoted keys:
+```javascript
+// Only match keys after { or , that aren't already quoted
+jsonStr = jsonStr.replace(/([{,]\s*)([a-zA-Z_]\w*)(\s*:)/g, '$1"$2"$3');
+```
+
+This regex:
+- Captures the delimiter (`{` or `,`) and any whitespace
+- Captures the unquoted key (word starting with letter/underscore)
+- Captures the colon and any whitespace
+- Only matches if key is NOT already in quotes (because `"name"` doesn't match `[a-zA-Z_]\w*` after `,\s*`)
+
+**File**: `Javascripts/tidyTabs.js`, function `parseJSONResponse()` around line 1225
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc

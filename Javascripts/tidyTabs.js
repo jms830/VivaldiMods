@@ -1218,14 +1218,12 @@ Avoid the following:
 		
 		// Fix common JSON issues
 		jsonStr = jsonStr
-			.replace(/,\s*]/g, ']')  // trailing commas in arrays
-			.replace(/,\s*}/g, '}')  // trailing commas in objects
-			.replace(/'/g, '"')       // single quotes to double quotes
-			.replace(/(\w+):/g, '"$1":')  // unquoted keys (careful - might break valid JSON)
-			.replace(/""+/g, '"');    // fix double-double quotes
+			.replace(/,\s*]/g, ']')
+			.replace(/,\s*}/g, '}')
+			.replace(/'/g, '"');
 		
-		// If keys got double-quoted, fix that
-		jsonStr = jsonStr.replace(/""(\w+)""/g, '"$1"');
+		// Quote unquoted keys: {foo: or , bar: patterns (but NOT {"foo": which is already valid)
+		jsonStr = jsonStr.replace(/([{,]\s*)([a-zA-Z_]\w*)(\s*:)/g, '$1"$2"$3');
 		
 		console.log('Cleaned JSON string:', jsonStr);
 		
