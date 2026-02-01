@@ -19,13 +19,10 @@ See: https://vivaldi.com/blog/how-to/pawel-shows-you-how-to-play-with-workspaces
 }
 
 /* Workspace popup styling - default solid background */
-/* z-index must be higher than pinned tabs (--z-pinned-expand: 100000000) */
 .WorkspacePopup,
-div[class*="WorkspacePopup"],
-.vivaldi-popup:has(.WorkspacePopup-Items),
-div[class*="Popup"]:has(.WorkspacePopup-Items) {
+div[class*="WorkspacePopup"] {
   position: relative;
-  z-index: 2000000000 !important;
+  z-index: var(--z-overlay) !important;
   background: var(--colorBg, #1e1e1e) !important;
   background-color: var(--colorBg, #1e1e1e) !important;
   backdrop-filter: none !important;
@@ -37,11 +34,8 @@ div[class*="Popup"]:has(.WorkspacePopup-Items) {
 /* Use body.transparent-tabbar since popup may be at document root */
 body.transparent-tabbar .WorkspacePopup,
 body.transparent-tabbar div[class*="WorkspacePopup"],
-body.transparent-tabbar .vivaldi-popup:has(.WorkspacePopup-Items),
-body.transparent-tabbar div[class*="Popup"]:has(.WorkspacePopup-Items),
 .transparent-tabbar .WorkspacePopup,
 .transparent-tabbar div[class*="WorkspacePopup"] {
-  z-index: 2000000000 !important;
   background: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
   background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
   backdrop-filter: blur(16px) saturate(180%) !important;
@@ -63,37 +57,47 @@ div[class*="WorkspacePopup"] > * {
 }
 
 /* Suppress pinned tab hover effects when workspace popup is open */
-/* Force pinned tabs BELOW popup z-index when popup is visible */
-body:has(.WorkspacePopup) #tabs-container .tab-strip .is-pinned,
-body:has(.WorkspacePopup) #tabs-container .tab-strip .is-pinned .tab-wrapper,
-body:has(.WorkspacePopup) #tabs-container .tab-strip .is-pinned .tab,
-body:has(.WorkspacePopup-Items) #tabs-container .tab-strip .is-pinned,
-body:has(.WorkspacePopup-Items) #tabs-container .tab-strip .is-pinned .tab-wrapper {
-  z-index: 1 !important;
-  pointer-events: none !important;
+body:has(.WorkspacePopup) #tabs-container .tab-strip .is-pinned .tab-wrapper {
+  z-index: var(--z-base) !important;
+  pointer-events: none;
 }
 
-body:has(.WorkspacePopup) #tabs-container .tab-strip .is-pinned .tab-wrapper:hover,
-body:has(.WorkspacePopup-Items) #tabs-container .tab-strip .is-pinned .tab-wrapper:hover {
+body:has(.WorkspacePopup) #tabs-container .tab-strip .is-pinned .tab-wrapper:hover {
   width: auto !important;
   min-height: auto !important;
   background-color: transparent !important;
-  transform: none !important;
 }
 
 /* Suppress auto-hide toolbar items when workspace popup is open */
-/* Must target ALL toolbar children and force them below popup */
-body:has(.WorkspacePopup) .toolbar.toolbar-tabbar-before > *:not(.UrlBar-AddressField):not(.workspace-popup),
-body:has(.WorkspacePopup-Items) .toolbar.toolbar-tabbar-before > *:not(.UrlBar-AddressField):not(.workspace-popup),
-body:has(.WorkspacePopup) .toolbar.toolbar-tabbar-before .button-toolbar:not(.workspace-popup),
-body:has(.WorkspacePopup-Items) .toolbar.toolbar-tabbar-before .button-toolbar:not(.workspace-popup) {
+body:has(.WorkspacePopup) .toolbar.toolbar-tabbar-before > *:not(.UrlBar-AddressField) {
   opacity: 0 !important;
   pointer-events: none !important;
-  z-index: 1 !important;
+  z-index: var(--z-base) !important;
 }
 
-/* Also suppress the entire toolbar row z-index when popup is open */
-body:has(.WorkspacePopup) .toolbar.toolbar-tabbar-before,
-body:has(.WorkspacePopup-Items) .toolbar.toolbar-tabbar-before {
-  z-index: 1 !important;
+/* ============================================ */
+/* Stacking Context Fix for Popup Z-Index      */
+/* ============================================ */
+
+/*
+ * When transparent tabbar is enabled, #tabs-tabbar-container gets backdrop-filter
+ * which creates a new stacking context. This causes everything inside it (pinned
+ * tabs, toolbar items) to paint as one unit, potentially covering the popup.
+ *
+ * Solution: Lower the CONTAINER's z-index when popup is open, not individual items.
+ * This makes the entire stacking context paint below the popup.
+ */
+body:has(.WorkspacePopup) #tabs-tabbar-container {
+  z-index: auto !important;
+}
+
+/* Also suppress the toolbar row when popup is open */
+body:has(.WorkspacePopup) .toolbar.toolbar-tabbar-before {
+  z-index: auto !important;
+}
+
+/* Ensure popup stays above by giving it a reasonable but not extreme z-index */
+/* Note: Don't use extreme values like 2000000000 - causes other issues */
+.WorkspacePopup {
+  z-index: var(--z-popup, 400) !important;
 }
