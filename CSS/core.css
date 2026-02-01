@@ -121,6 +121,15 @@ You may manage and config all your css mods and config them as well all in this 
   --toolbar-show-settings: 0;
   --toolbar-show-vbutton: 0;
 
+  --zen-addressbar-enabled: on;
+  --zen-addressbar-radius: 16px;
+  --zen-addressbar-padding: 12px 18px;
+  --zen-addressbar-bg: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.06));
+  --zen-addressbar-bg-hover: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.08));
+  --zen-addressbar-bg-focus: var(--colorBgLighter, #2a2a2a);
+  --zen-addressbar-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --zen-addressbar-shadow-focus: 0 8px 24px rgba(0, 0, 0, 0.3);
+
   --transition-delay-time-expand: 0ms;
   --transition-delay-time-collapse: 200ms;
 

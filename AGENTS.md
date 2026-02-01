@@ -337,6 +337,56 @@ The toolbar autohide feature hides elements in the sidebar toolbar (`.toolbar-ta
 
 **What This Controls**: Elements in the toolbar ROW (horizontal bar above tabs in sidebar), NOT the tabbar itself or the top address bar when using native autohide.
 
+---
+
+### Zen Browser Address Bar Styling (Feb 2026)
+
+**File**: `CSS/Layout/addressbar.css`
+
+Zen Browser-inspired address bar with pill-shaped design, generous padding, and clean elevation.
+
+**Configuration** - Add these CSS variables to `CSS/core.css` `:root` section:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--zen-addressbar-enabled` | `on` | Enable/disable Zen styling |
+| `--zen-addressbar-radius` | `16px` | Border radius (pill shape) |
+| `--zen-addressbar-padding` | `12px 18px` | Internal padding |
+| `--zen-addressbar-bg` | `rgba(255,255,255,0.06)` | Base background |
+| `--zen-addressbar-bg-hover` | `rgba(255,255,255,0.08)` | Hover background |
+| `--zen-addressbar-bg-focus` | `#2a2a2a` | Focus background |
+| `--zen-addressbar-shadow` | `0 2px 8px rgba(0,0,0,0.15)` | Base shadow |
+| `--zen-addressbar-shadow-focus` | `0 8px 24px rgba(0,0,0,0.3)` | Focus shadow |
+
+**To disable Zen styling**, set:
+```css
+:root {
+  --zen-addressbar-enabled: off;
+}
+```
+
+**Key Features**:
+- **Pill shape**: Heavy border-radius (16px default) for modern, rounded look
+- **Generous padding**: 12px vertical, 18px horizontal for breathing room
+- **Lighter background**: Subtle background distinct from sidebar
+- **Hover feedback**: Background lightens on hover
+- **Focus elevation**: Enhanced shadow and background on focus
+- **Clean transitions**: Smooth animations using `--animation-speed`
+
+**Behavior**:
+- **Default state**: Subtle background with light shadow
+- **Hover**: Background lightens, shadow deepens
+- **Focus**: Prominent background and deep shadow for clear focus indication
+
+**Customization Example**:
+```css
+:root {
+  --zen-addressbar-radius: 20px;  /* More pill-like */
+  --zen-addressbar-padding: 14px 20px;  /* More generous */
+  --zen-addressbar-bg: rgba(255,255,255,0.1);  /* Lighter background */
+}
+```
+
 ## Code Standards & Best Practices
 
 ### CSS Guidelines
