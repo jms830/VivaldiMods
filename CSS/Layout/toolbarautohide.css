@@ -15,27 +15,6 @@ Granular controls for individual element visibility
   align-items: center !important;
 }
 
-/* ============================================ */
-/* Transparent Tabbar Support                  */
-/* ============================================ */
-
-/* When Vivaldi's transparent tabbar mode is active, make the sidebar toolbar transparent */
-body.transparent-tabbar .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget,
-.transparent-tabbar .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget {
-  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
-  backdrop-filter: blur(12px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-  border-radius: var(--radius, 12px) !important;
-}
-
-/* Also make the entire tabs-tabbar-container transparent */
-body.transparent-tabbar #tabs-tabbar-container,
-.transparent-tabbar #tabs-tabbar-container {
-  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
-  backdrop-filter: blur(12px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-}
-
 /* Default: hide all toolbar items except URL bar and workspace popup */
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget > * {
   opacity: 0;
