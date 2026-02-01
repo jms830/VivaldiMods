@@ -125,6 +125,19 @@ Fixes: Transparent skin support for address bar autohide (ynomas92-ctrl forum re
   border-radius: calc(var(--radius, 12px) * 0.6) !important;
 }
 
+/* Address bar in auto-hide wrapper with transparent tabbar */
+.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField {
+  background-color: var(--colorBgAlpha, rgba(40, 40, 40, 0.7)) !important;
+  backdrop-filter: blur(8px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
+}
+
+.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField:focus-within {
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.9)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+}
+
 /* ============================================ */
 /* Corner Gap Fix                              */
 /* ============================================ */

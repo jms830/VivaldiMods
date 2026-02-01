@@ -41,6 +41,23 @@ Zen Browser style: pill-shaped, generous padding, clean elevation
   }
 }
 
+/* Transparent tabbar mode - match sidebar transparency */
+.transparent-tabbar .UrlBar-AddressField {
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+}
+
+.transparent-tabbar .UrlBar-AddressField:hover:not(:focus-within) {
+  background-color: var(--colorBgAlpha, rgba(40, 40, 40, 0.9)) !important;
+}
+
+.transparent-tabbar .UrlBar-AddressField:focus-within {
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.95)) !important;
+  backdrop-filter: blur(16px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(200%) !important;
+}
+
 .UrlBar-AddressField::before {
   content: "";
   position: absolute;

@@ -387,6 +387,33 @@ Zen Browser-inspired address bar with pill-shaped design, generous padding, and 
 }
 ```
 
+**Transparent Tabbar Integration**: When "Transparent Tab Bar" is enabled in Settings > Themes > Settings, the address bar automatically uses `backdrop-filter: blur()` and semi-transparent background to match the rest of the UI. This overrides the Zen solid backgrounds with glass-like transparency.
+
+---
+
+### Transparent Tabbar Mode (Feb 2026)
+
+**Trigger**: Enable "Transparent Tab Bar" in Settings > Themes > Settings. Vivaldi adds `.transparent-tabbar` class to body.
+
+**What gets transparency**:
+- Auto-hide wrappers (sidebar, top address bar)
+- Address bar (`.UrlBar-AddressField`)
+- Workspace popup dropdown
+
+**CSS Pattern**:
+```css
+.transparent-tabbar .element {
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+}
+```
+
+**Files implementing this**:
+- `CSS/Layout/nativeautohidepolish.css` - Auto-hide wrappers
+- `CSS/Layout/addressbar.css` - Address bar
+- `CSS/Layout/workspacebuttons.css` - Workspace popup
+
 ## Code Standards & Best Practices
 
 ### CSS Guidelines

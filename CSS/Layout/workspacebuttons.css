@@ -18,7 +18,7 @@ See: https://vivaldi.com/blog/how-to/pawel-shows-you-how-to-play-with-workspaces
   width: 100% !important;
 }
 
-/* Workspace popup styling - solid background to hide elements behind */
+/* Workspace popup styling - default solid background */
 .WorkspacePopup,
 .workspace-popup,
 div[class*="WorkspacePopup"] {
@@ -29,6 +29,16 @@ div[class*="WorkspacePopup"] {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   opacity: 1 !important;
+}
+
+/* When transparent tabbar is enabled, match transparency */
+.transparent-tabbar .WorkspacePopup,
+.transparent-tabbar .workspace-popup,
+.transparent-tabbar div[class*="WorkspacePopup"] {
+  background: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
 }
 
 .WorkspacePopup > *,
