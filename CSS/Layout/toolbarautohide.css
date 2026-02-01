@@ -1,8 +1,8 @@
 /*
 Toolbar Auto-Hide
-version 2026.01.13
+version 2026.02.01
 Auto-hides the toolbar row in the sidebar, expands on hover
-Extracted from AutoHide/tabbar.css for standalone use
+Granular controls for individual element visibility
 */
 
 /* Before toolbar: collapsed state */
@@ -15,9 +15,8 @@ Extracted from AutoHide/tabbar.css for standalone use
   align-items: center !important;
 }
 
-/* Hide toolbar items except URL bar and workspace popup */
-.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget
-  > *:not(:is(.UrlBar-AddressField, .workspace-popup)) {
+/* Default: hide all toolbar items except URL bar and workspace popup */
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget > * {
   opacity: 0;
   min-height: 0px;
   max-height: 0px;
@@ -25,7 +24,65 @@ Extracted from AutoHide/tabbar.css for standalone use
   transition: all var(--animation-speed, 260ms) ease-out;
 }
 
-/* Before toolbar: expanded state on hover or focus */
+/* Always visible elements (non-configurable) */
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField,
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .workspace-popup {
+  opacity: 1 !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Configurable element visibility in collapsed state */
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .button-toolbar.extensions {
+  opacity: var(--toolbar-show-extensions, 0);
+  min-height: calc(var(--toolbar-show-extensions, 0) * 30px);
+  max-height: calc(var(--toolbar-show-extensions, 0) * 30px);
+}
+
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .button-toolbar:is(.back, .forward, .reload, .home) {
+  opacity: var(--toolbar-show-navigation, 0);
+  min-height: calc(var(--toolbar-show-navigation, 0) * 30px);
+  max-height: calc(var(--toolbar-show-navigation, 0) * 30px);
+}
+
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .button-toolbar.pageactions {
+  opacity: var(--toolbar-show-pageactions, 0);
+  min-height: calc(var(--toolbar-show-pageactions, 0) * 30px);
+  max-height: calc(var(--toolbar-show-pageactions, 0) * 30px);
+}
+
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .button-toolbar.readermode {
+  opacity: var(--toolbar-show-readermode, 0);
+  min-height: calc(var(--toolbar-show-readermode, 0) * 30px);
+  max-height: calc(var(--toolbar-show-readermode, 0) * 30px);
+}
+
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .button-toolbar.bookmarks-button {
+  opacity: var(--toolbar-show-bookmarks, 0);
+  min-height: calc(var(--toolbar-show-bookmarks, 0) * 30px);
+  max-height: calc(var(--toolbar-show-bookmarks, 0) * 30px);
+}
+
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .button-toolbar.downloads {
+  opacity: var(--toolbar-show-downloads, 0);
+  min-height: calc(var(--toolbar-show-downloads, 0) * 30px);
+  max-height: calc(var(--toolbar-show-downloads, 0) * 30px);
+}
+
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .button-toolbar:has(> button[title*="ettings"i]) {
+  opacity: var(--toolbar-show-settings, 0);
+  min-height: calc(var(--toolbar-show-settings, 0) * 30px);
+  max-height: calc(var(--toolbar-show-settings, 0) * 30px);
+}
+
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .vivaldi-v {
+  opacity: var(--toolbar-show-vbutton, 0);
+  min-height: calc(var(--toolbar-show-vbutton, 0) * 30px);
+  max-height: calc(var(--toolbar-show-vbutton, 0) * 30px);
+}
+
+/* Expanded state on hover or focus */
 body:has(
     :is(
       #tabs-tabbar-container .toolbar-tabbar-before .UrlBar-AddressField:focus-within,
@@ -42,7 +99,7 @@ body:has(
   transition: all var(--animation-speed, 260ms) ease-out;
 }
 
-/* Show toolbar items when expanded */
+/* Show ALL elements when expanded (ignore granular controls) */
 body:has(
     :is(
       #tabs-tabbar-container .toolbar-tabbar-before .UrlBar-AddressField:focus-within,
@@ -50,15 +107,13 @@ body:has(
       .toolbar-tabbar-before .ToolbarButton-Button.button-pressed
     )
   )
-  .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget
-  > *:not(:is(.UrlBar-AddressField, .workspace-popup)),
-.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget:hover
-  > *:not(:is(.UrlBar-AddressField, .workspace-popup)) {
-  opacity: 1;
-  min-height: 30px;
-  max-height: 30px;
+  .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget > *,
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget:hover > * {
+  opacity: 1 !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
   z-index: var(--z-modal) !important;
-  overflow: visible;
+  overflow: visible !important;
   transition: all var(--animation-speed, 260ms) ease-out;
 }
 

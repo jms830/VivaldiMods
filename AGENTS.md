@@ -296,6 +296,47 @@ NeatDial.css:1 Failed to load resource: net::ERR_FAILED
 - `Other/Picture-in-Picture.js` → `Other/picture-in-picture.js`
 - `ClearTabs.js` → `cleartabs.js`
 
+## Configuration Guide
+
+### Toolbar AutoHide Granular Controls (Jan 2026)
+
+**File**: `CSS/Layout/toolbarautohide.css`
+
+The toolbar autohide feature hides elements in the sidebar toolbar (`.toolbar-tabbar-before`) until you hover. By default, ONLY the address bar and workspace popup remain visible.
+
+**Granular Controls** - Add these CSS variables to `CSS/core.css` `:root` section to control individual element visibility in collapsed state:
+
+| Variable | Element | Default |
+|----------|---------|---------|
+| `--toolbar-show-extensions` | Extensions button | `0` (hidden) |
+| `--toolbar-show-navigation` | Back, Forward, Reload, Home buttons | `0` (hidden) |
+| `--toolbar-show-pageactions` | Page actions button | `0` (hidden) |
+| `--toolbar-show-readermode` | Reader mode button | `0` (hidden) |
+| `--toolbar-show-bookmarks` | Bookmarks button | `0` (hidden) |
+| `--toolbar-show-downloads` | Downloads button | `0` (hidden) |
+| `--toolbar-show-settings` | Settings button | `0` (hidden) |
+| `--toolbar-show-vbutton` | Vivaldi menu button | `0` (hidden) |
+
+**Always Visible** (non-configurable):
+- Address bar (`.UrlBar-AddressField`)
+- Workspace popup button (`.workspace-popup`)
+
+**To show an element in collapsed state**, change its value from `0` to `1`:
+
+```css
+:root {
+  --toolbar-show-navigation: 1;  /* Show back/forward/reload/home */
+  --toolbar-show-downloads: 1;   /* Show downloads button */
+}
+```
+
+**Behavior**:
+- **Collapsed**: Only configured elements + address bar + workspace popup visible
+- **Expanded** (on hover): ALL elements visible regardless of configuration
+- **Focused**: ALL elements visible when address bar has focus
+
+**What This Controls**: Elements in the toolbar ROW (horizontal bar above tabs in sidebar), NOT the tabbar itself or the top address bar when using native autohide.
+
 ## Code Standards & Best Practices
 
 ### CSS Guidelines

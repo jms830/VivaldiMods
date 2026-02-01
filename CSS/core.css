@@ -110,7 +110,16 @@ You may manage and config all your css mods and config them as well all in this 
   --z-popup: 400;
   --z-tooltip: 500;
   --z-overlay: 1000;
-  --z-pinned-expand: 100000000; /* For pinned tab hover expansion - must be above everything */
+  --z-pinned-expand: 100000000;
+
+  --toolbar-show-extensions: 0;
+  --toolbar-show-navigation: 0;
+  --toolbar-show-pageactions: 0;
+  --toolbar-show-readermode: 0;
+  --toolbar-show-bookmarks: 0;
+  --toolbar-show-downloads: 0;
+  --toolbar-show-settings: 0;
+  --toolbar-show-vbutton: 0;
 
   --transition-delay-time-expand: 0ms;
   --transition-delay-time-collapse: 200ms;
