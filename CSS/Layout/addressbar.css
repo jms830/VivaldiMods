@@ -22,16 +22,11 @@ Zen Browser style: pill-shaped, generous padding, clean elevation
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Focus state - expand and elevate */
+/* Focus state - elevate without moving */
 .UrlBar-AddressField:focus-within {
   background-color: var(--zen-addressbar-bg-focus, #2a2a2a) !important;
   box-shadow: var(--zen-addressbar-shadow-focus, 0 8px 24px rgba(0, 0, 0, 0.4)) !important;
   z-index: var(--z-overlay, 1000) !important;
-  position: relative !important;
-  min-width: 300px !important;
-  width: calc(100% + 40px) !important;
-  margin-left: -20px !important;
-  margin-right: -20px !important;
 }
 
 /* Inner URL field padding */
@@ -99,22 +94,7 @@ body.transparent-tabbar .UrlBar-AddressField:focus-within,
   z-index: var(--z-base);
 }
 
-@keyframes expand {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.UrlBar-AddressField:focus-within,
-.OmniDropdown {
-  animation: expand var(--animation-speed) ease;
-}
+/* Removed expand animation - was causing movement on focus */
 
 .UrlBar-UrlField {
   background: transparent;

@@ -25,13 +25,15 @@ Granular controls for individual element visibility
   flex-shrink: 0;
 }
 
-/* Always visible elements (non-configurable) */
+/* Always visible elements - consistent sizes, no shrinking */
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField {
   opacity: 1 !important;
   min-height: 36px !important;
-  max-height: none !important;
+  height: 36px !important;
+  max-height: 36px !important;
   overflow: visible !important;
   flex-shrink: 0 !important;
+  width: 100% !important;
 }
 
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField:focus-within {
@@ -41,8 +43,9 @@ Granular controls for individual element visibility
 
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .workspace-popup {
   opacity: 1 !important;
-  min-height: 28px !important;
-  max-height: 32px !important;
+  min-height: 30px !important;
+  height: 30px !important;
+  max-height: 30px !important;
   overflow: visible !important;
   flex-shrink: 0 !important;
 }
@@ -113,7 +116,7 @@ body:has(
   transition: all var(--animation-speed, 260ms) ease-out;
 }
 
-/* Show ALL elements when expanded (ignore granular controls) */
+/* Show hidden elements when expanded (but don't resize always-visible ones) */
 body:has(
     :is(
       #tabs-tabbar-container .toolbar-tabbar-before .UrlBar-AddressField:focus-within,
@@ -121,8 +124,8 @@ body:has(
       .toolbar-tabbar-before .ToolbarButton-Button.button-pressed
     )
   )
-  .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget > *,
-.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget:hover > * {
+  .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget > *:not(.UrlBar-AddressField):not(.workspace-popup),
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget:hover > *:not(.UrlBar-AddressField):not(.workspace-popup) {
   opacity: 1 !important;
   min-height: 30px !important;
   max-height: 30px !important;
