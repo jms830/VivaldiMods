@@ -9,8 +9,8 @@ Granular controls for individual element visibility
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget {
   margin: 3px !important;
   min-height: 35px !important;
-  max-height: 35px !important;
-  overflow: hidden !important;
+  max-height: fit-content !important;
+  overflow: visible !important;
   transition: all var(--animation-speed, 260ms) ease-out;
   align-items: center !important;
 }
@@ -22,15 +22,24 @@ Granular controls for individual element visibility
   max-height: 0px;
   overflow: hidden;
   transition: all var(--animation-speed, 260ms) ease-out;
+  flex-shrink: 0;
 }
 
 /* Always visible elements (non-configurable) */
-.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField,
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField {
+  opacity: 1 !important;
+  min-height: 30px !important;
+  max-height: 34px !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .workspace-popup {
   opacity: 1 !important;
-  min-height: auto !important;
-  max-height: none !important;
+  min-height: 28px !important;
+  max-height: 32px !important;
   overflow: visible !important;
+  flex-shrink: 0 !important;
 }
 
 /* Configurable element visibility in collapsed state */
