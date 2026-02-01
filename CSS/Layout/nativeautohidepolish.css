@@ -1,8 +1,9 @@
 /*
 Native Auto-Hide Polish
-version 2026.01.13
+version 2026.01.31
 Applies Arc-style rounding and transparency to Vivaldi 7.8+ native auto-hide UI
 Fixes: https://github.com/jms830/revivarc-vivaldi/issues - ynomas92-ctrl's report
+Fixes: Transparent skin support for address bar autohide (ynomas92-ctrl forum request)
 */
 
 /* ============================================ */
@@ -30,19 +31,10 @@ Fixes: https://github.com/jms830/revivarc-vivaldi/issues - ynomas92-ctrl's repor
 }
 
 /* ============================================ */
-/* Transparent Skin Support                    */
+/* Base Background (non-transparent themes)    */
 /* ============================================ */
 
-/* Use theme background with transparency for auto-hide wrappers */
-@container style(--fluid-theme: transparent) {
-  .auto-hide-wrapper {
-    background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-  }
-}
-
-/* Ensure auto-hide inherits theme colors properly */
+/* Default: solid background matching theme */
 .auto-hide-wrapper {
   background-color: var(--colorBg) !important;
   border: 1px solid var(--colorBorder, transparent) !important;
@@ -54,27 +46,79 @@ Fixes: https://github.com/jms830/revivarc-vivaldi/issues - ynomas92-ctrl's repor
 }
 
 /* ============================================ */
+/* Transparent Skin Support                    */
+/* ============================================ */
+
+/*
+ * Vivaldi adds .transparent-tabbar to body when "Transparent Tab Bar" is enabled
+ * in Settings > Themes > Editor > Settings. This makes autohide wrappers
+ * use the same transparency as the rest of the UI.
+ *
+ * Note: Previous @container style() approach didn't work because CSS custom
+ * property values can't be queried that way.
+ */
+
+/* When Vivaldi's transparent tabbar mode is active */
+.transparent-tabbar .auto-hide-wrapper {
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+}
+
+/* Ensure address bar also gets transparency */
+.transparent-tabbar .auto-hide-wrapper.top {
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+}
+
+/* Alternative: When accent is transparent (some themes use this) */
+#browser.acc-transparent .auto-hide-wrapper,
+#browser.color-accent-from-page .auto-hide-wrapper {
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+}
+
+/* ============================================ */
 /* Animation Smoothing                         */
 /* ============================================ */
 
+/* Hide state: smooth deceleration */
 .auto-hide-wrapper {
   transition: 
-    transform var(--animation-speed, 260ms) cubic-bezier(0.4, 0, 0.2, 1),
+    transform 300ms cubic-bezier(.4, 0, .6, 1),
     opacity var(--animation-speed, 260ms) ease-out,
     background-color var(--animation-speed, 260ms) ease-out !important;
+}
+
+/* Show state: slight overshoot for snappy feel */
+.auto-hide-wrapper.left.show {
+  transition: transform 300ms cubic-bezier(.25, .8, .25, 1.03) !important;
+}
+
+.auto-hide-wrapper.right.show {
+  transition: transform 300ms cubic-bezier(.25, .8, .25, 1.03) !important;
+}
+
+.auto-hide-wrapper.top.show {
+  transition: transform 300ms cubic-bezier(.25, .8, .25, 1.02) !important;
+}
+
+.auto-hide-wrapper.bottom.show {
+  transition: transform 300ms cubic-bezier(.25, .8, .25, 1.02) !important;
 }
 
 /* ============================================ */
 /* Inner Element Rounding                      */
 /* ============================================ */
 
-.auto-hide-wrapper .toolbar-mainbar {
+.auto-hide-wrapper .toolbar-mainbar,
+.auto-hide-wrapper #tabs-tabbar-container,
+.auto-hide-wrapper .tab-strip,
+.auto-hide-wrapper #tabs-container {
   border-radius: inherit !important;
   background-color: inherit !important;
-}
-
-.auto-hide-wrapper #tabs-tabbar-container {
-  border-radius: inherit !important;
 }
 
 .auto-hide-wrapper .UrlBar-AddressField {
@@ -85,7 +129,6 @@ Fixes: https://github.com/jms830/revivarc-vivaldi/issues - ynomas92-ctrl's repor
 /* Corner Gap Fix                              */
 /* ============================================ */
 
-/* Fix corners sticking out (ynomas92-ctrl's report) */
 .auto-hide-wrapper.left {
   margin-top: var(--window-border, 4px) !important;
   margin-bottom: var(--window-border, 4px) !important;
@@ -96,7 +139,16 @@ Fixes: https://github.com/jms830/revivarc-vivaldi/issues - ynomas92-ctrl's repor
   margin-bottom: var(--window-border, 4px) !important;
 }
 
-/* Prevent corner overflow */
+.auto-hide-wrapper.top {
+  margin-left: var(--window-border, 4px) !important;
+  margin-right: var(--window-border, 4px) !important;
+}
+
+.auto-hide-wrapper.bottom {
+  margin-left: var(--window-border, 4px) !important;
+  margin-right: var(--window-border, 4px) !important;
+}
+
 #browser:not(.fullscreen) .auto-hide-wrapper {
   box-sizing: border-box !important;
 }

@@ -578,6 +578,70 @@ Most are **necessary** to override Vivaldi's internal styles. Distribution by fi
 
 **Policy**: `tabbar.css` is disabled by default (Vivaldi 7.8+ has native auto-hide). Keep as-is for users who need custom auto-hide behavior.
 
+### Two-Level Tab Stack Peek (Optional Feature - Jan 2026)
+
+**File**: `CSS/Layout/twolevel-tabstack.css`
+
+**Purpose**: For users with 2-level tab stacks (Settings > Tabs > Tab Stacking > Two-Level), this creates an interactive hover-to-expand behavior where hovering over one level expands it while shrinking the other.
+
+**How it works**:
+- Main tabs container starts at 18% width, expands to 82% on hover
+- Secondary tabs shrink from 82% to 18% when main is hovered (and vice versa)
+- Uses CSS container queries to hide toolbar buttons when collapsed
+- 300ms delay before expanding for intentional hover detection
+
+**To enable**: Uncomment in `core.css`:
+```css
+@import "Layout/twolevel-tabstack.css";
+```
+
+**Note**: Only useful if you have 2-level tab stacks enabled in Vivaldi settings. Disabled by default since most users don't use this feature.
+
+**Source**: Ported from upstream `Bettert2LevelTabStack.css` (commit 4bb4cb9)
+
+---
+
+### Remove Clutter Module (Jan 2026)
+
+**File**: `CSS/EnhancedUX/removeclutter.css`
+
+**Purpose**: General UI cleanup by hiding rarely-used elements. Separate from `quietify.css` which specifically handles audio/media icons.
+
+**What it hides**:
+- Scrollbars in vertical tab bars
+- WorkspacePopup scrollbar
+- Update notification toolbar
+- Tabs-locked/unlocked buttons
+
+**Relationship to quietify.css**:
+| File | Purpose |
+|------|---------|
+| `quietify.css` | Hides audio/media icons on tabs |
+| `removeclutter.css` | Hides other UI clutter (scrollbars, update notifications, lock buttons) |
+
+Both are enabled by default. Disable either in `core.css` if you need those UI elements.
+
+**Source**: Ported from upstream `RemoveClutter.css` (commit 4bb4cb9)
+
+---
+
+### Improved Auto-Hide Transitions (Jan 2026)
+
+**File**: `CSS/Layout/nativeautohidepolish.css`
+
+**Enhancement**: Added differentiated easing curves for show vs hide states to make auto-hide animations feel more polished.
+
+**Before**: Same transition for both show and hide
+**After**: 
+- **Hide state**: `cubic-bezier(.4, 0, .6, 1)` - smooth deceleration
+- **Show state**: `cubic-bezier(.25, .8, .25, 1.03)` - slight overshoot for snappy feel
+
+The show transition has a subtle overshoot (1.03 > 1.0) that creates a more responsive "snap into place" feel when panels appear.
+
+**Source**: Merged from upstream `BetterAutoHide.css` (commit 4bb4cb9)
+
+---
+
 ### Command Chain Icons: SVG Color for Dark/Light Themes (Jan 2026)
 
 **Symptom**: Custom icons set via the Command Chain Icon Picker appear dark/black on dark themes instead of matching toolbar button colors (white).

@@ -26,13 +26,15 @@ You may manage and config all your css mods and config them as well all in this 
 @import "Layout/workspacebuttons.css";
 @import "Layout/nativeautohidepolish.css";
 @import "Layout/toolbarautohide.css";
+/* @import "Layout/twolevel-tabstack.css"; */
 /* @import "Layout/themepreviewer.css"; */
 
 /* Import EnhancedUX folder CSS files */
 @import "EnhancedUX/btnhoveranime.css";
-/* @import "EnhancedUX/tabstrail.css"; */
-/* @import "EnhancedUX/quietify.css"; */
+@import "EnhancedUX/tabstrail.css";
+@import "EnhancedUX/quietify.css";
 @import "EnhancedUX/selectabletext.css";
+@import "EnhancedUX/removeclutter.css";
 
 /* Import JSIntegration folder CSS files */
 @import "JSIntegration/cleartabs.css";

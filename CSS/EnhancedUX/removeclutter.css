@@ -1,0 +1,46 @@
+/*
+Remove Clutter
+version 2026.01.31
+Ported from PaRr0tBoY/Awesome-Vivaldi (RemoveClutter.css)
+https://github.com/PaRr0tBoY/Awesome-Vivaldi
+
+Hides unnecessary UI elements for a cleaner interface.
+For audio icon styling, see quietify.css instead.
+*/
+
+/* ============================================ */
+/* Scrollbar Cleanup                           */
+/* ============================================ */
+
+#browser #tabs-tabbar-container.left ::-webkit-scrollbar,
+#browser #tabs-tabbar-container.right ::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs-left .tabbar-wrapper,
+.tabs-right .tabbar-wrapper {
+  background-color: transparent;
+  overflow: visible;
+}
+
+.WorkspacePopup-Items {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.WorkspacePopup-Items::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================ */
+/* Toolbar Cleanup                             */
+/* ============================================ */
+
+.toolbar.toolbar-mainbar.toolbar-required.update {
+  display: none !important;
+}
+
+.button-toolbar.tabs-locked,
+.button-toolbar.tabs-unlocked {
+  display: none !important;
+}
