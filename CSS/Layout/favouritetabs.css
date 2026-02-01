@@ -128,7 +128,7 @@ Currently only support 3x3 tabs grid.
     background-color: var(--colorAccentBg, rgba(255, 255, 255, 0.2)) !important;
     overflow: hidden;
     position: relative;
-    z-index: var(--z-hover);
+    z-index: var(--z-pinned-expand);
     width: calc(
       var(--pinned-column-count) * 100% + (var(--pinned-column-count) - 1) *
         var(--pinned-gap)
@@ -490,8 +490,7 @@ Currently only support 3x3 tabs grid.
       .tab-wrapper:not(:hover) {
       position: sticky !important;
       top: 0 !important;
-      /* background: transparent !important; */
-      z-index: var(--z-dropdown) !important;
+      z-index: var(--z-sticky) !important;
     }
 
     #tabs-container
@@ -501,8 +500,7 @@ Currently only support 3x3 tabs grid.
       .tab-wrapper:not(:hover) {
       position: sticky !important;
       top: calc(var(--pinned-tab-height) + var(--pinned-gap)) !important;
-      /* background: transparent !important; */
-      z-index: var(--z-dropdown) !important;
+      z-index: var(--z-sticky) !important;
     }
 
     #tabs-container
@@ -512,8 +510,7 @@ Currently only support 3x3 tabs grid.
       .tab-wrapper:not(:hover) {
       position: sticky !important;
       top: calc((var(--pinned-tab-height) + var(--pinned-gap)) * 2) !important;
-      /* background: transparent !important; */
-      z-index: var(--z-dropdown) !important;
+      z-index: var(--z-sticky) !important;
     }
 
     #tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 3) {

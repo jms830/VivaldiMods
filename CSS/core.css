@@ -69,7 +69,7 @@ You may manage and config all your css mods and config them as well all in this 
   --fluid-border-radius: on;
 
   --fluid-tabs-grid: on;
-  --fluid-pin-at-top: off;
+  --fluid-pin-at-top: on;
 
   --pinned-column-count: 3;
   --pinned-row-count: 3;
@@ -110,6 +110,7 @@ You may manage and config all your css mods and config them as well all in this 
   --z-popup: 400;
   --z-tooltip: 500;
   --z-overlay: 1000;
+  --z-pinned-expand: 100000000; /* For pinned tab hover expansion - must be above everything */
 
   --transition-delay-time-expand: 0ms;
   --transition-delay-time-collapse: 200ms;
