@@ -20,7 +20,6 @@ See: https://vivaldi.com/blog/how-to/pawel-shows-you-how-to-play-with-workspaces
 
 /* Workspace popup styling - default solid background */
 .WorkspacePopup,
-.workspace-popup,
 div[class*="WorkspacePopup"] {
   position: relative;
   z-index: var(--z-overlay) !important;
@@ -32,18 +31,20 @@ div[class*="WorkspacePopup"] {
 }
 
 /* When transparent tabbar is enabled, match transparency */
+/* Use body.transparent-tabbar since popup may be at document root */
+body.transparent-tabbar .WorkspacePopup,
+body.transparent-tabbar div[class*="WorkspacePopup"],
 .transparent-tabbar .WorkspacePopup,
-.transparent-tabbar .workspace-popup,
 .transparent-tabbar div[class*="WorkspacePopup"] {
   background: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
   background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
-  backdrop-filter: blur(12px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
 }
 
 .WorkspacePopup > *,
 div[class*="WorkspacePopup"] > * {
-  background: inherit;
+  background: transparent !important;
 }
 
 .WorkspacePopup-Items {

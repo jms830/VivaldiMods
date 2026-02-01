@@ -28,10 +28,15 @@ Granular controls for individual element visibility
 /* Always visible elements (non-configurable) */
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField {
   opacity: 1 !important;
-  min-height: 30px !important;
-  max-height: 34px !important;
+  min-height: 36px !important;
+  max-height: none !important;
   overflow: visible !important;
   flex-shrink: 0 !important;
+}
+
+.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField:focus-within {
+  z-index: var(--z-overlay, 1000) !important;
+  overflow: visible !important;
 }
 
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .workspace-popup {
@@ -131,4 +136,15 @@ body:has(
   align-content: flex-end;
   min-height: 35px !important;
   min-width: 100% !important;
+}
+
+/* Allow address bar to overflow tabbar when focused */
+#tabs-tabbar-container:has(.UrlBar-AddressField:focus-within) {
+  overflow: visible !important;
+  z-index: var(--z-overlay, 1000) !important;
+}
+
+#tabs-tabbar-container:has(.UrlBar-AddressField:focus-within) .toolbar-tabbar-before {
+  overflow: visible !important;
+  z-index: var(--z-overlay, 1000) !important;
 }

@@ -59,13 +59,15 @@ Fixes: Transparent skin support for address bar autohide (ynomas92-ctrl forum re
  */
 
 /* When Vivaldi's transparent tabbar mode is active */
+body.transparent-tabbar .auto-hide-wrapper,
 .transparent-tabbar .auto-hide-wrapper {
   background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
 }
 
-/* Ensure address bar also gets transparency */
+/* Ensure address bar wrapper also gets transparency */
+body.transparent-tabbar .auto-hide-wrapper.top,
 .transparent-tabbar .auto-hide-wrapper.top {
   background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;
@@ -126,12 +128,14 @@ Fixes: Transparent skin support for address bar autohide (ynomas92-ctrl forum re
 }
 
 /* Address bar in auto-hide wrapper with transparent tabbar */
+body.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField,
 .transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField {
   background-color: var(--colorBgAlpha, rgba(40, 40, 40, 0.7)) !important;
   backdrop-filter: blur(8px) saturate(150%) !important;
   -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
 }
 
+body.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField:focus-within,
 .transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField:focus-within {
   background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.9)) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;

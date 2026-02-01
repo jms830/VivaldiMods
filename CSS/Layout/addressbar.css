@@ -2,85 +2,63 @@
 Addressbar Styling
 version 2026.02.01
 Author PaRr0tBoY + Zen Browser enhancements
-https://github.com/PaRr0tBoY/Awesome-Vivaldi
-Thinner addressbar
-Urlbar expand when focus within
-Separated dropdown menu
 Zen Browser style: pill-shaped, generous padding, clean elevation
 */
 
+/* Base address bar - Zen styling applied directly */
 .UrlBar-AddressField {
   position: relative;
   transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: var(--radius, 8px);
   overflow: visible;
   isolation: isolate;
+  border-radius: var(--zen-addressbar-radius, 16px) !important;
+  background-color: var(--zen-addressbar-bg, rgba(255, 255, 255, 0.06)) !important;
+  box-shadow: var(--zen-addressbar-shadow, 0 2px 8px rgba(0, 0, 0, 0.15));
+  padding: 2px;
 }
 
-@container style(--zen-addressbar-enabled: on) {
-  .UrlBar-AddressField {
-    border-radius: var(--zen-addressbar-radius, 16px);
-    background-color: var(--zen-addressbar-bg);
-    box-shadow: var(--zen-addressbar-shadow);
-    padding: 2px;
-  }
-
-  .UrlBar-AddressField:hover:not(:focus-within) {
-    background-color: var(--zen-addressbar-bg-hover);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  .UrlBar-AddressField:focus-within {
-    background-color: var(--zen-addressbar-bg-focus) !important;
-    box-shadow: var(--zen-addressbar-shadow-focus) !important;
-    border-radius: var(--zen-addressbar-radius, 16px) !important;
-  }
-
-  .UrlBar-UrlField {
-    padding: var(--zen-addressbar-padding, 12px 18px);
-  }
+.UrlBar-AddressField:hover:not(:focus-within) {
+  background-color: var(--zen-addressbar-bg-hover, rgba(255, 255, 255, 0.1)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Transparent tabbar mode - match sidebar transparency */
+/* Focus state - expand and elevate */
+.UrlBar-AddressField:focus-within {
+  background-color: var(--zen-addressbar-bg-focus, #2a2a2a) !important;
+  box-shadow: var(--zen-addressbar-shadow-focus, 0 8px 24px rgba(0, 0, 0, 0.4)) !important;
+  z-index: var(--z-overlay, 1000) !important;
+  position: relative !important;
+  min-width: 300px !important;
+  width: calc(100% + 40px) !important;
+  margin-left: -20px !important;
+  margin-right: -20px !important;
+}
+
+/* Inner URL field padding */
+.UrlBar-UrlField {
+  padding: var(--zen-addressbar-padding, 10px 16px) !important;
+}
+
+/* Transparent tabbar mode - glass effect */
+body.transparent-tabbar .UrlBar-AddressField,
 .transparent-tabbar .UrlBar-AddressField {
-  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
+  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.7)) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
+body.transparent-tabbar .UrlBar-AddressField:hover:not(:focus-within),
 .transparent-tabbar .UrlBar-AddressField:hover:not(:focus-within) {
-  background-color: var(--colorBgAlpha, rgba(40, 40, 40, 0.9)) !important;
+  background-color: var(--colorBgAlpha, rgba(40, 40, 40, 0.8)) !important;
 }
 
+body.transparent-tabbar .UrlBar-AddressField:focus-within,
 .transparent-tabbar .UrlBar-AddressField:focus-within {
-  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.95)) !important;
-  backdrop-filter: blur(16px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(200%) !important;
-}
-
-.UrlBar-AddressField::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.12);
-  opacity: 0;
-  transition: opacity var(--animation-speed) ease;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: var(--z-base);
-}
-
-.UrlBar-AddressField:hover:not(:focus-within)::before {
-  opacity: 0.5;
-}
-
-@container style(--zen-addressbar-enabled: on) {
-  .UrlBar-AddressField::before {
-    display: none;
-  }
+  background-color: var(--colorBgAlpha, rgba(25, 25, 25, 0.92)) !important;
+  backdrop-filter: blur(20px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(200%) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* #browser:has(.UrlBar-AddressField:focus-within) .ToolbarButton-Button{
