@@ -41,7 +41,7 @@ Currently only support 3x3 tabs grid.
     display: contents !important;
   }
 
-  /* Square button style for first 9 pinned tabs */
+  /* Square button style for first 9 pinned tabs - Zen-like minimal */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned):nth-child(-n + 9)
@@ -54,10 +54,11 @@ Currently only support 3x3 tabs grid.
     align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
-    /* background-color: var(--colorBg, rgba(255, 255, 255, 0.2)) !important; */
     z-index: var(--z-dropdown);
-    background-color: var(--colorBgAlpha) !important;
-    border: 1px solid var(--colorHighlightBgDark) !important;
+    /* Zen-like: subtle background, no harsh border */
+    background-color: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.04)) !important;
+    border: none !important;
+    border-radius: var(--zen-tab-radius, 8px) !important;
   }
 
   #tabs-container
@@ -125,7 +126,8 @@ Currently only support 3x3 tabs grid.
     > span:has(.is-pinned):nth-child(-n + 9)
     .is-pinned
     .tab-wrapper:not(.active):hover {
-    background-color: var(--colorAccentBg, rgba(255, 255, 255, 0.2)) !important;
+    /* Zen-like: lighter hover, keep expansion behavior */
+    background-color: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.1)) !important;
     overflow: hidden;
     position: relative;
     z-index: var(--z-pinned-expand);
@@ -135,6 +137,7 @@ Currently only support 3x3 tabs grid.
     ) !important;
     min-height: calc(var(--pinned-tab-height) + var(--pinned-gap)) !important;
     transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1) 0.8s;
+    border-radius: var(--zen-tab-radius, 8px) !important;
   }
 
   /* Column-specific hover positioning */
@@ -228,13 +231,16 @@ Currently only support 3x3 tabs grid.
     display: none !important;
   }
 
-  /* Active tab outline */
+  /* Active tab - Zen-like subtle highlight instead of outline */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned)
     .is-pinned.active
     .tab-wrapper {
-    outline: 2px solid var(--colorAccentBg, #4a90e2);
+    background-color: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.12)) !important;
+    outline: none !important;
+    /* Subtle inner glow instead of harsh outline */
+    box-shadow: inset 0 0 0 1px var(--colorAccentBgFaded, rgba(255, 255, 255, 0.15)) !important;
   }
 
   /* Regular style for pinned tabs after 9th */
