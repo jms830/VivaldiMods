@@ -138,7 +138,8 @@ Currently only support 3x3 tabs grid.
         var(--pinned-gap)
     ) !important;
     min-height: calc(var(--pinned-tab-height) + var(--pinned-gap)) !important;
-    transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1) 0.8s;
+    /* 1.2s delay before expansion - allows quick clicks without blocking */
+    transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1) 1.2s;
   }
 
   /* Column-specific hover positioning */
