@@ -1,9 +1,38 @@
 /*
 Zen Browser-Style Tabs
-version 2026.02.01 - Third Pass
+version 2026.02.01 - Fourth Pass
 The Zen formula: inactive = invisible, active = visible
 Visual hierarchy through CONTRAST, not addition
 */
+
+/* ============================================ */
+/* ACCORDION VIEW FIX                          */
+/* Remove excessive spacing in accordion mode  */
+/* ============================================ */
+
+/* Accordion tabs should not have pinned-tab-height */
+.tab-position.accordion-toggle-arrow .tab-wrapper,
+.tab-position.accordion .tab-wrapper {
+  min-height: auto !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* Remove gaps in accordion view */
+.tab-strip:has(.accordion-toggle-arrow) {
+  gap: 2px !important;
+}
+
+/* Accordion arrow tabs - compact */
+.tab-position.accordion-toggle-arrow {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Accordion children - no extra height */
+.tab-position.accordion-toggle-arrow ~ .tab-position {
+  min-height: auto !important;
+}
 
 /* ============================================ */
 /* INACTIVE TABS - Nearly Invisible            */
