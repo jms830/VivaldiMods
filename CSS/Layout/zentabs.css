@@ -1,21 +1,72 @@
 /*
 Zen Browser-Style Tabs
 version 2026.02.01
-Minimal styling to avoid conflicts with favouritetabs.css
-Only adds subtle enhancements, doesn't change layout
+Focus: Visual hierarchy - active tab MUST stand out
 */
 
 /* ============================================ */
-/* MINIMAL ZEN ENHANCEMENTS                    */
-/* These rules are low-specificity and safe    */
+/* BASE TAB STYLING - ALL TABS                 */
+/* Give every tab a subtle background so they  */
+/* don't blend into the sidebar                */
 /* ============================================ */
 
-/* Subtle rounded corners on non-pinned tabs */
-.tab-position:not(.is-pinned) .tab-wrapper {
-  border-radius: var(--zen-tab-radius, 8px);
+/* All tabs - subtle background for visibility */
+.tab-position .tab-wrapper {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-radius: var(--zen-tab-radius, 8px) !important;
+  margin: 2px 0 !important;
+  transition: background-color var(--fast-animation-speed, 140ms) ease-out !important;
 }
 
-/* Hide close button by default, show on hover (non-pinned only) */
+/* Hover - slightly more visible */
+.tab-position .tab:hover .tab-wrapper {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ============================================ */
+/* ACTIVE TAB - MUST STAND OUT                 */
+/* This is the most important visual state     */
+/* ============================================ */
+
+/* Active tab - strong left accent bar + background */
+.tab-position .tab.active .tab-wrapper {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  /* Left accent bar - the key Zen/Arc indicator */
+  box-shadow: inset 3px 0 0 0 var(--colorAccentBg, #4a9eff) !important;
+}
+
+/* Active + hover */
+.tab-position .tab.active:hover .tab-wrapper {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ============================================ */
+/* OVERRIDE TAB STACK COLORS FOR ACTIVE STATE  */
+/* Active indicator must be visible even when  */
+/* tab has a custom stack color                */
+/* ============================================ */
+
+/* When tab has stack color AND is active - keep the accent bar */
+.tab-position .tab.active[style*="background"] .tab-wrapper,
+.tab-position .tab.active .tab-wrapper[style*="background"] {
+  box-shadow: inset 4px 0 0 0 var(--colorAccentBg, #4a9eff) !important;
+}
+
+/* ============================================ */
+/* PINNED TABS (3x3 GRID) - Preserve layout    */
+/* Only add the accent bar for active state    */
+/* ============================================ */
+
+/* Pinned tabs in grid - keep existing layout but add active indicator */
+#tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 9) .is-pinned.active .tab-wrapper {
+  box-shadow: inset 3px 0 0 0 var(--colorAccentBg, #4a9eff) !important;
+}
+
+/* ============================================ */
+/* NON-PINNED TAB CLOSE BUTTON                 */
+/* Hide by default, show on hover              */
+/* ============================================ */
+
 .tab-position:not(.is-pinned) .tab .close {
   opacity: 0;
   width: 0;
@@ -40,7 +91,31 @@ Only adds subtle enhancements, doesn't change layout
   opacity: 1;
 }
 
-/* New tab button - subtle rounded corners */
+/* ============================================ */
+/* SPACING & SEPARATION                        */
+/* ============================================ */
+
+/* Add slight gap between tabs for clarity */
+.tab-position {
+  margin-bottom: 1px !important;
+}
+
+/* Separator line - more subtle */
+#tabs-container .tab-strip .separator hr {
+  opacity: 0.2 !important;
+  margin: 8px 12px !important;
+}
+
+/* ============================================ */
+/* NEW TAB BUTTON                              */
+/* ============================================ */
+
 .newtab button {
-  border-radius: var(--zen-tab-radius, 8px);
+  border-radius: var(--zen-tab-radius, 8px) !important;
+  opacity: 0.5;
+}
+
+.newtab button:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
 }
