@@ -51,9 +51,8 @@ Granular controls for individual element visibility
   margin-left: 0 !important;
   margin-right: 0 !important;
   transform: none !important;
-  /* Allow content to overflow for full URL visibility */
-  width: auto !important;
-  min-width: 100% !important;
+  /* Keep width stable - don't change on focus */
+  width: 100% !important;
 }
 
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .workspace-popup {

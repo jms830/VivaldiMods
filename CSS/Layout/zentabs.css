@@ -161,9 +161,48 @@ Visual hierarchy through CONTRAST, not addition
 }
 
 /* ============================================ */
-/* TAB STACK COLORS - Keep visible but         */
-/* still show active state clearly             */
+/* TAB STACKS - Remove cluttered outlines      */
+/* Zen style: no colored borders               */
 /* ============================================ */
 
-/* When tab has custom color, active state still shows via text brightness */
-/* The text opacity change will make active tabs readable regardless of bg */
+/* Remove tab stack colored borders/outlines */
+.tab-position .tab.color,
+.tab-position .tab[style*="border"],
+.tab-position .tab-wrapper[style*="border"] {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Tab stack indicator - make it subtle */
+.tab-position .tab .tab-group-indicator,
+.tab-position .tab .stack-counter {
+  border: none !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 6px !important;
+}
+
+/* Remove the colored left/right borders on stacked tabs */
+.tab-position .tab-header {
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Tab with custom color - keep bg but remove border */
+.tab-position .tab[style*="background"] .tab-wrapper,
+.tab-position .tab .tab-wrapper[style*="background"] {
+  border: none !important;
+  outline: none !important;
+  /* Let the color show through but muted */
+}
+
+/* SVG tab selection indicator - hide harsh outlines */
+.tab-position .svg-tab-selection {
+  stroke: none !important;
+  fill: none !important;
+}
+
+/* Remove any border from tab-header */
+.tab-position .tab .tab-header {
+  border: none !important;
+  outline: none !important;
+}

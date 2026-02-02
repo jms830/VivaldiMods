@@ -41,7 +41,7 @@ Currently only support 3x3 tabs grid.
     display: contents !important;
   }
 
-  /* Square button style for first 9 pinned tabs */
+  /* Square button style for first 9 pinned tabs - Zen minimal */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned):nth-child(-n + 9)
@@ -54,10 +54,11 @@ Currently only support 3x3 tabs grid.
     align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
-    /* background-color: var(--colorBg, rgba(255, 255, 255, 0.2)) !important; */
     z-index: var(--z-dropdown);
-    background-color: var(--colorBgAlpha) !important;
-    border: 1px solid var(--colorHighlightBgDark) !important;
+    /* Zen: subtle background, NO border */
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border: none !important;
+    border-radius: var(--zen-tab-radius, 8px) !important;
   }
 
   #tabs-container
@@ -125,7 +126,10 @@ Currently only support 3x3 tabs grid.
     > span:has(.is-pinned):nth-child(-n + 9)
     .is-pinned
     .tab-wrapper:not(.active):hover {
-    background-color: var(--colorAccentBg, rgba(255, 255, 255, 0.2)) !important;
+    /* Zen: subtle hover, not accent color */
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: none !important;
+    border-radius: var(--zen-tab-radius, 8px) !important;
     overflow: hidden;
     position: relative;
     z-index: var(--z-pinned-expand);
@@ -228,13 +232,15 @@ Currently only support 3x3 tabs grid.
     display: none !important;
   }
 
-  /* Active tab outline */
+  /* Active tab - Zen style: no outline, subtle background */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned)
     .is-pinned.active
     .tab-wrapper {
-    outline: 2px solid var(--colorAccentBg, #4a90e2);
+    outline: none !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
   }
 
   /* Regular style for pinned tabs after 9th */
