@@ -1,70 +1,112 @@
 /*
 Zen Browser-Style Tabs
-version 2026.02.01
-Focus: Visual hierarchy - active tab MUST stand out
+version 2026.02.01 - Third Pass
+The Zen formula: inactive = invisible, active = visible
+Visual hierarchy through CONTRAST, not addition
 */
 
 /* ============================================ */
-/* BASE TAB STYLING - ALL TABS                 */
-/* Give every tab a subtle background so they  */
-/* don't blend into the sidebar                */
+/* INACTIVE TABS - Nearly Invisible            */
+/* No background, muted text                   */
 /* ============================================ */
 
-/* All tabs - subtle background for visibility */
+/* Base tab - transparent, muted text */
 .tab-position .tab-wrapper {
-  background-color: rgba(255, 255, 255, 0.03) !important;
+  background-color: transparent !important;
+  border: none !important;
   border-radius: var(--zen-tab-radius, 8px) !important;
-  margin: 2px 0 !important;
-  transition: background-color var(--fast-animation-speed, 140ms) ease-out !important;
+  transition: 
+    background-color var(--fast-animation-speed, 140ms) ease-out,
+    color var(--fast-animation-speed, 140ms) ease-out !important;
 }
 
-/* Hover - slightly more visible */
+/* Inactive tab text - GREY/muted */
+.tab-position .tab .title {
+  color: var(--colorFg) !important;
+  opacity: 0.6 !important;
+  transition: opacity var(--fast-animation-speed, 140ms) ease-out !important;
+}
+
+/* Inactive favicon - slightly muted too */
+.tab-position .tab .favicon {
+  opacity: 0.7 !important;
+  transition: opacity var(--fast-animation-speed, 140ms) ease-out !important;
+}
+
+/* ============================================ */
+/* HOVER STATE - Subtle appearance             */
+/* ============================================ */
+
+/* Hover - slight background appears */
 .tab-position .tab:hover .tab-wrapper {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Hover - text brightens */
+.tab-position .tab:hover .title {
+  opacity: 0.85 !important;
+}
+
+/* Hover - favicon brightens */
+.tab-position .tab:hover .favicon {
+  opacity: 0.9 !important;
 }
 
 /* ============================================ */
-/* ACTIVE TAB - MUST STAND OUT                 */
-/* This is the most important visual state     */
+/* ACTIVE TAB - Visible & Clear                */
+/* Subtle background, WHITE text               */
 /* ============================================ */
 
-/* Active tab - strong left accent bar + background */
+/* Active - subtle rounded background fill */
 .tab-position .tab.active .tab-wrapper {
   background-color: rgba(255, 255, 255, 0.1) !important;
-  /* Left accent bar - the key Zen/Arc indicator */
-  box-shadow: inset 3px 0 0 0 var(--colorAccentBg, #4a9eff) !important;
 }
 
-/* Active + hover */
+/* Active - WHITE text (full brightness) */
+.tab-position .tab.active .title {
+  opacity: 1 !important;
+  color: var(--colorFg) !important;
+}
+
+/* Active - favicon full brightness */
+.tab-position .tab.active .favicon {
+  opacity: 1 !important;
+}
+
+/* Active + hover - slightly brighter */
 .tab-position .tab.active:hover .tab-wrapper {
   background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 /* ============================================ */
-/* OVERRIDE TAB STACK COLORS FOR ACTIVE STATE  */
-/* Active indicator must be visible even when  */
-/* tab has a custom stack color                */
+/* PINNED TABS (Grid) - Same Treatment         */
+/* Apply same active styling to pinned tabs    */
 /* ============================================ */
 
-/* When tab has stack color AND is active - keep the accent bar */
-.tab-position .tab.active[style*="background"] .tab-wrapper,
-.tab-position .tab.active .tab-wrapper[style*="background"] {
-  box-shadow: inset 4px 0 0 0 var(--colorAccentBg, #4a9eff) !important;
+/* Pinned inactive - muted */
+.tab-position.is-pinned .tab .title {
+  opacity: 0.6 !important;
+}
+
+.tab-position.is-pinned .tab .favicon {
+  opacity: 0.7 !important;
+}
+
+/* Pinned active - bright */
+.tab-position.is-pinned .tab.active .title {
+  opacity: 1 !important;
+}
+
+.tab-position.is-pinned .tab.active .favicon {
+  opacity: 1 !important;
+}
+
+.tab-position.is-pinned .tab.active .tab-wrapper {
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* ============================================ */
-/* PINNED TABS (3x3 GRID) - Preserve layout    */
-/* Only add the accent bar for active state    */
-/* ============================================ */
-
-/* Pinned tabs in grid - keep existing layout but add active indicator */
-#tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 9) .is-pinned.active .tab-wrapper {
-  box-shadow: inset 3px 0 0 0 var(--colorAccentBg, #4a9eff) !important;
-}
-
-/* ============================================ */
-/* NON-PINNED TAB CLOSE BUTTON                 */
-/* Hide by default, show on hover              */
+/* CLOSE BUTTON - Hidden until hover           */
 /* ============================================ */
 
 .tab-position:not(.is-pinned) .tab .close {
@@ -81,7 +123,7 @@ Focus: Visual hierarchy - active tab MUST stand out
 }
 
 .tab-position:not(.is-pinned) .tab:hover .close {
-  opacity: 0.6;
+  opacity: 0.5;
   width: 16px;
   min-width: 16px;
   margin-left: 4px;
@@ -92,30 +134,36 @@ Focus: Visual hierarchy - active tab MUST stand out
 }
 
 /* ============================================ */
-/* SPACING & SEPARATION                        */
+/* CLEAN UP - Remove visual noise              */
 /* ============================================ */
 
-/* Add slight gap between tabs for clarity */
-.tab-position {
-  margin-bottom: 1px !important;
+/* Remove any default borders/outlines */
+.tab-position .tab,
+.tab-position .tab-wrapper {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-/* Separator line - more subtle */
+/* Separator - very subtle */
 #tabs-container .tab-strip .separator hr {
-  opacity: 0.2 !important;
-  margin: 8px 12px !important;
+  opacity: 0.15 !important;
 }
 
-/* ============================================ */
-/* NEW TAB BUTTON                              */
-/* ============================================ */
-
+/* New tab button - muted like inactive tabs */
 .newtab button {
   border-radius: var(--zen-tab-radius, 8px) !important;
   opacity: 0.5;
 }
 
 .newtab button:hover {
-  opacity: 1;
+  opacity: 0.8;
   background-color: rgba(255, 255, 255, 0.06) !important;
 }
+
+/* ============================================ */
+/* TAB STACK COLORS - Keep visible but         */
+/* still show active state clearly             */
+/* ============================================ */
+
+/* When tab has custom color, active state still shows via text brightness */
+/* The text opacity change will make active tabs readable regardless of bg */
