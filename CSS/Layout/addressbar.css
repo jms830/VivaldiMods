@@ -91,30 +91,45 @@ body.transparent-tabbar .UrlBar-AddressField:focus-within,
   z-index: var(--z-base);
 }
 
+/* ============================================ */
+/* ZEN-STYLE MINIMAL URL BAR                   */
+/* Hide icons by default, show on focus        */
+/* ============================================ */
+
 .toolbar.toolbar-insideinput {
   z-index: var(--z-base);
-  /* Ensure icons (reader, RSS, etc.) are visible */
   display: flex !important;
   flex-shrink: 0 !important;
   overflow: visible !important;
-  opacity: 1 !important;
-  min-height: auto !important;
-  max-height: none !important;
+  /* Zen: hide toolbar icons by default */
+  opacity: 0;
+  max-width: 0;
+  padding: 0 !important;
+  transition: 
+    opacity var(--fast-animation-speed, 140ms) ease-out,
+    max-width var(--fast-animation-speed, 140ms) ease-out,
+    padding var(--fast-animation-speed, 140ms) ease-out;
 }
 
-/* Ensure buttons inside URL field are visible */
+/* Show toolbar icons on URL field focus */
+.UrlBar-AddressField:focus-within .toolbar.toolbar-insideinput {
+  opacity: 1;
+  max-width: 200px;
+  padding: 0 4px !important;
+}
+
+/* Ensure buttons inside URL field work when visible */
 .UrlBar-AddressField .ToolbarButton-Button {
   display: flex !important;
-  opacity: 1 !important;
   visibility: visible !important;
+  flex-shrink: 0 !important;
 }
 
-/* Show reader and RSS icons specifically */
+/* Reader/RSS/Feed icons - visible when focused */
 .UrlBar-AddressField .ToolbarButton-Button[title*="Feed"],
 .UrlBar-AddressField .ToolbarButton-Button[title*="Reader"],
 .UrlBar-AddressField .ToolbarButton-Button[title*="RSS"] {
   display: flex !important;
-  opacity: 1 !important;
 }
 
 /* Removed expand animation - was causing movement on focus */

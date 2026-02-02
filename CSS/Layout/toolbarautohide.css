@@ -174,17 +174,20 @@ body:has(
   overflow: visible !important;
 }
 
-/* Ensure the toolbar with reader/RSS icons is visible */
+/* 
+ * Zen-style: toolbar icons hidden by default, shown on focus 
+ * (See addressbar.css for the main implementation)
+ * These rules ensure it works in the sidebar tabbar context
+ */
 .toolbar.toolbar-tabbar-before .UrlBar-AddressField .toolbar-insideinput {
   display: flex !important;
   flex-shrink: 0 !important;
-  opacity: 1 !important;
   overflow: visible !important;
+  /* Hidden by default - addressbar.css handles the show/hide */
 }
 
-/* Show URL icons in sidebar tabbar */
-.toolbar.toolbar-tabbar-before .UrlBar-AddressField .ToolbarButton-Button {
+/* Show URL icons in sidebar tabbar when focused */
+.toolbar.toolbar-tabbar-before .UrlBar-AddressField:focus-within .ToolbarButton-Button {
   display: flex !important;
-  opacity: 1 !important;
   flex-shrink: 0 !important;
 }

@@ -1,0 +1,203 @@
+/*
+Zen Browser-Style Tabs
+version 2026.02.01
+Clean, minimal, pill-shaped tabs inspired by Zen Browser
+*/
+
+/* ============================================ */
+/* ZEN TAB BASE STYLING                        */
+/* ============================================ */
+
+/* Tab wrapper - clean pill shape */
+.tab-position .tab {
+  border-radius: var(--zen-tab-radius, 10px) !important;
+  margin: 2px 4px !important;
+  padding: 0 !important;
+  background-color: transparent !important;
+  transition: 
+    background-color var(--fast-animation-speed, 140ms) ease-out,
+    transform var(--fast-animation-speed, 140ms) ease-out !important;
+}
+
+.tab-position .tab-wrapper {
+  border-radius: var(--zen-tab-radius, 10px) !important;
+  padding: 6px 10px !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+  transition: background-color var(--fast-animation-speed, 140ms) ease-out !important;
+}
+
+/* ============================================ */
+/* TAB STATES                                  */
+/* ============================================ */
+
+/* Hover state - subtle highlight */
+.tab-position .tab:hover .tab-wrapper {
+  background-color: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.06)) !important;
+}
+
+/* Active tab - clear but subtle background */
+.tab-position .tab.active .tab-wrapper {
+  background-color: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.1)) !important;
+}
+
+/* Active tab hover */
+.tab-position .tab.active:hover .tab-wrapper {
+  background-color: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.12)) !important;
+}
+
+/* ============================================ */
+/* FAVICON & TITLE                             */
+/* ============================================ */
+
+/* Favicon sizing */
+.tab .favicon {
+  width: var(--tab-icon-size, 16px) !important;
+  height: var(--tab-icon-size, 16px) !important;
+  min-width: var(--tab-icon-size, 16px) !important;
+  flex-shrink: 0 !important;
+}
+
+/* Tab title - clean and readable */
+.tab .title {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  margin-left: 8px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: var(--colorFg) !important;
+  opacity: 0.85;
+  transition: opacity var(--fast-animation-speed, 140ms) ease-out !important;
+}
+
+/* Active tab title - slightly more prominent */
+.tab.active .title {
+  opacity: 1;
+  font-weight: 500 !important;
+}
+
+/* Hover title - full opacity */
+.tab:hover .title {
+  opacity: 1;
+}
+
+/* ============================================ */
+/* CLOSE BUTTON - HIDDEN BY DEFAULT            */
+/* ============================================ */
+
+/* Hide close button by default (Zen-style) */
+.tab .close {
+  opacity: 0 !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  transition: 
+    opacity var(--fast-animation-speed, 140ms) ease-out,
+    width var(--fast-animation-speed, 140ms) ease-out !important;
+}
+
+/* Show close button on tab hover */
+.tab:hover .close {
+  opacity: 0.6 !important;
+  width: 18px !important;
+  min-width: 18px !important;
+  margin-left: 4px !important;
+}
+
+/* Close button hover - more visible */
+.tab:hover .close:hover {
+  opacity: 1 !important;
+}
+
+/* ============================================ */
+/* TAB INDICATORS                              */
+/* ============================================ */
+
+/* Audio indicator - minimal */
+.tab .tab-audio {
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+/* Tab counter badge (tab stacks) */
+.tab .tab-group-indicator {
+  font-size: 11px !important;
+  padding: 2px 6px !important;
+  border-radius: 8px !important;
+  background-color: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.15)) !important;
+  margin-left: auto !important;
+}
+
+/* ============================================ */
+/* REMOVE VISUAL CLUTTER                       */
+/* ============================================ */
+
+/* Remove default tab decorations */
+.tab::before,
+.tab::after,
+.tab-wrapper::before,
+.tab-wrapper::after {
+  display: none !important;
+}
+
+/* Remove tab borders/separators */
+.tab-position {
+  border: none !important;
+}
+
+/* Remove active tab indicator line */
+.tab.active::before {
+  display: none !important;
+}
+
+/* ============================================ */
+/* VERTICAL TAB BAR SPECIFIC                   */
+/* ============================================ */
+
+/* For sidebar tabs - consistent spacing */
+#tabs-container.left .tab-position,
+#tabs-container.right .tab-position {
+  margin: 1px 0 !important;
+}
+
+/* Cleaner separator between pinned and regular tabs */
+#tabs-container .tab-strip .separator {
+  height: 1px !important;
+  margin: 8px 12px !important;
+  background-color: var(--colorBorder, rgba(255, 255, 255, 0.1)) !important;
+  opacity: 0.5;
+}
+
+#tabs-container .tab-strip .separator hr {
+  display: none !important;
+}
+
+/* ============================================ */
+/* NEW TAB BUTTON                              */
+/* ============================================ */
+
+.newtab button {
+  border-radius: var(--zen-tab-radius, 10px) !important;
+  opacity: 0.6;
+  transition: opacity var(--fast-animation-speed, 140ms) ease-out !important;
+}
+
+.newtab button:hover {
+  opacity: 1;
+  background-color: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.06)) !important;
+}
+
+/* ============================================ */
+/* ZEN TAB VARIABLES (configurable in core.css)*/
+/* ============================================ */
+/*
+:root {
+  --zen-tab-radius: 10px;
+  --zen-tab-padding: 6px 10px;
+  --zen-tab-active-bg: rgba(255, 255, 255, 0.1);
+  --zen-tab-hover-bg: rgba(255, 255, 255, 0.06);
+}
+*/

@@ -22,7 +22,24 @@ Fixes: Transparent skin support for address bar autohide (ynomas92-ctrl forum re
 
 .auto-hide-wrapper.top {
   border-radius: 0 0 var(--radius, 12px) var(--radius, 12px) !important;
-  overflow: hidden !important;
+  overflow: visible !important;  /* Changed from hidden to allow trigger zone */
+}
+
+/* 
+ * HOVER TRIGGER ZONE - Fixes maximized window edge detection
+ * Creates an invisible area at the very top of screen that triggers autohide
+ * Without this, cursor at screen edge misses the hover target
+ */
+.auto-hide-wrapper.top::before {
+  content: '';
+  position: absolute;
+  top: -20px;  /* Extends 20px above the wrapper */
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: transparent;
+  pointer-events: auto;  /* Captures hover events */
+  z-index: var(--z-overlay, 1000);
 }
 
 .auto-hide-wrapper.bottom {

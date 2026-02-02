@@ -26,6 +26,7 @@ You may manage and config all your css mods and config them as well all in this 
 @import "Layout/workspacebuttons.css";
 @import "Layout/nativeautohidepolish.css";
 @import "Layout/toolbarautohide.css";
+@import "Layout/zentabs.css";
 /* @import "Layout/twolevel-tabstack.css"; */
 /* @import "Layout/themepreviewer.css"; */
 
@@ -129,6 +130,11 @@ You may manage and config all your css mods and config them as well all in this 
   --zen-addressbar-bg-focus: var(--colorBgLighter, #2a2a2a);
   --zen-addressbar-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   --zen-addressbar-shadow-focus: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* Zen Tab Styling */
+  --zen-tab-radius: 10px;
+  --zen-tab-active-bg: rgba(255, 255, 255, 0.1);
+  --zen-tab-hover-bg: rgba(255, 255, 255, 0.06);
 
   --transition-delay-time-expand: 0ms;
   --transition-delay-time-collapse: 200ms;
