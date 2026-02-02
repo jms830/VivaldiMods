@@ -8,13 +8,20 @@ Zen Browser style: pill-shaped, generous padding, clean elevation
 /* Base address bar - Zen styling applied directly */
 .UrlBar-AddressField {
   position: relative;
-  transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
+  /* IMPORTANT: Only transition visual properties, NOT position/size to prevent movement */
+  transition: 
+    background-color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1),
+    border-color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
   isolation: isolate;
   border-radius: var(--zen-addressbar-radius, 16px) !important;
   background-color: var(--zen-addressbar-bg, rgba(255, 255, 255, 0.06)) !important;
   box-shadow: var(--zen-addressbar-shadow, 0 2px 8px rgba(0, 0, 0, 0.15));
   padding: 2px;
+  /* Prevent any lateral movement */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .UrlBar-AddressField:hover:not(:focus-within) {
@@ -27,6 +34,10 @@ Zen Browser style: pill-shaped, generous padding, clean elevation
   background-color: var(--zen-addressbar-bg-focus, #2a2a2a) !important;
   box-shadow: var(--zen-addressbar-shadow-focus, 0 8px 24px rgba(0, 0, 0, 0.4)) !important;
   z-index: var(--z-overlay, 1000) !important;
+  /* Prevent any position changes on focus */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: none !important;
 }
 
 /* Inner URL field padding */
@@ -60,17 +71,7 @@ body.transparent-tabbar .UrlBar-AddressField:focus-within,
   display: none !important;
 } */
 
-.UrlBar-AddressField:focus-within {
-  z-index: var(--z-overlay);
-}
-
-@container style(--zen-addressbar-enabled: off) {
-  .UrlBar-AddressField:focus-within {
-    background-color: var(--colorBgLighter, #2a2a2a) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    border-radius: var(--radius, 8px);
-  }
-}
+/* Note: @container style() queries don't work in Vivaldi/Chromium - removed dead code */
 
 .UrlBar-AddressField:focus-within .OmniDropdown{
   /* padding: 0px auto auto;
@@ -92,6 +93,28 @@ body.transparent-tabbar .UrlBar-AddressField:focus-within,
 
 .toolbar.toolbar-insideinput {
   z-index: var(--z-base);
+  /* Ensure icons (reader, RSS, etc.) are visible */
+  display: flex !important;
+  flex-shrink: 0 !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  min-height: auto !important;
+  max-height: none !important;
+}
+
+/* Ensure buttons inside URL field are visible */
+.UrlBar-AddressField .ToolbarButton-Button {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Show reader and RSS icons specifically */
+.UrlBar-AddressField .ToolbarButton-Button[title*="Feed"],
+.UrlBar-AddressField .ToolbarButton-Button[title*="Reader"],
+.UrlBar-AddressField .ToolbarButton-Button[title*="RSS"] {
+  display: flex !important;
+  opacity: 1 !important;
 }
 
 /* Removed expand animation - was causing movement on focus */
@@ -105,20 +128,13 @@ body.transparent-tabbar .UrlBar-AddressField:focus-within,
   color: inherit;
 }
 
-@container style(--zen-addressbar-enabled: off) {
-  .UrlBar-UrlField {
-    padding: 8px 12px;
-  }
-}
+/* Note: @container style() queries don't work in Vivaldi/Chromium */
 
 .UrlBar-UrlField::placeholder {
   color: var(--colorTextSecondary, #999);
 }
 
-.UrlBar-AddressField:focus-within {
-  position: relative;
-  z-index: var(--z-overlay);
-}
+/* Note: focus-within z-index is set in main .UrlBar-AddressField:focus-within rule above */
 
 
 /* .UrlBar-AddressField {

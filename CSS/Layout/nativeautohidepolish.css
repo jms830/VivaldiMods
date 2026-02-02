@@ -45,6 +45,13 @@ Fixes: Transparent skin support for address bar autohide (ynomas92-ctrl forum re
   background-color: var(--colorTabBar, var(--colorBg)) !important;
 }
 
+/* Top address BAR inner elements - transparent background */
+.auto-hide-wrapper.top .toolbar-mainbar,
+.auto-hide-wrapper.top .mainbar {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
 /* ============================================ */
 /* Transparent Skin Support                    */
 /* ============================================ */
@@ -72,6 +79,17 @@ body.transparent-tabbar .auto-hide-wrapper.top,
   background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.85)) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+}
+
+/* Top address BAR - all inner elements transparent when in transparent mode */
+body.transparent-tabbar .auto-hide-wrapper.top .toolbar-mainbar,
+body.transparent-tabbar .auto-hide-wrapper.top .mainbar,
+body.transparent-tabbar .auto-hide-wrapper.top #header,
+.transparent-tabbar .auto-hide-wrapper.top .toolbar-mainbar,
+.transparent-tabbar .auto-hide-wrapper.top .mainbar,
+.transparent-tabbar .auto-hide-wrapper.top #header {
+  background-color: transparent !important;
+  background: transparent !important;
 }
 
 /* Alternative: When accent is transparent (some themes use this) */
