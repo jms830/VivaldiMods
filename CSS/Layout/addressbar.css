@@ -78,6 +78,11 @@ body.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField {
   overflow: visible !important;
 }
 
+/* Remove isolation when OmniDropdown is present - prevents clipping */
+.UrlBar-AddressField:has(.OmniDropdown) {
+  isolation: auto !important;
+}
+
 /* OmniDropdown styling - MUST be above all tab elements */
 .OmniDropdown {
   position: relative !important;
