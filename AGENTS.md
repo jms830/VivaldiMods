@@ -243,6 +243,57 @@ document.body.appendChild(this.host_);
 
 **File**: `Javascripts/Other/picture-in-picture.js`
 
+### OmniDropdown (URL Autocomplete) Clipping at Sidebar Edge (Vivaldi 7.8+, Feb 2026)
+
+**Symptom**: When typing in the URL bar with tabs on left/right, the autocomplete dropdown (OmniDropdown) is clipped at the sidebar edge instead of extending into the content area.
+
+**Root Cause**: TWO separate issues creating **containing blocks** that clip positioned descendants:
+
+1. **selectSearch.js**: `transform: translateY(-5px)` on `.search-engines-in-address-bar`
+2. **nativeautohidepolish.css**: `backdrop-filter: blur(12px)` on `.auto-hide-wrapper`
+
+Both `transform` and `backdrop-filter` create **stacking contexts** and **containing blocks**, which clip `position: absolute` descendants (OmniDropdown).
+
+**CSS Properties That Create Containing Blocks**:
+- `transform` (any value except `none`)
+- `filter` / `backdrop-filter` (any value except `none`)
+- `will-change: transform` or `will-change: filter`
+- `perspective` (any value except `none`)
+- `contain: paint` or `contain: layout`
+
+**Solution**:
+
+1. **Disable selectSearch.js** (user preference - adds clutter to dropdown):
+   ```bash
+   # In custom.js, comment out the selectSearch.js section:
+   sed -i '11866s|^|/* DISABLED: |; 12314s|$| */|' \
+     "/mnt/c/Users/jordans/AppData/Local/Vivaldi/Application/<version>/resources/vivaldi/custom.js"
+   ```
+
+2. **CSS Fix** (already in `nativeautohidepolish.css` lines 157-167):
+   ```css
+   .auto-hide-wrapper.left:has(.OmniDropdown),
+   .auto-hide-wrapper.right:has(.OmniDropdown),
+   .auto-hide-wrapper.top:has(.OmniDropdown) {
+     overflow: visible !important;
+     backdrop-filter: none !important;
+     -webkit-backdrop-filter: none !important;
+   }
+   ```
+
+**How we found it**:
+1. Disabled all CSS → clipping persisted → suspected JS mod
+2. Bisected JS mods → isolated selectSearch.js
+3. Disabling selectSearch helped but didn't fix 100% → suspected CSS too
+4. Searched for `backdrop-filter` in active CSS → found `.auto-hide-wrapper`
+5. Added `.top` to existing fix (was only `.left` and `.right`)
+
+**Key Insight**: When debugging clipping issues, always check for properties that create containing blocks, not just `overflow: hidden` or `clip-path`.
+
+**Files**:
+- `CSS/Layout/nativeautohidepolish.css` (lines 157-167)
+- `Javascripts/Tam710562/selectSearch.js` (disable in custom.js)
+
 ### CSS @import Case Sensitivity on Linux/WSL (Jan 2026)
 
 **Symptom**: CSS files fail to load with `ERR_FAILED` in DevTools console. Example errors:
