@@ -1,394 +1,181 @@
 /*
 Addressbar Styling
-version 2026.02.01
-Author PaRr0tBoY + Zen Browser enhancements
-Zen Browser style: pill-shaped, generous padding, clean elevation
+version 2026.02.02
+MINIMAL VERSION - debugging clipping issue
 */
 
-/* Base address bar - Zen styling applied directly */
+/* ============================================ */
+/* THEME-AWARE GLASS VARIABLES                 */
+/* ============================================ */
+
+.theme-dark {
+  --zen-url-bg: rgba(255, 255, 255, 0.03);
+  --zen-url-bg-hover: rgba(255, 255, 255, 0.06);
+  --zen-url-bg-focus: rgba(255, 255, 255, 0.08);
+}
+
+.theme-light {
+  --zen-url-bg: rgba(0, 0, 0, 0.03);
+  --zen-url-bg-hover: rgba(0, 0, 0, 0.06);
+  --zen-url-bg-focus: rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================ */
+/* ZEN-STYLE URL BAR - MINIMAL                 */
+/* Just visual styling, no layout changes      */
+/* ============================================ */
+
 .UrlBar-AddressField {
-  position: relative !important;
-  left: 0 !important;
-  right: auto !important;
-  /* IMPORTANT: Only transition visual properties, NOT position/size to prevent movement */
-  transition: 
-    background-color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1),
-    border-color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: visible;
-  isolation: isolate;
-  border-radius: var(--zen-addressbar-radius, 16px) !important;
-  background-color: var(--zen-addressbar-bg, rgba(255, 255, 255, 0.06)) !important;
-  box-shadow: var(--zen-addressbar-shadow, 0 2px 8px rgba(0, 0, 0, 0.15));
-  padding: 2px;
-  /* Prevent any lateral movement */
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: none !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background-color: var(--zen-url-bg) !important;
+  transition: background-color 0.15s ease;
+  isolation: isolate !important;
+  -webkit-font-smoothing: antialiased !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-.UrlBar-AddressField:hover:not(:focus-within) {
-  background-color: var(--zen-addressbar-bg-hover, rgba(255, 255, 255, 0.1)) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.UrlBar-AddressField:hover {
+  background-color: var(--zen-url-bg-hover) !important;
 }
 
-/* Focus state - elevate without moving */
 .UrlBar-AddressField:focus-within {
-  background-color: var(--zen-addressbar-bg-focus, #2a2a2a) !important;
-  box-shadow: var(--zen-addressbar-shadow-focus, 0 8px 24px rgba(0, 0, 0, 0.4)) !important;
-  z-index: var(--z-overlay, 1000) !important;
-  /* Prevent any position changes on focus */
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: none !important;
+  background-color: var(--zen-url-bg-focus) !important;
 }
 
-/* Inner URL field padding */
-.UrlBar-UrlField {
-  padding: var(--zen-addressbar-padding, 10px 16px) !important;
-}
-
-/* Transparent tabbar mode - glass effect */
+/* Override transparent tabbar backdrop-filter - causes text ghosting */
+.transparent-tabbar .UrlBar-AddressField,
 body.transparent-tabbar .UrlBar-AddressField,
-.transparent-tabbar .UrlBar-AddressField {
-  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.7)) !important;
-  backdrop-filter: blur(12px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
-}
-
-body.transparent-tabbar .UrlBar-AddressField:hover:not(:focus-within),
-.transparent-tabbar .UrlBar-AddressField:hover:not(:focus-within) {
-  background-color: var(--colorBgAlpha, rgba(40, 40, 40, 0.8)) !important;
-}
-
-body.transparent-tabbar .UrlBar-AddressField:focus-within,
-.transparent-tabbar .UrlBar-AddressField:focus-within {
-  background-color: var(--colorBgAlpha, rgba(25, 25, 25, 0.92)) !important;
-  backdrop-filter: blur(20px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(200%) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* #browser:has(.UrlBar-AddressField:focus-within) .ToolbarButton-Button{
-  display: none !important;
-} */
-
-/* Note: @container style() queries don't work in Vivaldi/Chromium - removed dead code */
-
-.UrlBar-AddressField:focus-within .OmniDropdown{
-  /* padding: 0px auto auto;
-  margin: 0px auto auto; */
-  margin-top: 20px;
-  background-color: var(--colorBgLighter, #2a2a2a) !important;
-  border: unset;
-  /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); */
-}
-/* .UrlBar-AddressField.dark:focus-within {
-  background: var(--colorBgDark, #2a2a2a);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-} */
-
-.UrlBar-UrlFieldWrapper {
-  position: relative;
-  z-index: var(--z-base);
+.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField,
+body.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: var(--colorBg) !important;
 }
 
 /* ============================================ */
-/* ZEN-STYLE MINIMAL URL BAR                   */
-/* Icons always visible but subtle             */
-/* NO LAYOUT SHIFT on focus                    */
+/* ALLOW URL BAR TO OVERFLOW TABBAR            */
+/* When focused, URL bar can extend beyond     */
+/* the sidebar/tabbar container bounds         */
 /* ============================================ */
 
-.toolbar.toolbar-insideinput {
-  z-index: var(--z-base);
-  display: flex !important;
-  flex-shrink: 0 !important;
+/* Parent containers: allow overflow when URL bar is focused */
+#tabs-tabbar-container:has(.UrlBar-AddressField:focus-within),
+.toolbar-tabbar-before:has(.UrlBar-AddressField:focus-within),
+.auto-hide-wrapper:has(.UrlBar-AddressField:focus-within) {
   overflow: visible !important;
-  /* Keep visible but subtle - NO max-width change to prevent shift */
-  opacity: 0.4;
-  padding: 0 4px !important;
-  transition: opacity var(--fast-animation-speed, 140ms) ease-out;
 }
 
-/* Brighten icons on URL field focus */
-.UrlBar-AddressField:focus-within .toolbar.toolbar-insideinput {
-  opacity: 1;
+/* URL bar gets higher z-index when focused to appear above everything */
+.UrlBar-AddressField:focus-within {
+  z-index: 9999 !important;
+  position: relative !important;
 }
 
-/* Hover also brightens icons */
-.UrlBar-AddressField:hover .toolbar.toolbar-insideinput {
-  opacity: 0.7;
+.UrlBar-AddressField .UrlBar-UrlFieldWrapper,
+.UrlBar-AddressField .UrlBar-UrlFieldWrapper > .observer {
+  overflow: visible !important;
 }
 
-/* Ensure buttons inside URL field work */
-.UrlBar-AddressField .ToolbarButton-Button {
+/* OmniDropdown styling - MUST be above all tab elements */
+.OmniDropdown {
+  position: relative !important;
+  z-index: 2147483647 !important;
+  border-radius: 8px !important;
+  background-color: var(--colorBg) !important;
+  border: 1px solid var(--colorBorder, rgba(255,255,255,0.1)) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  isolation: isolate !important;
+}
+
+.OmniDropdown .search-engines-in-address-bar {
+  background-color: var(--colorBg) !important;
   display: flex !important;
-  visibility: visible !important;
+  gap: 4px !important;
+  padding: 8px !important;
+  border-bottom: 1px solid var(--colorBorder, rgba(255,255,255,0.1)) !important;
+}
+
+.OmniDropdown .search-engine-button {
+  background: transparent !important;
+  border: none !important;
+  padding: 4px !important;
+  border-radius: 4px !important;
+}
+
+.OmniDropdown .search-engine-button:hover {
+  background: rgba(255,255,255,0.1) !important;
+}
+
+.OmniDropdown .OmniDropdown-Collection {
+  background-color: var(--colorBg) !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 4px 0 !important;
+}
+
+.OmniDropdown .OmniLinkItem {
+  background-color: var(--colorBg) !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  cursor: pointer !important;
+}
+
+.OmniDropdown .OmniLinkItem:hover,
+.OmniDropdown .OmniLinkItem--Highlighted {
+  background-color: rgba(255,255,255,0.08) !important;
+}
+
+.OmniDropdown .OmniLinkItem-DisplayText {
+  flex: 1 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.OmniDropdown .OmniLinkItem-Badge {
   flex-shrink: 0 !important;
+  margin-left: 8px !important;
+  opacity: 0.6 !important;
+  font-size: 0.85em !important;
 }
 
-/* Removed expand animation - was causing movement on focus */
-
-.UrlBar-UrlField {
-  background: transparent;
-  border: none;
-  outline: none;
-  width: 100%;
-  font-size: 14px;
-  color: inherit;
+/* Ensure tab-strip doesn't overlap URL bar when focused */
+.UrlBar-AddressField:focus-within ~ #tabs-container,
+.toolbar-tabbar-before:has(.UrlBar-AddressField:focus-within) ~ #tabs-container {
+  z-index: 1 !important;
 }
 
-/* Note: @container style() queries don't work in Vivaldi/Chromium */
-
-.UrlBar-UrlField::placeholder {
-  color: var(--colorTextSecondary, #999);
+/* Suppress pinned tab z-index when URL bar dropdown is visible */
+body:has(.OmniDropdown) #tabs-container .tab-strip .is-pinned .tab-wrapper {
+  z-index: 1 !important;
 }
 
-/* Note: focus-within z-index is set in main .UrlBar-AddressField:focus-within rule above */
+/* ============================================ */
+/* URL FRAGMENT COLORING                       */
+/* ============================================ */
 
-
-/* .UrlBar-AddressField {
-	background-color: var(--immersive-bg-color) !important;
-	color: var(--immersive-text-color) !important;
-	transition: background-color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1),
-	            color var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-#tabs-container {
-	background-color: var(--immersive-bg-color) !important;
-}
-
-.bookmark-bar {
-	background-color: rgba(
-		var(--immersive-bg-r),
-		var(--immersive-bg-g),
-		var(--immersive-bg-b),
-		0.9
-	) !important;
-	color: var(--immersive-text-color) !important;
-}
-
-#panels-container {
-	background: linear-gradient(
-		to bottom,
-		var(--immersive-bg-color),
-		transparent
-	) !important;
-} */
-
-/*
-Addressfield Theming
-version 2022.2.2
-https://forum.vivaldi.net/post/356714
-Changes the colors of the hostfragments, the certified siteinfo button, the
-icons for blocked content and the bookmark button in the addressfield.
-*/
-
-.UrlFragment-Wrapper,
-.UrlFragment--Lowlight:first-of-type {
-  color: var(--colorFgFaded);
-}
 .UrlFragment-HostFragment-Basedomain,
 .UrlFragment-HostFragment-TLD {
-  color: var(--colorFgIntense) !important;
-  font-weight: bold;
+  color: var(--colorFg) !important;
 }
+
 .UrlFragment-HostFragment-Subdomain {
-  color: var(--colorHighlightBg) !important;
-  font-weight: bold;
-}
-.SiteInfoButton.certified {
-  fill: var(--colorHighlightBgDark);
-  color: var(--colorHighlightBg);
-}
-.SiteInfoButton.certified:hover,
-.SiteInfoButton.certified:focus:not([tabindex="-1"]),
-.SiteInfoButton.certified:active {
-  fill: var(--colorHighlightBg);
-}
-.SiteInfoButton .siteinfo-text {
-	display: none;
-}
-.bookmark-animated-fill {
-  fill: var(--colorFg) !important;
-}
-.permission-denied circle {
-  fill: var(--colorHighlightBg);
-}
-.permission-denied path {
-  fill: var(--colorHighlightFg);
+  color: var(--colorFgFaded) !important;
 }
 
-/* https://forum.vivaldi.net/topic/31743/accent-transitions */
-/* Adds transition to address accent */
-#browser:not(.tabs-top) #header {
-    transition: background-color var(--slow-animation-speed);
-}
-#browser.color-behind-tabs-off:not(.tabs-top) {
-    transition: background-color var(--slow-animation-speed);
-}
-.color-behind-tabs-off .toolbar-mainbar {
-    transition: background-color var(--slow-animation-speed);
-}
-.color-behind-tabs-off.address-top .toolbar-mainbar:after {
-    transition: background-color var(--slow-animation-speed);
-}
-.color-behind-tabs-off.address-bottom .toolbar-mainbar {
-    transition: background-color var(--slow-animation-speed), box-shadow var(--slow-animation-speed);
-}
-.color-behind-tabs-off #tabs-container.top,
-.color-behind-tabs-off #tabs-container.bottom {
-    transition: border-color var(--slow-animation-speed);
-}
+/* ============================================ */
+/* HIDE CLUTTER                                */
+/* ============================================ */
 
-/* Port From Main.css */
-
-/* .toolbar.toolbar-small.toolbar-insideinput {
-  display: none !important;
-} */
-
-/* URL obfuscation warning */
-.UrlBar-UrlObfuscationWarning {
-  display: none !important;
-}
-
-/* .ToolbarButton-Button{
-  display: none !important;
-} */
-/* Content blocker */
-/* .UrlBar-AddressField .ToolbarButton-Button[title*="Feed"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="Reader"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="Translate"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="订阅"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="阅读"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="翻译"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="页面"] {
-  display: none !important;
-} */
-.UrlBar-AddressField .ToolbarButton-Button[title*="Bookmark"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="书签"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="Block"],
-.UrlBar-AddressField .ToolbarButton-Button[title*="拦截"] {
-  display: none !important;
-}
-
-/* Site info button and badge */
+.UrlBar-UrlObfuscationWarning,
 button.button-addressfield.SiteInfoButton,
-.SiteInfoButton-SecurityBadge {
-  display: none !important;
-}
-
-/* Bookmark button */
+.SiteInfoButton-SecurityBadge,
 .BookmarkButton {
   display: none !important;
-}
-
-/* Show input history button */
-button[title="显示输入记录"] {
-  display: none !important;
-}
-
-/* ========================================
-   TOOLBAR & ADDRESS BAR STYLING
-   ======================================== */
-
-/* Address field center alignment */
-/* #urlFieldInput {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px !important;
-} */
-
-/* URL fragment wrapper positioning */
-/* .UrlFragment-Wrapper {
-  position: absolute;
-  left: 45%;
-  transform: translateX(-50%);
-} */
-
-/* Address field styling */
-/* .UrlBar-SearchField,
-.UrlBar-AddressField {
-  border-radius: var(--radius);
-  height: auto;
-  overflow: visible !important;
-}
-
-.UrlBar-SearchField .pageload-indicator,
-.UrlBar-AddressField .pageload-indicator {
-  border-radius: var(--radius);
-  height: 100% !important;
-}
-
-.UrlField {
-  flex: 0 0 auto !important;
-  width: auto !important;
-  max-width: 100%;
-  height: calc(var(--mod-mainbar-height) - (var(--mod-whitespace-y) * 2));
-} */
-
-.UrlBar-AddressField {
-  /* background: var(--colorAccentBgDark) !important; */
-  border-color: transparent !important;
-}
-
-.UrlBar-UrlFieldWrapper {
-  height: auto !important;
-}
-
-[class*="button-popup"] {
-  border-radius: var(--radius) !important;
-}
-
-.density-on .UrlBar-SearchField,
-.density-on .UrlBar-AddressField {
-  height: auto;
-}
-
-.UrlFragment--Highlight {
-  color: var(--ColorFg);
-}
-
-.UrlFragment-Wrapper--ShouldHighlight {
-  --HighlightColor: none;
-  --LowlightColor: none;
-}
-
-.mainbar .toolbar-mainbar button.ToolbarButton-Button {
-  height: unset !important;
-  min-width: unset !important;
-  align-self: center !important;
-}
-
-/* ========================================
-   MAINBAR & ADDRESS FIELD STYLING
-   ======================================== */
-
-/* Mainbar styling - height REMOVED to fix blank space with native auto-hide (Vivaldi 7.8+) */
-.mainbar .toolbar-mainbar {
-  align-items: center !important;  /* Center all toolbar items vertically */
-  border: none !important;
-}
-/* padding: var(--mod-whitespace-y) !important; */
-
-.color-behind-tabs-off .mainbar {
-  border: none !important;
-  border-color: transparent !important;
-  &:not(:has(.UrlBar-AddressField:focus-within)){
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  }
-}
-
-/* Omni dropdown positioning */
-.OmniDropdown {
-  top: 100% !important;
-}
-
-/* Profile popup positioning */
-.toolbar-mainbar .profile-popup {
-  margin-right: var(--mod-whitespace-tabbar-right);
 }

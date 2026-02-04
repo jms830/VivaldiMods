@@ -25,34 +25,24 @@ Granular controls for individual element visibility
   flex-shrink: 0;
 }
 
-/* Always visible elements - consistent sizes, no shrinking, NO MOVEMENT */
+/* Always visible elements - just keep visible, let Vivaldi handle sizing */
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField {
   opacity: 1 !important;
-  min-height: 36px !important;
-  height: 36px !important;
-  max-height: 36px !important;
+  min-height: 34px !important;
+  max-height: none !important;
   overflow: visible !important;
-  flex-shrink: 0 !important;
-  width: 100% !important;
-  /* Prevent any movement on state changes */
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: none !important;
-  /* Only animate visual properties */
-  transition: 
-    background-color var(--animation-speed, 260ms) ease-out,
-    box-shadow var(--animation-speed, 260ms) ease-out !important;
+  flex: 1 1 auto !important;
 }
 
-.toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .UrlBar-AddressField:focus-within {
-  z-index: var(--z-overlay, 1000) !important;
+/* Ensure URL bar internal elements aren't collapsed and can overflow */
+.toolbar.toolbar-tabbar-before .UrlBar-AddressField > *,
+.toolbar.toolbar-tabbar-before .UrlBar-UrlFieldWrapper,
+.toolbar.toolbar-tabbar-before .UrlBar-UrlFieldWrapper > .observer,
+.toolbar.toolbar-tabbar-before .UrlBar-UrlField {
+  opacity: 1 !important;
+  min-height: auto !important;
+  max-height: none !important;
   overflow: visible !important;
-  /* Explicitly prevent movement on focus */
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: none !important;
-  /* Keep width stable - don't change on focus */
-  width: 100% !important;
 }
 
 .toolbar.toolbar-tabbar-before.toolbar-large.toolbar-droptarget .workspace-popup {
@@ -153,40 +143,4 @@ body:has(
   align-content: flex-end;
   min-height: 35px !important;
   min-width: 100% !important;
-}
-
-/* Allow address bar to overflow tabbar when focused */
-#tabs-tabbar-container:has(.UrlBar-AddressField:focus-within) {
-  overflow: visible !important;
-  z-index: var(--z-overlay, 1000) !important;
-}
-
-#tabs-tabbar-container:has(.UrlBar-AddressField:focus-within) .toolbar-tabbar-before {
-  overflow: visible !important;
-  z-index: var(--z-overlay, 1000) !important;
-}
-
-/* Ensure URL field inner content shows full URL and icons */
-.toolbar.toolbar-tabbar-before .UrlBar-AddressField .UrlBar-UrlFieldWrapper {
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  overflow: visible !important;
-}
-
-/* 
- * Zen-style: toolbar icons hidden by default, shown on focus 
- * (See addressbar.css for the main implementation)
- * These rules ensure it works in the sidebar tabbar context
- */
-.toolbar.toolbar-tabbar-before .UrlBar-AddressField .toolbar-insideinput {
-  display: flex !important;
-  flex-shrink: 0 !important;
-  overflow: visible !important;
-  /* Hidden by default - addressbar.css handles the show/hide */
-}
-
-/* Show URL icons in sidebar tabbar when focused */
-.toolbar.toolbar-tabbar-before .UrlBar-AddressField:focus-within .ToolbarButton-Button {
-  display: flex !important;
-  flex-shrink: 0 !important;
 }

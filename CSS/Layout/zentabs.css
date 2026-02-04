@@ -1,37 +1,75 @@
 /*
 Zen Browser-Style Tabs
-version 2026.02.01 - Fourth Pass
+version 2026.02.02 - Sixth Pass
 The Zen formula: inactive = invisible, active = visible
 Visual hierarchy through CONTRAST, not addition
 */
 
 /* ============================================ */
 /* ACCORDION VIEW FIX                          */
-/* Remove excessive spacing in accordion mode  */
+/* Target ONLY accordion elements              */
+/* DO NOT change the entire tab-strip layout!  */
 /* ============================================ */
 
-/* Accordion tabs should not have pinned-tab-height */
-.tab-position.accordion-toggle-arrow .tab-wrapper,
-.tab-position.accordion .tab-wrapper {
-  min-height: auto !important;
-  max-height: none !important;
-  height: auto !important;
-}
+/* 
+ * IMPORTANT: We must NOT use rules like:
+ *   #tabs-container .tab-strip:has(.accordion-toggle-arrow) { display: flex... }
+ * This breaks the grid layout for pinned tabs!
+ * Instead, target ONLY the accordion elements specifically.
+ */
 
-/* Remove gaps in accordion view */
-.tab-strip:has(.accordion-toggle-arrow) {
-  gap: 2px !important;
-}
-
-/* Accordion arrow tabs - compact */
+/* Accordion toggle header - remove colored outline, constrain width */
 .tab-position.accordion-toggle-arrow {
-  margin: 0 !important;
-  padding: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
-/* Accordion children - no extra height */
-.tab-position.accordion-toggle-arrow ~ .tab-position {
-  min-height: auto !important;
+.tab-position.accordion-toggle-arrow .tab-wrapper {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  /* Center the content including arrow */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Remove colored borders/outlines from accordion header */
+.tab-position.accordion-toggle-arrow,
+.tab-position.accordion-toggle-arrow .tab,
+.tab-position.accordion-toggle-arrow .tab-wrapper,
+.tab-position.accordion-toggle-arrow .tab-header {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Accordion children - remove colored outlines */
+.tab-wrapper.accordion,
+.tab-wrapper.in-accordion,
+.tab-wrapper.extended.in-accordion {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Tab positions containing accordion wrappers */
+.tab-position:has(.tab-wrapper.accordion),
+.tab-position:has(.tab-wrapper.in-accordion) {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Center the accordion arrow (it's typically an ::after pseudo-element) */
+.tab-position.accordion-toggle-arrow .tab::after,
+.tab-position.accordion-toggle-arrow .tab-wrapper::after {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 /* ============================================ */

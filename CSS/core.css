@@ -18,14 +18,15 @@ You may manage and config all your css mods and config them as well all in this 
 @import "Layout/main.css";
 @import "Layout/neatdial.css";
 @import "Layout/favouritetabs.css";
-@import "Layout/addressbar.css";
+/* BISECT: Comment out to isolate clipping issue */
+/* @import "Layout/addressbar.css"; */
 @import "Layout/findinpage.css";
 @import "Layout/quickcommand.css";
 @import "Layout/downloadpanel.css";
 @import "Layout/extensionspanel.css";
 @import "Layout/workspacebuttons.css";
-@import "Layout/nativeautohidepolish.css";
-@import "Layout/toolbarautohide.css";
+/* @import "Layout/nativeautohidepolish.css"; */
+/* @import "Layout/toolbarautohide.css"; */
 @import "Layout/zentabs.css";
 /* @import "Layout/twolevel-tabstack.css"; */
 /* @import "Layout/themepreviewer.css"; */
@@ -122,15 +123,6 @@ You may manage and config all your css mods and config them as well all in this 
   --toolbar-show-settings: 0;
   --toolbar-show-vbutton: 0;
 
-  --zen-addressbar-enabled: on;
-  --zen-addressbar-radius: 16px;
-  --zen-addressbar-padding: 12px 18px;
-  --zen-addressbar-bg: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.06));
-  --zen-addressbar-bg-hover: var(--colorBgAlphaHeavy, rgba(255, 255, 255, 0.08));
-  --zen-addressbar-bg-focus: var(--colorBgLighter, #2a2a2a);
-  --zen-addressbar-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  --zen-addressbar-shadow-focus: 0 8px 24px rgba(0, 0, 0, 0.3);
-
   /* Zen Tab Styling */
   --zen-tab-radius: 10px;
   --zen-tab-active-bg: rgba(255, 255, 255, 0.1);
@@ -162,4 +154,30 @@ You may manage and config all your css mods and config them as well all in this 
   --mod-whitespace-y: 5px;
   --mod-whitespace-tabbar-right: 15px;
   --mod-mainbar-height: 25px;
+}
+
+/* ============================================
+   TEST: Make dropdown viewport-relative + remove transforms
+   ============================================ */
+.OmniDropdown {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+}
+
+#browser:has(.OmniDropdown) #tabs-container,
+#browser:has(.OmniDropdown) #tabs-tabbar-container,
+#browser:has(.OmniDropdown) .tabbar-wrapper,
+#browser:has(.OmniDropdown) .toolbar-tabbar-before,
+#browser:has(.OmniDropdown) .toolbar,
+#browser:has(.OmniDropdown) .mainbar,
+#browser:has(.OmniDropdown) .UrlBar-AddressField,
+#browser:has(.OmniDropdown) .UrlBar-UrlFieldWrapper,
+#browser:has(.OmniDropdown) .observer,
+#browser:has(.OmniDropdown) .UrlField {
+  overflow: visible !important;
+  clip-path: none !important;
+  contain: none !important;
+  transform: none !important;
+  perspective: none !important;
+  filter: none !important;
 }

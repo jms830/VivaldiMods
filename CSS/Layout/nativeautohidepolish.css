@@ -65,7 +65,6 @@ Fixes: Transparent skin support for address bar autohide (ynomas92-ctrl forum re
 /* Top address BAR inner elements - transparent background */
 .auto-hide-wrapper.top .toolbar-mainbar,
 .auto-hide-wrapper.top .mainbar {
-  background-color: transparent !important;
   background: transparent !important;
 }
 
@@ -105,7 +104,6 @@ body.transparent-tabbar .auto-hide-wrapper.top #header,
 .transparent-tabbar .auto-hide-wrapper.top .toolbar-mainbar,
 .transparent-tabbar .auto-hide-wrapper.top .mainbar,
 .transparent-tabbar .auto-hide-wrapper.top #header {
-  background-color: transparent !important;
   background: transparent !important;
 }
 
@@ -147,6 +145,25 @@ body.transparent-tabbar .auto-hide-wrapper.top #header,
 }
 
 /* ============================================ */
+/* URL Bar Overflow Fix                        */
+/* ============================================ */
+
+/*
+ * Problem: backdrop-filter creates a stacking context that clips OmniDropdown
+ * even with overflow: visible. The dropdown cannot extend beyond the sidebar.
+ * 
+ * Solution: Disable backdrop-filter AND set overflow visible when URL bar focused.
+ */
+.auto-hide-wrapper.left:has(.UrlBar-AddressField:focus-within),
+.auto-hide-wrapper.right:has(.UrlBar-AddressField:focus-within),
+.auto-hide-wrapper.left:has(.OmniDropdown),
+.auto-hide-wrapper.right:has(.OmniDropdown) {
+  overflow: visible !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ============================================ */
 /* Inner Element Rounding                      */
 /* ============================================ */
 
@@ -162,19 +179,15 @@ body.transparent-tabbar .auto-hide-wrapper.top #header,
   border-radius: calc(var(--radius, 12px) * 0.6) !important;
 }
 
-/* Address bar in auto-hide wrapper with transparent tabbar */
+/* Address bar in auto-hide wrapper with transparent tabbar - NO backdrop-filter (causes text ghosting) */
 body.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField,
 .transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField {
-  background-color: var(--colorBgAlpha, rgba(40, 40, 40, 0.7)) !important;
-  backdrop-filter: blur(8px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
+  background-color: var(--colorBg) !important;
 }
 
 body.transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField:focus-within,
 .transparent-tabbar .auto-hide-wrapper .UrlBar-AddressField:focus-within {
-  background-color: var(--colorBgAlpha, rgba(30, 30, 30, 0.9)) !important;
-  backdrop-filter: blur(12px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  background-color: var(--colorBg) !important;
 }
 
 /* ============================================ */
