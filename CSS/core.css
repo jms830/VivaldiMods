@@ -24,11 +24,11 @@ You may manage and config all your css mods and config them as well all in this 
 @import "Layout/quickcommand.css";
 @import "Layout/downloadpanel.css";
 @import "Layout/extensionspanel.css";
-/* @import "Layout/workspacebuttons.css"; */
+@import "Layout/workspacebuttons.css";
 /* @import "Layout/nativeautohidepolish.css"; */
 /* @import "Layout/toolbarautohide.css"; */
 /* @import "Layout/zentabs.css"; */
-/* @import "Layout/twolevel-tabstack.css"; */
+@import "Layout/twolevel-tabstack.css";
 /* @import "Layout/themepreviewer.css"; */
 
 /* Import EnhancedUX folder CSS files */

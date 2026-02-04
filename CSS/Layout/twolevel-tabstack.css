@@ -1,88 +1,52 @@
-/*
-Two-Level Tab Stack Peek
-version 2026.01.31
-Ported from PaRr0tBoY/Awesome-Vivaldi (Bettert2LevelTabStack.css)
-https://github.com/PaRr0tBoY/Awesome-Vivaldi
-
-Creates an interactive hover-to-expand behavior for 2-level tab stacks:
-- Main tabs container (#tabs-container) starts at 18% width
-- Secondary tabs (#tabs-subcontainer) takes 82% width
-- On hover, main expands to 82% and secondary shrinks to 18%
-- Smooth transitions with 300ms delay before expanding
-
-REQUIREMENTS:
-- Vivaldi 7.8+ with 2-level tab stacks enabled
-- Vertical tabs (left or right position)
-- Settings > Tabs > Tab Stacking > Two-Level Tab Stacks
-*/
-
-/* ============================================ */
-/* Two-Level Tab Stack Width Distribution      */
-/* ============================================ */
-
-/* Default state: main tabs collapsed (18%), secondary expanded (82%) */
-body:has(#tabs-subcontainer) #tabs-container {
-  max-width: 18%;
-  min-width: 18%;
+body:has(#tabs-subcontainer) #tabs-container{
+  max-width:18%;
+  min-width:18%;
   transition: min-width 200ms ease-in, max-width 200ms ease-in;
 }
 
-body:has(#tabs-container) #tabs-subcontainer {
-  max-width: 82%;
-  min-width: 82%;
+body:has(#tabs-container) #tabs-subcontainer{
+  max-width:82%;
+  min-width:82%;
   transition: min-width 200ms ease-in, max-width 200ms ease-in;
   transform-origin: left center !important;
 }
 
-/* ============================================ */
-/* Hover State: Expand Main Tabs               */
-/* ============================================ */
-
-/* On hover: main tabs expand (82%), secondary collapses (18%) */
-body:has(#tabs-subcontainer) #tabs-container:hover {
-  max-width: 82% !important;
-  min-width: 82% !important;
+body:has(#tabs-subcontainer) #tabs-container:hover
+{
+  max-width:82% !important;
+  min-width:82% !important;
   transition: min-width 200ms ease-out 300ms, max-width 200ms ease-out 300ms;
 }
 
-body:has(#tabs-container:hover) #tabs-subcontainer {
-  max-width: 18% !important;
-  min-width: 18% !important;
+body:has(#tabs-container:hover) #tabs-subcontainer{
+  max-width:18% !important;
+  min-width:18% !important;
   transition: min-width 200ms ease-out 300ms, max-width 200ms ease-out 300ms;
 }
 
-/* ============================================ */
-/* Container Queries for Responsive UI         */
-/* ============================================ */
+#tabs-tabbar-container{
+}
 
-#tabs-container {
+#tabs-container{
   container-type: inline-size;
   container-name: tabs-container;
 }
 
-/* Hide toolbar buttons when tabs area is too narrow */
 @container tabs-container (max-width: 100px) {
-  .toolbar-large .ToolbarButton-Button {
+  .toolbar-large .ToolbarButton-Button{
     display: none !important;
   }
 }
 
-/* ============================================ */
-/* Scrollbar and UI Cleanup                    */
-/* ============================================ */
-
-/* Hide scrollbars for vertical tab bars */
 #browser #tabs-tabbar-container.left ::-webkit-scrollbar,
 #browser #tabs-tabbar-container.right ::-webkit-scrollbar {
   display: none;
 }
 
-/* Disable tab bar resizing when auto-hide is active */
-body:has(.auto-hide-wrapper) #tabs-tabbar-container .SlideBar {
+#tabs-tabbar-container .SlideBar {
   display: none !important;
 }
 
-/* Hide accordion arrow for right-side tabs in density mode */
 .tabs-right#browser.density-on .accordion-toggle-arrow:after,
 .tabs-right#browser.density-on .tab-wrapper:after {
   display: none !important;
