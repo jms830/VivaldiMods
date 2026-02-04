@@ -1,0 +1,62 @@
+/* DynamicNeonTab - Dynamic Effects for Vivaldi (Neon Theme)
+ * Source: https://github.com/ELGUAPOLIFE/Zen-Theme-CSS-for-Vivaldi-Browser
+ * 
+ * Adds animated neon gradient effect to active tab with glow effects
+ * on hover and button interactions.
+ *
+ * NOTE: This mod may conflict with tab styling in:
+ * - Layout/zentabs.css (Zen-style tab styling)
+ * - EnhancedUX/tabstrail.css (tab hover effects)
+ * 
+ * Consider which visual style you prefer before enabling.
+ */
+
+/* Smooth transitions for all tabs */
+.tab {
+    transition:
+        background 0.4s ease,
+        transform 0.2s ease,
+        box-shadow 0.4s ease;
+}
+
+/* Glow & scale on hover (inactive tabs only) */
+
+/*
+.tab:not(.active):hover {
+    background-color: rgba(0, 255, 200, 0.08) !important;
+    transform: scale(1.04);
+    box-shadow: 0 0 12px rgba(0, 255, 200, 0.9);
+}
+*/
+
+/* Active tab with animated neon gradient */
+@keyframes activeTabGradient {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+.tab.active {
+    background: linear-gradient(270deg, #00fff7, #ff00f7);
+    background-size: 200% 200%;
+    animation: activeTabGradient 3s linear infinite;
+    color: white !important;
+    text-shadow: 0 0 6px #00fff7, 0 0 10px #ff00f7;
+    box-shadow: 0 0 15px rgba(255, 0, 247, 0.9), 0 0 25px rgba(0, 255, 247, 0.7);
+}
+
+/* Click bounce effect */
+.tab:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+/* Slight lift when hovering over buttons */
+.button-toolbar:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease;
+}
+
+/* Neon glow on button hover */
+.button-toolbar:hover .button-icon {
+    filter: drop-shadow(0 0 6px #00fff7) drop-shadow(0 0 10px #ff00f7);
+}

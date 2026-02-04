@@ -37,6 +37,9 @@ You may manage and config all your css mods and config them as well all in this 
 @import "EnhancedUX/quietify.css";
 @import "EnhancedUX/selectabletext.css";
 @import "EnhancedUX/removeclutter.css";
+/* Community mods from ELGUAPOLIFE/Zen-Theme-CSS-for-Vivaldi-Browser */
+/* @import "EnhancedUX/airzenify.css"; */
+/* @import "EnhancedUX/dynamicneontab.css"; */
 
 /* Import JSIntegration folder CSS files */
 @import "JSIntegration/cleartabs.css";
