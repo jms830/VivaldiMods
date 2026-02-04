@@ -156,28 +156,4 @@ You may manage and config all your css mods and config them as well all in this 
   --mod-mainbar-height: 25px;
 }
 
-/* ============================================
-   TEST: Make dropdown viewport-relative + remove transforms
-   ============================================ */
-.OmniDropdown {
-  position: fixed !important;
-  z-index: 2147483647 !important;
-}
 
-#browser:has(.OmniDropdown) #tabs-container,
-#browser:has(.OmniDropdown) #tabs-tabbar-container,
-#browser:has(.OmniDropdown) .tabbar-wrapper,
-#browser:has(.OmniDropdown) .toolbar-tabbar-before,
-#browser:has(.OmniDropdown) .toolbar,
-#browser:has(.OmniDropdown) .mainbar,
-#browser:has(.OmniDropdown) .UrlBar-AddressField,
-#browser:has(.OmniDropdown) .UrlBar-UrlFieldWrapper,
-#browser:has(.OmniDropdown) .observer,
-#browser:has(.OmniDropdown) .UrlField {
-  overflow: visible !important;
-  clip-path: none !important;
-  contain: none !important;
-  transform: none !important;
-  perspective: none !important;
-  filter: none !important;
-}
