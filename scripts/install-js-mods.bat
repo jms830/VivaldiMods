@@ -1,14 +1,16 @@
 @echo off
 REM ============================================================================
-REM Vivaldi Mods - JavaScript Mods Installer
+REM Vivaldi Mods - JavaScript Mods Installer (Modular)
 REM ============================================================================
-REM This script patches Vivaldi to load JavaScript mods from THIS repository.
-REM No external downloads or cloning required.
+REM This script installs JavaScript mods using the MODULAR approach:
+REM   - Copies all JS files (preserving folder structure) to Vivaldi
+REM   - Replaces window.html with our commented/configurable version
+REM   - You can enable/disable mods by editing window.html (like core.css!)
 REM
 REM What it does:
 REM   1. Backs up Vivaldi's original window.html
-REM   2. Combines all JS mods into a single custom.js file
-REM   3. Patches window.html to load custom.js
+REM   2. Copies entire Javascripts/ folder to Vivaldi's resources/vivaldi/
+REM   3. Copies our modular window.html (with comments for each mod)
 REM   4. (Optional) Installs AutoHotkey watcher for auto-patching on updates
 REM
 REM Usage:
@@ -16,6 +18,12 @@ REM   install-js-mods.bat              - Normal install with watcher prompt
 REM   install-js-mods.bat --silent     - Silent mode (no watcher prompt)
 REM   install-js-mods.bat --ahk-path "C:\path\to\AutoHotkey"
 REM                                    - Custom AHK scripts folder
+REM
+REM To customize which mods are enabled:
+REM   1. Navigate to Vivaldi's resources/vivaldi/ folder
+REM   2. Open window.html in a text editor
+REM   3. Comment/uncomment <script> lines to disable/enable mods
+REM   4. Restart Vivaldi
 REM
 REM NOTE: You'll need to re-run this after Vivaldi updates (or use the watcher)!
 REM ============================================================================
@@ -38,7 +46,7 @@ goto :parse_args
 
 echo.
 echo ========================================
-echo  Vivaldi Mods - JS Installer
+echo  Vivaldi Mods - JS Installer (Modular)
 echo ========================================
 echo.
 
@@ -49,6 +57,7 @@ set "REPO_ROOT=%CD%"
 popd
 
 set "JS_FOLDER=%REPO_ROOT%\Javascripts"
+set "WINDOW_HTML=%JS_FOLDER%\window.html"
 
 REM === Verify Javascripts folder exists ===
 if not exist "%JS_FOLDER%" (
@@ -60,24 +69,44 @@ if not exist "%JS_FOLDER%" (
     pause & exit /b 1
 )
 
+REM === Verify window.html template exists ===
+if not exist "%WINDOW_HTML%" (
+    echo [X] ERROR: Modular window.html not found at:
+    echo     %WINDOW_HTML%
+    echo.
+    echo     This file should be in the Javascripts folder.
+    pause & exit /b 1
+)
+
 echo [OK] Found Javascripts folder: %JS_FOLDER%
+echo [OK] Found modular window.html template
 echo.
 
-REM === Find Vivaldi installation ===
-set "VIVALDI_PATH=%LOCALAPPDATA%\Vivaldi\Application"
-echo Searching for Vivaldi at: %VIVALDI_PATH%
+REM === Find Vivaldi installation (get latest version) ===
+set "VIVALDI_BASE=%LOCALAPPDATA%\Vivaldi\Application"
+echo Searching for Vivaldi at: %VIVALDI_BASE%
 
-for /f "tokens=*" %%a in ('dir /a:-d /b /s "%VIVALDI_PATH%" 2^>nul') do (
-    if "%%~nxa"=="window.html" set "VIVALDI_VERSION_DIR=%%~dpa"
+REM Find the latest version folder by looking for window.html
+set "VIVALDI_VERSION_DIR="
+set "LATEST_VERSION="
+
+for /f "tokens=*" %%d in ('dir /ad /b /o-n "%VIVALDI_BASE%" 2^>nul ^| findstr /r "^[0-9]"') do (
+    if exist "%VIVALDI_BASE%\%%d\resources\vivaldi\window.html" (
+        if not defined VIVALDI_VERSION_DIR (
+            set "VIVALDI_VERSION_DIR=%VIVALDI_BASE%\%%d\resources\vivaldi\"
+            set "LATEST_VERSION=%%d"
+        )
+    )
 )
 
 if "%VIVALDI_VERSION_DIR%"=="" (
-    echo [X] ERROR: Vivaldi window.html not found.
+    echo [X] ERROR: Vivaldi installation not found.
     echo     Is Vivaldi installed?
     pause & exit /b 1
 )
 
-echo [OK] Found Vivaldi version folder: %VIVALDI_VERSION_DIR%
+echo [OK] Found Vivaldi %LATEST_VERSION%
+echo     Location: %VIVALDI_VERSION_DIR%
 echo.
 
 REM === Check if Vivaldi is running ===
@@ -89,7 +118,7 @@ if not errorlevel 1 (
     echo.
 )
 
-REM === Backup window.html ===
+REM === Step 1: Backup window.html ===
 echo [1/3] Creating backup...
 if not exist "%VIVALDI_VERSION_DIR%window.bak.html" (
     copy "%VIVALDI_VERSION_DIR%window.html" "%VIVALDI_VERSION_DIR%window.bak.html" >nul
@@ -99,140 +128,89 @@ if not exist "%VIVALDI_VERSION_DIR%window.bak.html" (
 )
 echo.
 
-REM === Build custom.js ===
-echo [2/3] Combining JS mods into custom.js...
+REM === Step 2: Copy Javascripts folder structure ===
+echo [2/3] Copying JavaScript mods...
 echo.
 
-echo // Vivaldi JS Mods > "%VIVALDI_VERSION_DIR%custom.js"
-echo // Installed from: %REPO_ROOT% >> "%VIVALDI_VERSION_DIR%custom.js"
-echo // Date: %DATE% %TIME% >> "%VIVALDI_VERSION_DIR%custom.js"
-echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-
 set "MOD_COUNT=0"
+set "FOLDER_COUNT=0"
 
-REM FIRST: Add chroma.min.js (dependency for colorTabs.js - must load before root files)
-if exist "%JS_FOLDER%\aminought\chroma.min.js" (
-    echo     Adding: aminought/chroma.min.js ^(dependency - must load first^)
-    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-    echo // === aminought/chroma.min.js ^(DEPENDENCY - must load first^) === >> "%VIVALDI_VERSION_DIR%custom.js"
-    type "%JS_FOLDER%\aminought\chroma.min.js" >> "%VIVALDI_VERSION_DIR%custom.js"
-    set /a MOD_COUNT+=1
-)
-
-REM Add root-level JS files (only *.js, skips *.js.disabled)
+REM Copy root-level JS files
+echo     Copying root JS files...
 for %%f in ("%JS_FOLDER%\*.js") do (
-    echo     Adding: %%~nxf
-    echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-    echo // === %%~nxf === >> "%VIVALDI_VERSION_DIR%custom.js"
-    type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
-    set /a MOD_COUNT+=1
-)
-REM Note: files with .js.disabled extension are intentionally skipped
-echo     (Files ending in .js.disabled are skipped - enable by removing .disabled extension)
-
-REM Add Tam710562 mods (globalMediaControls, mdNotes, easyFiles, etc.)
-if exist "%JS_FOLDER%\Tam710562" (
-    for %%f in ("%JS_FOLDER%\Tam710562\*.js") do (
-        echo     Adding: Tam710562/%%~nxf
-        echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-        echo // === Tam710562/%%~nxf === >> "%VIVALDI_VERSION_DIR%custom.js"
-        type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
+    copy /y "%%f" "%VIVALDI_VERSION_DIR%" >nul 2>&1
+    if not errorlevel 1 (
+        echo       + %%~nxf
         set /a MOD_COUNT+=1
     )
 )
 
-REM Add aminought mods (colorTabs, ybAddressBar) - skip chroma.min.js (already added above)
-if exist "%JS_FOLDER%\aminought" (
-    for %%f in ("%JS_FOLDER%\aminought\*.js") do (
-        if /I not "%%~nxf"=="chroma.min.js" (
-            echo     Adding: aminought/%%~nxf
-            echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-            echo // === aminought/%%~nxf === >> "%VIVALDI_VERSION_DIR%custom.js"
-            type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
-            set /a MOD_COUNT+=1
+REM Copy subfolders (Tam710562, luetage, Other, PageAction, aminought)
+for %%d in (Tam710562 luetage Other PageAction aminought) do (
+    if exist "%JS_FOLDER%\%%d" (
+        echo.
+        echo     Copying %%d/ folder...
+        
+        REM Create folder if it doesn't exist
+        if not exist "%VIVALDI_VERSION_DIR%%%d" (
+            mkdir "%VIVALDI_VERSION_DIR%%%d"
+        )
+        set /a FOLDER_COUNT+=1
+        
+        REM Copy all JS files in the subfolder
+        for %%f in ("%JS_FOLDER%\%%d\*.js") do (
+            copy /y "%%f" "%VIVALDI_VERSION_DIR%%%d\" >nul 2>&1
+            if not errorlevel 1 (
+                echo       + %%d/%%~nxf
+                set /a MOD_COUNT+=1
+            )
         )
     )
 )
 
-REM Add luetage mods (accentMod, monochromeIcons, etc.)
-if exist "%JS_FOLDER%\luetage" (
-    for %%f in ("%JS_FOLDER%\luetage\*.js") do (
-        echo     Adding: luetage/%%~nxf
-        echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-        echo // === luetage/%%~nxf === >> "%VIVALDI_VERSION_DIR%custom.js"
-        type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
-        set /a MOD_COUNT+=1
-    )
-)
-
-REM Add PageAction mods
-if exist "%JS_FOLDER%\PageAction" (
-    for %%f in ("%JS_FOLDER%\PageAction\*.js") do (
-        echo     Adding: PageAction/%%~nxf
-        echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-        echo // === PageAction/%%~nxf === >> "%VIVALDI_VERSION_DIR%custom.js"
-        type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
-        set /a MOD_COUNT+=1
-    )
-)
-
-REM Add Other mods
-if exist "%JS_FOLDER%\Other" (
-    for %%f in ("%JS_FOLDER%\Other\*.js") do (
-        echo     Adding: Other/%%~nxf
-        echo. >> "%VIVALDI_VERSION_DIR%custom.js"
-        echo // === Other/%%~nxf === >> "%VIVALDI_VERSION_DIR%custom.js"
-        type "%%f" >> "%VIVALDI_VERSION_DIR%custom.js"
-        set /a MOD_COUNT+=1
-    )
-)
-
 echo.
-echo     Total mods added: %MOD_COUNT%
-echo     ^(chroma.min.js dependency loaded first for colorTabs.js^)
+echo     Copied %MOD_COUNT% JS files in %FOLDER_COUNT% subfolders
 echo.
 
-REM === Patch window.html ===
-echo [3/3] Patching window.html...
+REM === Step 3: Copy modular window.html ===
+echo [3/3] Installing modular window.html...
 
-REM Remove closing tags and add script reference
-type "%VIVALDI_VERSION_DIR%window.bak.html" | findstr /v "</body>" | findstr /v "</html>" > "%VIVALDI_VERSION_DIR%window.html"
+copy /y "%WINDOW_HTML%" "%VIVALDI_VERSION_DIR%window.html" >nul
 if errorlevel 1 goto :patch_failed
-echo     ^<script src="custom.js"^>^</script^> >> "%VIVALDI_VERSION_DIR%window.html"
-echo   ^</body^> >> "%VIVALDI_VERSION_DIR%window.html"
-echo ^</html^> >> "%VIVALDI_VERSION_DIR%window.html"
 
-REM === Validate patch ===
+REM === Validate installation ===
 echo     Validating...
 
-REM Check that window.html exists and has content
-if not exist "%VIVALDI_VERSION_DIR%window.html" goto :patch_failed
-
-REM Check that custom.js script tag was added
-findstr /C:"custom.js" "%VIVALDI_VERSION_DIR%window.html" >nul
+REM Check window.html exists and has our marker comment
+findstr /C:"VIVALDI MODS - MASTER JS CONFIGURATION" "%VIVALDI_VERSION_DIR%window.html" >nul
 if errorlevel 1 goto :patch_failed
 
-REM Check that closing tags are present
-findstr /C:"</body>" "%VIVALDI_VERSION_DIR%window.html" >nul
-if errorlevel 1 goto :patch_failed
-
-findstr /C:"</html>" "%VIVALDI_VERSION_DIR%window.html" >nul
-if errorlevel 1 goto :patch_failed
-
-REM Check custom.js exists and has content
-if not exist "%VIVALDI_VERSION_DIR%custom.js" goto :patch_failed
-for %%A in ("%VIVALDI_VERSION_DIR%custom.js") do if %%~zA LSS 100 goto :patch_failed
+REM Check a few key JS files exist
+if not exist "%VIVALDI_VERSION_DIR%workspaceButtons.js" goto :patch_failed
+if not exist "%VIVALDI_VERSION_DIR%tidyTabs.js" goto :patch_failed
 
 echo     Validation passed.
 echo.
 
 echo ========================================
-echo  JS Installation Complete!
+echo  JS Installation Complete! (Modular)
 echo ========================================
 echo.
 echo  Installed %MOD_COUNT% JavaScript mods.
 echo.
-echo  Location: %VIVALDI_VERSION_DIR%custom.js
+echo  Location: %VIVALDI_VERSION_DIR%
+echo.
+echo  +---------------------------------------------------------+
+echo  ^|  HOW TO CUSTOMIZE:                                      ^|
+echo  ^|                                                         ^|
+echo  ^|  1. Open: %VIVALDI_VERSION_DIR%window.html
+echo  ^|  2. Comment/uncomment ^<script^> lines to toggle mods   ^|
+echo  ^|  3. Restart Vivaldi                                     ^|
+echo  ^|                                                         ^|
+echo  ^|  Example:                                                ^|
+echo  ^|    Enabled:  ^<script src="tidyTabs.js"^>^</script^>       ^|
+echo  ^|    Disabled: ^<!-- ^<script src="foo.js"^>^</script^> --^>  ^|
+echo  +---------------------------------------------------------+
 echo.
 
 REM === Offer to install watcher (if not silent and AHK exists) ===
@@ -302,7 +280,7 @@ REM Error Handler: Auto-rollback on patch failure
 REM ============================================================================
 :patch_failed
 echo.
-echo [X] ERROR: Patch validation failed!
+echo [X] ERROR: Installation validation failed!
 echo.
 echo     Attempting automatic rollback...
 echo.
@@ -319,11 +297,6 @@ if exist "%VIVALDI_VERSION_DIR%window.bak.html" (
 ) else (
     echo [!] No backup found - cannot rollback automatically.
     echo     You may need to reinstall Vivaldi.
-)
-
-if exist "%VIVALDI_VERSION_DIR%custom.js" (
-    del "%VIVALDI_VERSION_DIR%custom.js" 2>nul
-    echo     Removed incomplete custom.js
 )
 
 echo.
