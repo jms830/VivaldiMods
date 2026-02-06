@@ -10,8 +10,6 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
 
 .tab-strip .separator {
   position: relative;
-  min-height: 24px !important;
-  padding: 4px 0 !important;
 }
 
 .tab-strip .separator .tidy-tabs-below-button {
@@ -27,7 +25,11 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
   color: #4a9eff;
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--animation-speed) ease, visibility var(--animation-speed) ease, color var(--animation-speed) ease, background-color var(--animation-speed) ease;
+  transition: opacity var(--animation-speed, 0.26s) ease, 
+              visibility var(--animation-speed, 0.26s) ease, 
+              color var(--fast-animation-speed, 0.14s) ease, 
+              background-color var(--fast-animation-speed, 0.14s) ease,
+              transform var(--fast-animation-speed, 0.14s) ease;
   left: 8px;
   top: 50%;
   transform: translateY(-50%);
@@ -43,14 +45,14 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  left: 60px;
+  right: 80px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: var(--z-dropdown, 100);
+  z-index: 100;
   pointer-events: none;
 }
 
-.tab-strip .separator:hover .tidy-tabs-below-button {
+#tabs-container:hover .tidy-tabs-below-button {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -58,33 +60,35 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
 
 .tidy-tabs-below-button:hover {
   color: white !important;
-  background-color: rgba(74, 158, 255, 0.3) !important;
+  background-color: rgba(74, 158, 255, 0.35) !important;
   border-color: rgba(74, 158, 255, 0.5) !important;
+  transform: translateY(-50%) scale(1.02);
 }
 
+/* Tooltip on hover */
 .tidy-tabs-below-button::after {
-  content: 'Right-click for options';
+  content: "AI-group tabs below";
   position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%) scale(0.9);
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
   padding: 4px 8px;
-  background: var(--colorBg, #1e1e1e);
-  border: 1px solid var(--colorBorder, #444);
+  background-color: var(--colorBgDarker, #1a1a1a);
+  color: var(--colorFg, #ffffff);
+  font-size: 11px;
+  font-weight: 400;
   border-radius: 4px;
-  font-size: 10px;
-  font-weight: normal;
-  color: var(--colorFg, #ccc);
   white-space: nowrap;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity var(--fast-animation-speed, 0.14s) ease,
+              visibility var(--fast-animation-speed, 0.14s) ease;
   z-index: var(--z-tooltip, 500);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .tidy-tabs-below-button:hover::after {
   opacity: 1;
-  transform: translateX(-50%) scale(1);
-  transition-delay: 0.5s;
+  visibility: visible;
 }

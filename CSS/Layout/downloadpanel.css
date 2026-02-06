@@ -29,7 +29,7 @@ Download Panel Theme
 }
 
 .button-toolbar .progress .loaded {
-  transition: background-color var(--animation-speed) ease-out 0s !important;
+  transition: background-color 300ms ease-out 0s !important;
 }
 
 /* Progress color variations */

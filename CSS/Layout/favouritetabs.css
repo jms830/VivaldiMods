@@ -8,7 +8,7 @@ Currently only support 3x3 tabs grid.
 */
 
 /* === Uncomment :root to use and config this mod independently === */
-/* :root {
+:root {
   --fluid-tabs-grid: on;
   --fluid-pin-at-top: off;
 
@@ -18,10 +18,11 @@ Currently only support 3x3 tabs grid.
   --pinned-icon-size: 20px;
   --pinned-tab-height: 50px;
   --animation-speed: 280ms;
-} */
+}
 
 /* Fluid tabs grid layout for pinned tabs */
 @container style(--fluid-tabs-grid: on) {
+  
   /* Container adjustments */
   .resize {
     max-height: fit-content !important;
@@ -37,11 +38,11 @@ Currently only support 3x3 tabs grid.
     justify-content: center !important;
   }
 
-  #tabs-container .tab-position.is-pinned {
+  #tabs-container .tab-position:not(.accordion-toggle-arrow):not(.tab-yield-space).is-pinned {
     display: contents !important;
   }
 
-  /* Square button style for first 9 pinned tabs - Zen minimal */
+  /* Square button style for first 9 pinned tabs - Zen minimal design */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned):nth-child(-n + 9)
@@ -50,15 +51,15 @@ Currently only support 3x3 tabs grid.
     max-height: var(--pinned-tab-height) !important;
     min-height: var(--pinned-tab-height) !important;
     display: flex !important;
-    justify-content: flex-start !important;
+    justify-content: center !important;
     align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
-    z-index: var(--z-dropdown);
-    /* Zen: subtle background, NO border */
+    z-index: var(--z-base, 1);
     background-color: rgba(255, 255, 255, 0.03) !important;
     border: none !important;
     border-radius: var(--zen-tab-radius, 8px) !important;
+    transition: background-color var(--fast-animation-speed, 0.14s) ease !important;
   }
 
   #tabs-container
@@ -99,11 +100,10 @@ Currently only support 3x3 tabs grid.
     width: var(--pinned-icon-size) !important;
     height: var(--pinned-icon-size) !important;
     margin: auto !important;
-    justify-self: flex-start;
-    transition: margin var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1) !important;
+    justify-self: center;
   }
 
-  /* Favicon on hover - NO transform, keep centered */
+  /* Zen minimal: favicon stays centered on hover (no transform) */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned):nth-child(-n + 9)
@@ -111,43 +111,37 @@ Currently only support 3x3 tabs grid.
     .tab-wrapper:hover
     .favicon {
     margin: auto !important;
-    /* No transform - keep favicon centered for stable clicking */
   }
 
-  /* Hover for first 9 pinned tabs - NO EXPANSION, just subtle visual feedback */
+  /* Hover expansion for first 9 pinned tabs */
   #tabs-container .tab-strip > span:has(.is-pinned) .is-pinned .tab-wrapper {
     overflow: hidden;
     isolation: isolate;
-    z-index: var(--z-base);
-    /* Only transition background, not size/position */
-    transition: background-color var(--fast-animation-speed, 140ms) ease-out;
+    z-index: 5;
+    transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Hover - subtle background change only, NO size change */
+  /* Zen minimal: subtle background on hover, no width expansion */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned):nth-child(-n + 9)
     .is-pinned
-    .tab-wrapper:hover {
-    /* Zen: subtle hover feedback */
+    .tab-wrapper:not(.active):hover {
     background-color: rgba(255, 255, 255, 0.08) !important;
-    /* NO width/height/margin changes - stable for clicking */
   }
 
-  /* Title hidden for first 9 pinned tabs (icon-only grid) */
+  /* Column-specific hover positioning removed - Zen minimal has no expansion */
+
+  /* Zen minimal: title always hidden for first 9 pinned tabs (icon-only grid) */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned):nth-child(-n + 9)
     .is-pinned
     .title {
-    opacity: 0 !important;
-    max-width: 0 !important;
-    /* No transition needed - always hidden */
+    display: none !important;
   }
 
-  /* NO title reveal on hover - we're not expanding the tab */
-
-  /* Stack counter always hidden for first 9 pinned tabs (icon-only grid) */
+  /* Zen minimal: stack counter always hidden for first 9 pinned tabs */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned):nth-child(-n + 9)
@@ -155,8 +149,6 @@ Currently only support 3x3 tabs grid.
     .stack-counter {
     display: none !important;
   }
-
-  /* NO stack counter reveal on hover - we're not expanding */
 
   /* Close button disabled for first 9 pinned tabs */
   #tabs-container
@@ -167,15 +159,13 @@ Currently only support 3x3 tabs grid.
     display: none !important;
   }
 
-  /* Active tab - Zen style: no outline, subtle background */
+  /* Active tab outline */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned)
     .is-pinned.active
     .tab-wrapper {
-    outline: none !important;
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    border: none !important;
+    outline: 2px solid var(--colorAccentBg, #4a90e2);
   }
 
   /* Regular style for pinned tabs after 9th */
@@ -295,7 +285,8 @@ Currently only support 3x3 tabs grid.
     grid-column: 1 / -1 !important;
   }
 
-  /* Separator - 居中样式 */
+  /* Separator block disabled: expands infinitely when unpinned tabs are present. */
+  /*
   #tabs-container .tab-strip .separator {
     grid-column: 1 / -1 !important;
     position: relative !important;
@@ -305,16 +296,16 @@ Currently only support 3x3 tabs grid.
     justify-content: center !important;
     align-items: center !important;
     transform: none !important;
-    /* margin-bottom: -6px !important; */
   }
 
   #tabs-container .tab-strip .separator hr {
     width: 100% !important;
     margin: 0 !important;
-    height: 1px !important;
+    height: 1.2px !important;
     border: none !important;
-    /* background-color: var(--colorBgLighter) !important; */
+    background-color: var(--colorFg) !important;
   }
+  */
 
   .tab-wrapper {
     position: relative;
@@ -330,23 +321,24 @@ Currently only support 3x3 tabs grid.
   }
 
   /* Non-pinned tabs layout */
-  #tabs-container .tab-position:not(.is-pinned),
+  #tabs-container .tab-position:not(.is-pinned):not(.accordion-toggle-arrow):not(.tab-yield-space),
 	/* #tabs-container .tab-position:not(.is-pinned) .separator, */
-	#tabs-container .tab-position:not(.is-pinned) .newtab {
-    grid-column: 1 / span var(--pinned-column-count) !important;
-    position: relative !important;
-    transform: none !important;
+	#tabs-container .tab-position:not(.is-pinned):not(.accordion-toggle-arrow):not(.tab-yield-space) .newtab {
+    grid-column: 1 / span var(--pinned-column-count);
+    position: relative;
+    transform: none;
   }
 
-  #tabs-container .tab-position:not(.is-pinned) .tab-wrapper {
+  #tabs-container .tab-position:not(.is-pinned):not(.accordion-toggle-arrow):not(.tab-yield-space) .tab-wrapper {
     grid-column: 1 / -1 !important;
     width: 100% !important;
     min-width: 0 !important;
   }
 
-  #tabs-container .tab-position:not(.is-pinned) {
-    display: contents !important;
+  #tabs-container .tab-position:not(.is-pinned):not(.accordion-toggle-arrow):not(.tab-yield-space) {
+    display: contents;
   }
+
 
   /* Hover state for first 9 pinned tabs */
   /* body:not(:has(:is(.WorkspacePopup, #panel_switch, .toolbar-editor, .UrlBar-AddressField:focus-within))) #tabs-tabbar-container:hover #tabs-container:not(:hover) .tab-strip > span:has(.is-pinned):nth-child(-n + 9) .is-pinned .tab-wrapper {
@@ -364,7 +356,7 @@ Currently only support 3x3 tabs grid.
       .tab-wrapper:hover {
       position: sticky !important;
       top: 0 !important;
-      z-index: var(--z-sticky) !important;
+      z-index: 200 !important;
     }
 
     #tabs-container
@@ -374,7 +366,7 @@ Currently only support 3x3 tabs grid.
       .tab-wrapper:hover {
       position: sticky !important;
       top: calc(var(--pinned-tab-height) + var(--pinned-gap)) !important;
-      z-index: var(--z-sticky) !important;
+      z-index: 200 !important;
     }
 
     #tabs-container
@@ -384,102 +376,105 @@ Currently only support 3x3 tabs grid.
       .tab-wrapper:hover {
       position: sticky !important;
       top: calc((var(--pinned-tab-height) + var(--pinned-gap)) * 2) !important;
-      z-index: var(--z-sticky) !important;
+      z-index: 200 !important;
     }
 
-#tabs-container .tab-position{
-  position: relative;
-}
+  #tabs-container .tab-position:not(.accordion-toggle-arrow):not(.tab-yield-space){
+    position: relative;
+  }
 
-/* 只在第一个固定标签页上创建背景 */
-#tabs-container
-.tab-strip
-> span:nth-child(1)
-.tab-position::after{
-  content: '';
-  position: fixed;
-  top: 70px;
-  left: calc(var(--pinned-gap) / 2);
-  min-width: calc(var(--tabs-container-expand-width) - var(--pinned-gap));
-  height: calc(var(--pinned-tab-height) * 3 + var(--pinned-gap) * 3);
-  z-index: var(--z-hover);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0s ease;
-}
+  /* 只在第一个固定标签页上创建背景 */
+  #tabs-container
+  .tab-strip
+  > span:nth-child(1)
+  .tab-position::after{
+    content: '';
+    position: fixed;
+    top: 70px;
+    left: calc(var(--pinned-gap) / 2);
+    min-width: calc(var(--tabs-container-expand-width) - var(--pinned-gap));
+    height: calc(var(--pinned-tab-height) * 3 + var(--pinned-gap) * 3);
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0s ease;
+  }
 
-#tabs-container:hover
-.tab-strip
-> span:nth-child(1)
-.tab-position::after {
-  opacity: 1 !important;
-  transition: opacity var(--animation-speed) ease calc(var(--transition-delay-time-collapse) + var(--animation-speed));
-}
+  #tabs-container:hover
+  .tab-strip
+  > span:nth-child(1)
+  .tab-position::after {
+    opacity: 1 !important;
+    transition: opacity var(--animation-speed) ease calc(var(--transition-delay-time-collapse) + var(--animation-speed));
+  }
 
-#tabs-container.right
-.tab-strip
-> span:nth-child(1)
-.tab-position::after {
-  left: unset;
-  right: calc(var(--pinned-gap) / 2);
-}
+  #tabs-container.right
+  .tab-strip
+  > span:nth-child(1)
+  .tab-position::after {
+    left: unset;
+    right: calc(var(--pinned-gap) / 2);
+  }
 
-    #tabs-container
-      .tab-strip
-      > span:has(.is-pinned):nth-child(-n + 3)
-      .is-pinned
-      .tab-wrapper:not(:hover) {
-      position: sticky !important;
-      top: 0 !important;
-      z-index: var(--z-sticky) !important;
-    }
+      #tabs-container
+        .tab-strip
+        > span:has(.is-pinned):nth-child(-n + 3)
+        .is-pinned
+        .tab-wrapper:not(:hover) {
+        position: sticky !important;
+        top: 0 !important;
+        /* background: transparent !important; */
+        z-index: 150 !important;
+      }
 
-    #tabs-container
-      .tab-strip
-      > span:has(.is-pinned):nth-child(n + 4):nth-child(-n + 6)
-      .is-pinned
-      .tab-wrapper:not(:hover) {
-      position: sticky !important;
-      top: calc(var(--pinned-tab-height) + var(--pinned-gap)) !important;
-      z-index: var(--z-sticky) !important;
-    }
+      #tabs-container
+        .tab-strip
+        > span:has(.is-pinned):nth-child(n + 4):nth-child(-n + 6)
+        .is-pinned
+        .tab-wrapper:not(:hover) {
+        position: sticky !important;
+        top: calc(var(--pinned-tab-height) + var(--pinned-gap)) !important;
+        /* background: transparent !important; */
+        z-index: 150 !important;
+      }
 
-    #tabs-container
-      .tab-strip
-      > span:has(.is-pinned):nth-child(n + 7):nth-child(-n + 9)
-      .is-pinned
-      .tab-wrapper:not(:hover) {
-      position: sticky !important;
-      top: calc((var(--pinned-tab-height) + var(--pinned-gap)) * 2) !important;
-      z-index: var(--z-sticky) !important;
-    }
+      #tabs-container
+        .tab-strip
+        > span:has(.is-pinned):nth-child(n + 7):nth-child(-n + 9)
+        .is-pinned
+        .tab-wrapper:not(:hover) {
+        position: sticky !important;
+        top: calc((var(--pinned-tab-height) + var(--pinned-gap)) * 2) !important;
+        /* background: transparent !important; */
+        z-index: 150 !important;
+      }
 
-    #tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 3) {
-      grid-row: 1 !important;
-      position: relative !important;
-      z-index: var(--z-base) !important;
-    }
+      #tabs-container .tab-strip > span:has(.is-pinned):nth-child(-n + 3) {
+        grid-row: 1 !important;
+        position: relative !important;
+        z-index: 1 !important;
+      }
 
-    #tabs-container
-      .tab-strip
-      > span:has(.is-pinned):nth-child(n + 4):nth-child(-n + 6) {
-      grid-row: 2 !important;
-      position: relative !important;
-      z-index: var(--z-base) !important;
-    }
+      #tabs-container
+        .tab-strip
+        > span:has(.is-pinned):nth-child(n + 4):nth-child(-n + 6) {
+        grid-row: 2 !important;
+        position: relative !important;
+        z-index: 1 !important;
+      }
 
-    #tabs-container
-      .tab-strip
-      > span:has(.is-pinned):nth-child(n + 7):nth-child(-n + 9) {
-      grid-row: 3 !important;
-      position: relative !important;
-      z-index: var(--z-base) !important;
-    }
+      #tabs-container
+        .tab-strip
+        > span:has(.is-pinned):nth-child(n + 7):nth-child(-n + 9) {
+        grid-row: 3 !important;
+        position: relative !important;
+        z-index: 1 !important;
+      }
 
-    #tabs-container .tab-strip > span:has(.is-pinned):nth-child(n + 10),
-    #tabs-container .tab-strip > span:not(:has(.is-pinned)) {
-      grid-row: auto !important;
-      /* margin-top: calc((var(--pinned-tab-height) + var(--pinned-gap)) * 3 + 1px) !important; */
+      #tabs-container .tab-strip > span:has(.is-pinned):nth-child(n + 10),
+      #tabs-container .tab-strip > span:not(:has(.is-pinned)) {
+        grid-row: auto !important;
+        /* margin-top: calc((var(--pinned-tab-height) + var(--pinned-gap)) * 3 + 1px) !important; */
+      }
     }
   }
-}

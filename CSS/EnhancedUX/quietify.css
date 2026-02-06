@@ -59,7 +59,7 @@
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
-  transition: transform var(--fast-animation-speed) ease-out;
+  transition: transform 0.15s ease-out;
   pointer-events: none;
 }
 

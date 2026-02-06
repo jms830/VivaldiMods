@@ -1,0 +1,391 @@
+/* Compact Tab - Vertical Grid Layout for Pinned Tabs */
+/* Source: https://github.com/gloria0021/vivaldi-compact-tab */
+
+:root {
+    --tiny-radius: 7px;
+}
+
+.tab,
+.tab.active,
+.tab .tab-bg,
+.tab.active .tab-bg {
+    background: none !important;
+    box-shadow: none !important;
+    clip-path: none !important;
+    mask-image: none !important;
+    border-radius: var(--tiny-radius) !important;
+}
+
+.tab-border {
+    border-radius: var(--tiny-radius) !important;
+    mask-image: none !important;
+    clip-path: none !important;
+}
+
+#tabs-tabbar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding-top: 10px;
+}
+
+.sync-and-trash-container {
+    padding-block: 0.5rem;
+}
+
+#tabs-container[aria-orientation="vertical"] [role="tablist"] {
+    margin-top: 8px !important;
+    margin-bottom: 4px !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-auto-rows: min-content;
+    gap: 0.24rem;
+    padding-inline: 12px !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#tabs-container[aria-orientation="vertical"] [role="tablist"]>span {
+    grid-column: 1 / -1;
+    display: block;
+    background: none !important;
+    border: none !important;
+    border-radius: var(--tiny-radius) !important;
+    margin: 0 !important;
+}
+
+#tabs-container[aria-orientation="vertical"] [role="tablist"]>span:has(.is-pinned) {
+    grid-column: auto !important;
+}
+
+.is-pinned .title {
+    display: none !important;
+}
+
+.is-pinned .tab-header {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100% !important;
+    color: #eaeaea !important;
+    font-size: 14px !important;
+}
+
+.is-pinned .tab-wrapper {
+    background: rgba(136, 135, 141, 0.2) !important;
+    border: none !important;
+    border-radius: var(--tiny-radius) !important;
+    padding: 0.3rem !important;
+}
+
+#tabs-container[aria-orientation="vertical"] .tab-position.is-pinned .tab-wrapper.active {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.is-pinned:hover .tab-wrapper {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.tab-position {
+    position: relative;
+    width: 100%;
+    overflow-x: hidden;
+    transform: none !important;
+    height: 2rem;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.tab-position.is-pinned {
+    height: auto !important;
+    min-height: min-content !important;
+}
+
+.tab-position:not(.is-pinned) .title {
+    color: #ffffff !important;
+}
+
+.tab .tab-header .title {
+    flex-grow: 1;
+    padding: 0.2rem !important;
+    filter: none !important;
+}
+
+.tab-wrapper {
+    margin: 0 !important;
+    max-height: none !important;
+    border: none !important;
+    border-radius: var(--tiny-radius) !important;
+}
+
+#tabs-container[aria-orientation="vertical"] .tab-position:not(.is-pinned) .tab-wrapper.active {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+#tabs-container[aria-orientation="vertical"] .tab-position:not(.is-pinned):hover .tab-wrapper {
+    background: rgba(255, 255, 255, 0.098) !important;
+}
+
+#tabs-container.left {
+    justify-content: flex-start !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+}
+
+#tabs-container.left .resize,
+#tabs-container.left .tab-strip {
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: auto !important;
+    height: auto !important;
+    min-height: max-content !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin-bottom: 0 !important;
+    contain: none !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+#tabs-container.left div[role="tablist"],
+#tabs-container.left span[role="tablist"] {
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: auto !important;
+    height: auto !important;
+    min-height: max-content !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin-bottom: 10px !important;
+    contain: none !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+}
+
+#tabs-container.left .spacer,
+#tabs-container.left>div[style*="flex-grow: 1"],
+#tabs-container.left>div[class*="spacer"] {
+    display: none !important;
+    flex-grow: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+}
+
+.button-badge {
+    display: none !important;
+}
+
+#tabs-container.left .toolbar-tabbar {
+    display: flex !important;
+    justify-content: center !important;
+    position: relative !important;
+    z-index: 50 !important;
+    margin-top: 10px !important;
+    transform: none !important;
+    height: 34px !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    background: transparent !important;
+}
+
+#tabs-container.left .toolbar-tabbar .button-toolbar.newtab {
+    pointer-events: auto !important;
+    top: auto !important;
+    left: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 30px !important;
+    position: static !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: inherit !important;
+    background: transparent !important;
+}
+
+#tabs-container.left .toolbar-tabbar .button-toolbar.newtab svg {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.auto-hide-wrapper.left {
+    position: fixed !important;
+    z-index: 5000 !important;
+    left: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) translateX(-95%) !important;
+    opacity: 0 !important;
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out !important;
+    height: 88vh !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    border-radius: 0 8px 8px 0 !important;
+    backdrop-filter: blur(8px) !important;
+    background-color: rgba(60, 50, 50, 0.5) !important;
+    width: auto !important;
+}
+
+.auto-hide-wrapper.left:hover {
+    transform: translateY(-50%) translateX(0) !important;
+    opacity: 1 !important;
+}
+
+#tabbar-wrapper {
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+#tabbar-wrapper::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+}
+
+button[name="WorkspaceButton"],
+button[name="PanelBookmarks"],
+button[name="NewTab"],
+.button-toolbar,
+.zoom-percent {
+    color: #ffffff !important;
+}
+
+.auto-hide-wrapper .button-toolbar {
+    opacity: 1 !important;
+}
+
+.separator {
+    width: 0px !important;
+}
+
+.mainbar {
+    background: transparent !important;
+}
+
+.toolbar-mainbar {
+    background-color: rgba(10, 0, 0, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    box-shadow: none !important;
+    border-bottom: none !important;
+}
+
+.UrlBar-AddressField {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.auto-hide-wrapper.top {
+    display: flex !important;
+    flex-direction: column !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 9000 !important;
+    opacity: 0 !important;
+    transform: translateY(-100%) !important;
+    pointer-events: none !important;
+    background: transparent !important;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease-out !important;
+}
+
+.auto-hide-wrapper.top.show,
+.auto-hide-wrapper.top:focus-within {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+}
+
+.ExtensionIcon,
+.ExtensionToggleIcon.ExtensionToggleIcon--Expanded {
+    background: transparent !important;
+}
+
+#switch {
+    background-color: rgba(10, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px) !important;
+    border: none !important;
+}
+
+#panels-container .panel-group {
+    background-color: rgba(10, 0, 0, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    border: none !important;
+}
+
+.window-buttongroup,
+.window-buttongroup button {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+.webpanel-header,
+.panels-container,
+.Panels,
+.webpanel {
+    background-color: rgba(10, 0, 0, 0.25) !important;
+    backdrop-filter: blur(8px) !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    z-index: 10 !important;
+}
+
+.webpanel-header * {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.webpanel-header .webpanel-title {
+    color: #ececec !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    opacity: 1 !important;
+}
+
+#panels-container.overlay.minimized {
+    position: absolute;
+    background-color: unset;
+}
+
+#browser:not(.toolbar-edit-mode).maximized #panels-container.overlay:not(:hover) {
+    width: 3px !important;
+    transition: .1s .9s, background-color 0s 0s, opacity 0s 1s !important;
+}
+
+#browser:not(.toolbar-edit-mode).fullscreen #panels-container.overlay:not(:hover) {
+    width: 3px !important;
+    transition: .1s .9s, background-color 0s 0s, opacity 0s 1s !important;
+}
+
+#browser:not(.toolbar-edit-mode).normal #panels-container.overlay:not(:hover) {
+    width: 6px !important;
+    transition: .1s .9s, background-color 0s 0s, opacity 0s 1s !important;
+}
+
+#switch {
+    flex: 0 0 35px;
+    max-width: 35px;
+}

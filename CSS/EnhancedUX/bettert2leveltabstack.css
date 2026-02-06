@@ -24,9 +24,6 @@ body:has(#tabs-container:hover) #tabs-subcontainer{
   transition: min-width 200ms ease-out 300ms, max-width 200ms ease-out 300ms;
 }
 
-#tabs-tabbar-container{
-}
-
 #tabs-container{
   container-type: inline-size;
   container-name: tabs-container;
@@ -38,16 +35,23 @@ body:has(#tabs-container:hover) #tabs-subcontainer{
   }
 }
 
+/* Hide scrollbars for vertical tab bars */
 #browser #tabs-tabbar-container.left ::-webkit-scrollbar,
 #browser #tabs-tabbar-container.right ::-webkit-scrollbar {
   display: none;
 }
 
-#tabs-tabbar-container .SlideBar {
+/* Disable tab bar resizing */
+body:has(.auto-hide-wrapper) #tabs-tabbar-container .SlideBar {
   display: none !important;
 }
 
+/* Hide accordion arrow for right-side tabs in density mode */
 .tabs-right#browser.density-on .accordion-toggle-arrow:after,
 .tabs-right#browser.density-on .tab-wrapper:after {
   display: none !important;
+}
+
+#tabs-tabbar-container{
+  /* overflow: hidden !important; */
 }

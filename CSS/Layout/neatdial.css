@@ -53,7 +53,7 @@ Toggle speeddial visibility by toggle 'add speeddial button'.
 	position: relative;
 	min-height: 46px;
 	max-width: 850px !important;
-	transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1) !important;
+	transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .SpeedDialView-Head:not(:has(.ToolbarButton-Button[aria-expanded="true"])):focus-within {
@@ -90,10 +90,10 @@ Toggle speeddial visibility by toggle 'add speeddial button'.
 /* Position search engine icon above search field */
 .SpeedDialView-Head .SearchEngineSelect-Icon {
 	position: absolute;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: var(--z-hover);
+	top: -60px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10;
 }
 
 .SpeedDialView-Head .SearchEngineSelect-Icon .button-toolbar {
