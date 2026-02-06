@@ -1,162 +1,159 @@
-/*
-Config Center
-version 2025.10.31
-Author PaRr0tBoY
-https://github.com/PaRr0tBoY/Awesome-Vivaldi
-You may manage and config all your css mods and config them as well all in this file
-*/
+/* ============================================================================
+   VIVALDI MODS - MASTER CSS CONFIGURATION
+   ============================================================================
+   
+   Uncomment/comment @import lines to enable/disable features.
+   Each section is organized by folder. Enable what you need!
+   
+   TIP: Ctrl+F to search for specific features.
+   
+   ============================================================================ */
 
-/* Import AutoHide folder CSS files */
-/* Most disabled - Vivaldi 7.8+ has native AutoHide (Settings > Appearance > Auto-hide UI) */
-@import "AutoHide/adaptiveBF.css";
-/* @import "AutoHide/tabbar.css"; */
-/* @import "AutoHide/bookmarkbar.css"; */
-/* @import "AutoHide/panel.css"; */
-/* @import "AutoHide/statusbar.css"; */
 
-/* Import Layout folder CSS files */
+/* ============================================================================
+   LAYOUT - Core structure, panels, and UI elements
+   ============================================================================ */
+
+/* Main Arc-style layout (vertical tabs, sidebar) - FOUNDATION */
 @import "Layout/main.css";
-@import "Layout/neatdial.css";
-@import "Layout/favouritetabs.css";
-/* BISECT: Comment out to isolate clipping issue */
-/* @import "Layout/addressbar.css"; */
-@import "Layout/findinpage.css";
-@import "Layout/quickcommand.css";
+
+/* Address bar styling (Zen-inspired pill shape) */
+/*@import "Layout/addressbar.css"; */
+
+/* Address field expand on focus (spotlight-style) */
+/*@import "Layout/addressfieldexpand.css";*/
+
+/* Better auto-hide animations (smoother Arc/Zen style) */
+@import "Layout/betterautohide.css";
+
+/* Compact tab styling */
+/* @import "Layout/compact-tab.css"; */
+
+/* Download panel improvements */
 @import "Layout/downloadpanel.css";
+
+/* Extensions panel styling */
 @import "Layout/extensionspanel.css";
-@import "Layout/workspacebuttons.css";
-/* @import "Layout/nativeautohidepolish.css"; */
-/* @import "Layout/toolbarautohide.css"; */
-/* @import "Layout/zentabs.css"; */
-@import "Layout/twolevel-tabstack.css";
+
+/* Favourite/Pinned tabs as 3x3 grid (Arc Essentials) */
+@import "Layout/favouritetabs.css";
+
+/* Zen Browser-style tabs - opacity-based hierarchy (inactive=muted, active=bright) */
+@import "Layout/zentabs.css";
+
+/* Floating find-in-page bar */
+@import "Layout/findinpage.css";
+
+/* Toolbar line break helper (for custom toolbar layouts) */
+/*@import "Layout/linebreak.css";*/
+
+/* Speed dial/start page styling */
+@import "Layout/neatdial.css";
+
+/* Quick command palette styling */
+@import "Layout/quickcommand.css";
+
+/* Theme previewer panel */
 /* @import "Layout/themepreviewer.css"; */
 
-/* Import EnhancedUX folder CSS files */
-@import "EnhancedUX/btnhoveranime.css";
-/* @import "EnhancedUX/tabstrail.css"; */
-@import "EnhancedUX/quietify.css";
-@import "EnhancedUX/selectabletext.css";
-@import "EnhancedUX/removeclutter.css";
-/* Community mods from ELGUAPOLIFE/Zen-Theme-CSS-for-Vivaldi-Browser */
-@import "EnhancedUX/airzenify.css";
-@import "EnhancedUX/dynamicneontab.css";
+/* Toolbar auto-hide (granular control) */
+/* @import "Layout/toolbarautohide.css"; */
 
-/* Import JSIntegration folder CSS files */
-@import "JSIntegration/cleartabs.css";
-@import "JSIntegration/tidytabs.css";
+/* Workspace buttons in toolbar (non-JS positioning) */
+@import "Layout/workspacebuttons.css";
+
+
+/* ============================================================================
+   AUTOHIDE - Auto-hide behaviors for various UI elements
+   ============================================================================ */
+
+/* Adaptive back/forward buttons (hide when no history) */
+@import "AutoHide/adaptivebf.css";
+
+/* Auto-hide bookmark bar */
+/* @import "AutoHide/bookmarkbar.css"; */
+
+/* Auto-hide side panel */
+/* @import "AutoHide/panel.css"; */
+
+/* Auto-hide status bar */
+@import "AutoHide/statusbar.css";
+
+/* Auto-hide tabbar (legacy - use betterautohide.css or native 7.8+ instead) */
+/* @import "AutoHide/tabbar.css"; */
+
+
+/* ============================================================================
+   ENHANCEDUX - Visual enhancements and polish
+   ============================================================================ */
+
+/* Air/Zen-ify styling (minimal, airy look) */
+/* @import "EnhancedUX/airzenify.css"; */
+
+/* Better 2-level tab stack (peek main tabs on hover) */
+@import "EnhancedUX/bettert2leveltabstack.css";
+
+/* Brave-style tabs (rounded, shadowed) */
+/*@import "EnhancedUX/bravestyletabs.css";*/
+
+/* Button hover animations */
+@import "EnhancedUX/btnhoveranime.css";
+
+/* Dynamic neon tab accents */
+/* @import "EnhancedUX/dynamicneontab.css"; */
+
+/* Quietify - hide audio/media icons on tabs */
+@import "EnhancedUX/quietify.css";
+
+/* Remove UI clutter (scrollbars, update notifications, lock buttons) */
+@import "EnhancedUX/removeclutter.css";
+
+/* Make UI text selectable */
+/* @import "EnhancedUX/selectabletext.css"; */
+
+/* Tab trail indicator (shows recently used tabs) */
+/* @import "EnhancedUX/tabstrail.css"; */
+
+
+/* ============================================================================
+   JSINTEGRATION - CSS for JavaScript mods (requires corresponding .js files)
+   ============================================================================ */
+
+/* Accent color mod styling */
+/* @import "JSIntegration/accentmod.css"; */
+
+/* Arc Peek (preview tabs on hover) */
 @import "JSIntegration/arcpeek.css";
-@import "JSIntegration/accentmod.css";
+
+/* Clear tabs button styling (red, right side) */
+@import "JSIntegration/cleartabs.css";
+
+/* Tidy tabs button styling (blue, left side, AI grouping) */
+@import "JSIntegration/tidytabs.css";
+
+/* Workspace quick-switch buttons */
 @import "JSIntegration/workspacebuttons.css";
 
-/* Import under dev folder CSS files */
-/* @import "Dev/TabStack.css"; */
+
+/* ============================================================================
+   THEMES - Color scheme overrides
+   ============================================================================ */
+
+/* Vivaldi Air theme (light, airy) */
+/* @import "Themes/vivaldi-air.css"; */
+
+/* VivaZen theme (Zen Browser inspired) */
+/* @import "Themes/vivazen.css"; */
+
+
+/* ============================================================================
+   DEV - Development/experimental features
+   ============================================================================ */
+
+/* Auto-hide panel (dev version) */
 /* @import "Dev/autoHidePanel.css"; */
-/* @import "Dev/Tabbar.css"; */
-/* @import "Dev/LineBreak.css"; */
-/* @import "Dev/TileExpand.css"; */
-/* @import "Layout/BraveStyleTabs.css"; */
-/* @import "Layout/EdgeCurve.css"; */
-
-/* Adjust Configure In :root */
-:root {
-  
-  /* color, transparent, immersive */
-  /* immersive requires immersiveAddressbar.js installed */
-  --fluid-theme: color;
-  /*on or off*/
-  --fluid-compact-mode: off;
-
-  --fluid-float-tabbar: on;
-  --fluid-mask: off;
-  --fluid-blur-hibernate-tab: off;
-
-  --fluid-delay: on;
-  --fluid-border-radius: on;
-
-  --fluid-tabs-grid: on;
-  --fluid-pin-at-top: on;
-
-  --pinned-column-count: 3;
-  --pinned-row-count: 3;
-  --pinned-gap: 8px;
-  --pinned-icon-size: 20px;
-  --pinned-tab-height: 50px;
-
-  --tabs-container-collapse-width-default: 44px;
-  --tabs-container-collapse-width-compact: 7px;
-
-  --tabs-container-expand-width: 280px;
-  --tabs-subcontainer-collapse-width: 44px;
-  --tabs-subcontainer-expand-width: calc(
-    var(--tabs-container-expand-width) +
-      var(--tabs-subcontainer-collapse-width) -
-      var(--tabs-container-collapse-width-default)
-  );
-
-  --Button-newtab-main-width: calc(var(--tabs-container-expand-width) / 2);
-  --Button-newtab-sub-width: calc(var(--tabs-subcontainer-expand-width) / 2);
-
-  --tabbar-margin-top: -6px;
-  --tabbar-margin-bottom: 0px;
-  --tabbar-padding: 7px;
-
-  --tabbar-border-radius-collapse: 0px;
-
-  --slow-animation-speed: 560ms;
-  --animation-speed: 260ms;
-  --fast-animation-speed: 140ms;
-
-  /* Z-Index Scale - use these instead of arbitrary numbers */
-  --z-base: 1;
-  --z-hover: 10;
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-modal: 300;
-  --z-popup: 400;
-  --z-tooltip: 500;
-  --z-overlay: 1000;
-  --z-pinned-expand: 100000000;
-
-  --toolbar-show-extensions: 0;
-  --toolbar-show-navigation: 0;
-  --toolbar-show-pageactions: 0;
-  --toolbar-show-readermode: 0;
-  --toolbar-show-bookmarks: 0;
-  --toolbar-show-downloads: 0;
-  --toolbar-show-settings: 0;
-  --toolbar-show-vbutton: 0;
-
-  /* Zen Tab Styling */
-  --zen-tab-radius: 10px;
-  --zen-tab-active-bg: rgba(255, 255, 255, 0.1);
-  --zen-tab-hover-bg: rgba(255, 255, 255, 0.06);
-
-  --transition-delay-time-expand: 0ms;
-  --transition-delay-time-collapse: 200ms;
-
-  --tabbar-bg-color-collapse: unset;
-  --tabbar-bg-color-expand: unset;
-  --tabbar-border-color-collapse: unset;
-  --tabbar-border-color-expand: unset;
-
-  --tab-icon-size: 16px;
-  --popup-icon-size: 14px;
-  --panel-icon-size: 10px;
-
-  --window-border: 4px;
-  --mac-header: 0px;
-  --win-header: calc(var(--window-border) + 20px);
-  --linux-header: calc(var(--window-border) + 20px);
-  --addressbar-height: 36px;
-  --window-button-scale: 0.8;
-  --window-button-opacity: 0.3;
-  --tab-padding: 0;
-  --colorTransparent: transparent;
-
-  --mod-whitespace-x: 3px;
-  --mod-whitespace-y: 5px;
-  --mod-whitespace-tabbar-right: 15px;
-  --mod-mainbar-height: 25px;
-}
 
 
+/* ============================================================================
+   END OF CONFIGURATION
+   ============================================================================ */

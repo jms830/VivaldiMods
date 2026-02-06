@@ -1,12 +1,36 @@
 /*
 Workspace Buttons Panel
-version 2026.01.13
-Additional styling for workspaceButtons.js
-Shows workspace icons as clickable buttons in sidebar
+version 2026.02.05
+Zen formula: inactive = muted (low opacity), active = visible (full opacity)
+Visual hierarchy through CONTRAST, not addition
 */
+
+:root {
+  /* Zen-inspired workspace accent colors (subtle, not saturated) */
+  --zen-ws-base: #2a2532;
+  --zen-ws-0: #2a2532;
+  --zen-ws-1: #252a32;
+  --zen-ws-2: #253228;
+  --zen-ws-3: #32302a;
+  --zen-ws-4: #322828;
+  --zen-ws-5: #302832;
+  --zen-ws-6: #282832;
+  --zen-ws-7: #322830;
+  
+  /* Matching glow colors at 25% opacity */
+  --zen-ws-glow-0: rgba(138, 120, 160, 0.25);
+  --zen-ws-glow-1: rgba(120, 150, 180, 0.25);
+  --zen-ws-glow-2: rgba(120, 160, 130, 0.25);
+  --zen-ws-glow-3: rgba(170, 155, 120, 0.25);
+  --zen-ws-glow-4: rgba(170, 120, 120, 0.25);
+  --zen-ws-glow-5: rgba(160, 120, 170, 0.25);
+  --zen-ws-glow-6: rgba(120, 130, 170, 0.25);
+  --zen-ws-glow-7: rgba(170, 120, 150, 0.25);
+}
 
 #workspace-buttons-container {
   order: 100;
+  background: transparent !important;
 }
 
 .tabs-left #workspace-buttons-container,
@@ -16,14 +40,83 @@ Shows workspace icons as clickable buttons in sidebar
   max-width: 100%;
 }
 
-#workspace-buttons-container::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-}
+/* ============================================ */
+/* INACTIVE - Nearly invisible (Zen formula)   */
+/* ============================================ */
 
 .workspace-quick-button {
   position: relative;
+  opacity: 0.5 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: 
+    opacity var(--fast-animation-speed, 140ms) ease-out,
+    background-color var(--fast-animation-speed, 140ms) ease-out,
+    box-shadow var(--fast-animation-speed, 140ms) ease-out !important;
+}
+
+/* ============================================ */
+/* HOVER - Subtle appearance                   */
+/* ============================================ */
+
+.workspace-quick-button:hover {
+  opacity: 0.75 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ============================================ */
+/* ACTIVE - Visible & clear (Zen formula)      */
+/* Full opacity + colored background + glow    */
+/* ============================================ */
+
+.workspace-quick-button.workspace-active {
+  opacity: 1 !important;
+  background: var(--zen-ws-0) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-0), 0 0 8px var(--zen-ws-glow-0) !important;
+}
+
+.workspace-quick-button.workspace-active:hover {
+  opacity: 1 !important;
+  background: color-mix(in srgb, var(--zen-ws-0) 85%, white) !important;
+}
+
+/* Per-workspace colors for active state */
+.workspace-quick-button[data-workspace-index="-1"].workspace-active {
+  background: var(--zen-ws-0) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-0), 0 0 8px var(--zen-ws-glow-0) !important;
+}
+
+.workspace-quick-button[data-workspace-index="0"].workspace-active {
+  background: var(--zen-ws-1) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-1), 0 0 8px var(--zen-ws-glow-1) !important;
+}
+
+.workspace-quick-button[data-workspace-index="1"].workspace-active {
+  background: var(--zen-ws-2) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-2), 0 0 8px var(--zen-ws-glow-2) !important;
+}
+
+.workspace-quick-button[data-workspace-index="2"].workspace-active {
+  background: var(--zen-ws-3) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-3), 0 0 8px var(--zen-ws-glow-3) !important;
+}
+
+.workspace-quick-button[data-workspace-index="3"].workspace-active {
+  background: var(--zen-ws-4) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-4), 0 0 8px var(--zen-ws-glow-4) !important;
+}
+
+.workspace-quick-button[data-workspace-index="4"].workspace-active {
+  background: var(--zen-ws-5) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-5), 0 0 8px var(--zen-ws-glow-5) !important;
+}
+
+.workspace-quick-button[data-workspace-index="5"].workspace-active {
+  background: var(--zen-ws-6) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-6), 0 0 8px var(--zen-ws-glow-6) !important;
+}
+
+.workspace-quick-button[data-workspace-index="6"].workspace-active {
+  background: var(--zen-ws-7) !important;
+  box-shadow: inset 0 0 0 1.5px var(--zen-ws-glow-7), 0 0 8px var(--zen-ws-glow-7) !important;
 }
