@@ -99,6 +99,24 @@ The configurator offers these presets:
 
 **Note:** JS mods require patching Vivaldi's `window.html`. Run `scripts/install-js-mods.bat` on Windows, or see [docs](docs/) for manual instructions on macOS/Linux.
 
+### JS Mods - Manual Modular Install
+
+For more control over which JS mods are loaded (like `core.css` for CSS), use the modular `window.html`:
+
+1. Copy `Javascripts/window.html` to `<VIVALDI>/Application/<VERSION>/resources/vivaldi/`
+2. Copy all JS files from `Javascripts/` (including subfolders) to the same location
+3. Edit `window.html` - comment/uncomment `<script>` lines to enable/disable mods:
+   ```html
+   <!-- Enabled: -->
+   <script src="tidyTabs.js"></script>
+   
+   <!-- Disabled (commented out): -->
+   <!-- <script src="colorTabs.js.disabled"></script> -->
+   ```
+4. Restart Vivaldi
+
+Each script has a comment explaining what it does. This approach is easier to customize than the bundled `custom.js`.
+
 ### JS Mod Persistence (Vivaldi Updates)
 
 JS mods are injected into Vivaldi's versioned `Application/<version>/resources/vivaldi/` folder. **When Vivaldi updates, this folder is replaced and JS mods are lost.** CSS mods persist because their path is stored in user preferences.

@@ -1,28 +1,180 @@
 <!-- Vivaldi window document -->
-<!doctype html>
+<!-- ============================================================================
+     VIVALDI MODS - MASTER JS CONFIGURATION
+     ============================================================================
+     
+     HOW TO USE:
+     1. Copy this file to: <VIVALDI>\Application\<VERSION>\resources\vivaldi\
+     2. Copy the Javascripts folder contents to the same location
+     3. Uncomment/comment <script> lines to enable/disable mods
+     
+     NOTE: Unlike CSS mods, JS mods require manual re-application after Vivaldi
+     updates (the Application/<VERSION> folder gets replaced).
+     
+     TIP: Use scripts/auto-patch-vivaldi.bat or vivaldi-watcher.ahk for auto-updates.
+     
+     ============================================================================ -->
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Vivaldi</title>
-    <link rel="stylesheet" href="style/common.css" />
-    <link rel="stylesheet" href="chrome://vivaldi-data/css-mods/css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <title>Vivaldi</title>
+  <link rel="stylesheet" href="style/common.css" />
+  <link rel="stylesheet" href="chrome://vivaldi-data/css-mods/css" />
+</head>
 
-  <body>
-    <script src="color_tabs.js"></script>
-    <script src="monochrome-icons.js"></script>
-    <script src="import-export-command-chains.js"></script>
-    <script src="chroma.min.js"></script>
-    <script src="easy-files.js"></script>
-    <script src="element-capture.js"></script>
-    <script src="global-media-controls.js"></script>
-    <script src="widgets.js"></script>
-    <script src="title_address_bar.js"></script>
-    <script src="ClickAddBlockList.js"></script>
-    <script src="AdaptiveWebPanelHeaders.js"></script>
-    <script src="vivaldi-dashboard-camo.js"></script>
-    <script src="autoHidePanel.js"></script>
-    <script src="moreFuncInWebPanel.js"></script>
-    <script src="colorful_loading_top_bar.js"></script>
-  </body>
+<body>
+
+<!-- ============================================================================
+     CORE MODS - Essential functionality
+     ============================================================================ -->
+
+<!-- Workspace colors - Assigns colors to workspaces -->
+<script src="workspaceColors.js"></script>
+
+<!-- Workspace buttons - Quick-switch buttons in tabbar sidebar -->
+<script src="workspaceButtons.js"></script>
+
+<!-- Import/Export workspace rules - Backup/restore workspace assignments -->
+<script src="importExportWorkspaceRules.js"></script>
+
+
+<!-- ============================================================================
+     TAB MANAGEMENT - AI-powered and manual tab organization
+     ============================================================================ -->
+
+<!-- TidyTabs - AI-powered tab grouping (requires API key in settings) -->
+<script src="tidyTabs.js"></script>
+
+<!-- ClearTabs - One-click close all tabs in workspace -->
+<script src="cleartabs.js"></script>
+
+<!-- TidyTitles - AI-powered tab title cleanup (DISABLED - experimental) -->
+<!-- <script src="tidyTitles.js.disabled"></script> -->
+
+
+<!-- ============================================================================
+     UI ENHANCEMENTS - Visual and UX improvements
+     ============================================================================ -->
+
+<!-- Command Chain Icons - Custom icons for command chains -->
+<script src="commandChainIcons.js"></script>
+
+<!-- Global Media Controls - Media playback panel in sidebar (Tam710562) -->
+<script src="Tam710562/globalMediaControls.js"></script>
+
+<!-- Dialog Tab - Opens dialogs in tabs instead of popups (Tam710562) -->
+<script src="Tam710562/dialogTab.js"></script>
+
+<!-- Easy Files - Drag-and-drop file management (Tam710562) -->
+<script src="Tam710562/easyFiles.js"></script>
+
+<!-- Element Capture - Screenshot element tool (Tam710562) -->
+<script src="Tam710562/elementCapture.js"></script>
+
+<!-- MD Notes - Markdown notes in sidebar panel (Tam710562) -->
+<script src="Tam710562/mdNotes.js"></script>
+
+<!-- Adaptive Web Panel Headers - Panel headers match page colors (Tam710562) -->
+<script src="Tam710562/adaptiveWebPanelHeaders.js"></script>
+
+<!-- Feed Icon - RSS feed indicator in address bar (Tam710562) -->
+<script src="Tam710562/feedIcon.js"></script>
+
+<!-- Click Add Block List - Easy ad-block list management (Tam710562) -->
+<script src="Tam710562/clickAddBlockList.js"></script>
+
+<!-- Import/Export Command Chains - Backup command chains (Tam710562) -->
+<script src="Tam710562/importExportCommandChains.js"></script>
+
+
+<!-- ============================================================================
+     SETTINGS & UTILITIES - Settings page enhancements
+     ============================================================================ -->
+
+<!-- Collapse Keyboard Settings - Collapsible keyboard shortcut sections (luetage) -->
+<script src="luetage/collapseKeyboardSettings.js"></script>
+
+<!-- Backup Search Engines - Export/import search engines (luetage) -->
+<script src="luetage/backupSearchEngines.js"></script>
+
+
+<!-- ============================================================================
+     DISABLED BY DEFAULT - Enable if needed
+     ============================================================================ -->
+
+<!-- Select Search - Choose search engine in address bar (Tam710562) -->
+<!-- DISABLED: Causes OmniDropdown clipping at sidebar edge (transform creates containing block) -->
+<!-- <script src="Tam710562/selectSearch.js"></script> -->
+
+<!-- Immersive Addressbar - Full-width URL bar (may conflict with sidebar layout) -->
+<!-- <script src="immersiveAddressbar.js.disabled"></script> -->
+
+<!-- Mainbar - Custom toolbar positioning -->
+<!-- <script src="mainbar.js.disabled"></script> -->
+
+<!-- Wrap Today - Date formatting in UI -->
+<!-- <script src="wrapToday.js.disabled"></script> -->
+
+
+<!-- ============================================================================
+     DISABLED - EXPERIMENTAL / DEPRECATED
+     ============================================================================ -->
+
+<!-- Color Tabs - Color tab borders by favicon (requires chroma.min.js) -->
+<!-- <script src="aminought/chroma.min.js.disabled"></script> -->
+<!-- <script src="aminought/colorTabs.js.disabled"></script> -->
+
+<!-- YB Address Bar - Alternative address bar styling (aminought) -->
+<!-- <script src="aminought/ybAddressBar.js.disabled"></script> -->
+
+<!-- Accent Mod - Dynamic accent colors (luetage) -->
+<!-- <script src="luetage/accentMod.js.disabled"></script> -->
+
+<!-- Activate Tab On Hover - Switch tabs by hovering (luetage) -->
+<!-- <script src="luetage/activateTabOnHover.js.disabled"></script> -->
+
+<!-- Monochrome Icons - Desaturate toolbar icons (luetage) -->
+<!-- <script src="luetage/monochromeIcons.js.disabled"></script> -->
+
+<!-- Moon Phase - Show moon phase in UI (luetage) -->
+<!-- <script src="luetage/moonPhase.js.disabled"></script> -->
+
+<!-- Tab Scroll - Scroll wheel tab switching (luetage) -->
+<!-- <script src="luetage/tabScroll.js.disabled"></script> -->
+
+<!-- Theme Internal - Internal theme modifications (luetage) -->
+<!-- <script src="luetage/themeInternal.js.disabled"></script> -->
+
+<!-- Auto-Hide Panel - Custom panel auto-hide (conflicts with native 7.8+) -->
+<!-- <script src="Other/autoHidePanel.js.disabled"></script> -->
+
+<!-- Picture-in-Picture - Enhanced PiP controls -->
+<!-- DISABLED: Causes dead space on right edge of panel (appends to wrong DOM element) -->
+<!-- <script src="Other/picture-in-picture.js.disabled"></script> -->
+
+<!-- Vivaldi Dashboard Camo - Dashboard theming -->
+<!-- <script src="Other/vivaldiDashboardCamo.js.disabled"></script> -->
+
+<!-- Hibernate Tabs - Suspend inactive tabs (g_bartsch) -->
+<!-- <script src="Other/g_bartsch-hibernateTabs.js.disabled"></script> -->
+
+<!-- Follower Tabs - Tab following behavior -->
+<!-- <script src="PageAction/follower-tabs.js.disabled"></script> -->
+
+<!-- Tabs Lock - Lock tabs from closing -->
+<!-- <script src="PageAction/tabslock.js.disabled"></script> -->
+
+<!-- Tab Panel Media Controls - Media controls in tab panel -->
+<!-- <script src="tabPanelMediaControls.js.disabled"></script> -->
+
+<!-- Utils - Utility functions (dependency for some mods) -->
+<!-- <script src="utils.js.disabled"></script> -->
+
+
+<!-- ============================================================================
+     END OF CONFIGURATION
+     ============================================================================ -->
+
+</body>
 </html>
