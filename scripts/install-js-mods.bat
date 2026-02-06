@@ -128,40 +128,39 @@ if not exist "%VIVALDI_VERSION_DIR%window.bak.html" (
 )
 echo.
 
-REM === Step 2: Copy Javascripts folder structure ===
-echo [2/3] Copying JavaScript mods...
+REM === Step 2: Copy JS files into javascript/ subfolder ===
+echo [2/3] Copying JavaScript mods into javascript/ subfolder...
 echo.
+
+set "JS_DEST=%VIVALDI_VERSION_DIR%javascript"
+if not exist "%JS_DEST%" mkdir "%JS_DEST%"
 
 set "MOD_COUNT=0"
 set "FOLDER_COUNT=0"
 
-REM Copy root-level JS files
+REM Copy root-level JS files into javascript/
 echo     Copying root JS files...
 for %%f in ("%JS_FOLDER%\*.js") do (
-    copy /y "%%f" "%VIVALDI_VERSION_DIR%" >nul 2>&1
+    copy /y "%%f" "%JS_DEST%\" >nul 2>&1
     if not errorlevel 1 (
-        echo       + %%~nxf
+        echo       + javascript/%%~nxf
         set /a MOD_COUNT+=1
     )
 )
 
-REM Copy subfolders (Tam710562, luetage, Other, PageAction, aminought)
+REM Copy subfolders into javascript/ (Tam710562, luetage, Other, PageAction, aminought)
 for %%d in (Tam710562 luetage Other PageAction aminought) do (
     if exist "%JS_FOLDER%\%%d" (
         echo.
         echo     Copying %%d/ folder...
-        
-        REM Create folder if it doesn't exist
-        if not exist "%VIVALDI_VERSION_DIR%%%d" (
-            mkdir "%VIVALDI_VERSION_DIR%%%d"
-        )
+
+        if not exist "%JS_DEST%\%%d" mkdir "%JS_DEST%\%%d"
         set /a FOLDER_COUNT+=1
-        
-        REM Copy all JS files in the subfolder
+
         for %%f in ("%JS_FOLDER%\%%d\*.js") do (
-            copy /y "%%f" "%VIVALDI_VERSION_DIR%%%d\" >nul 2>&1
+            copy /y "%%f" "%JS_DEST%\%%d\" >nul 2>&1
             if not errorlevel 1 (
-                echo       + %%d/%%~nxf
+                echo       + javascript/%%d/%%~nxf
                 set /a MOD_COUNT+=1
             )
         )
@@ -169,7 +168,7 @@ for %%d in (Tam710562 luetage Other PageAction aminought) do (
 )
 
 echo.
-echo     Copied %MOD_COUNT% JS files in %FOLDER_COUNT% subfolders
+echo     Copied %MOD_COUNT% JS files into javascript/ (%FOLDER_COUNT% subfolders)
 echo.
 
 REM === Step 3: Copy modular window.html ===
@@ -185,9 +184,9 @@ REM Check window.html exists and has our marker comment
 findstr /C:"VIVALDI MODS - MASTER JS CONFIGURATION" "%VIVALDI_VERSION_DIR%window.html" >nul
 if errorlevel 1 goto :patch_failed
 
-REM Check a few key JS files exist
-if not exist "%VIVALDI_VERSION_DIR%workspaceButtons.js" goto :patch_failed
-if not exist "%VIVALDI_VERSION_DIR%tidyTabs.js" goto :patch_failed
+REM Check a few key JS files exist in javascript/ subfolder
+if not exist "%VIVALDI_VERSION_DIR%javascript\workspaceButtons.js" goto :patch_failed
+if not exist "%VIVALDI_VERSION_DIR%javascript\tidyTabs.js" goto :patch_failed
 
 echo     Validation passed.
 echo.

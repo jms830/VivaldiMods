@@ -69,46 +69,40 @@ if exist "%VIVALDI_DIR%custom.js" (
 )
 echo.
 
-REM === Remove modular JS files (new approach) ===
-echo [3/3] Removing modular JS files...
+REM === Remove javascript/ subfolder (current approach) ===
+echo [3/3] Removing javascript/ subfolder...
 
-set "REMOVED_COUNT=0"
+if exist "%VIVALDI_DIR%javascript" (
+    rmdir /s /q "%VIVALDI_DIR%javascript" 2>nul
+    if not exist "%VIVALDI_DIR%javascript" (
+        echo     Removed javascript/ folder
+    ) else (
+        echo     [!] Could not fully remove javascript/ (files may be in use)
+    )
+) else (
+    echo     No javascript/ folder found (already clean)
+)
 
-REM Remove root-level JS files that we installed
+REM Also clean up legacy root-level JS files from older installs
+set "LEGACY_COUNT=0"
 for %%f in (
-    workspaceColors.js
-    workspaceButtons.js
-    importExportWorkspaceRules.js
-    tidyTabs.js
-    cleartabs.js
-    commandChainIcons.js
+    workspaceColors.js workspaceButtons.js importExportWorkspaceRules.js
+    tidyTabs.js cleartabs.js commandChainIcons.js
 ) do (
     if exist "%VIVALDI_DIR%%%f" (
         del "%VIVALDI_DIR%%%f" 2>nul
-        echo     Removed %%f
-        set /a REMOVED_COUNT+=1
+        echo     Removed legacy %%f
+        set /a LEGACY_COUNT+=1
     )
 )
-
-REM Remove subfolders we created
 for %%d in (Tam710562 luetage Other PageAction aminought) do (
     if exist "%VIVALDI_DIR%%%d" (
-        echo     Removing %%d/ folder...
         rmdir /s /q "%VIVALDI_DIR%%%d" 2>nul
-        if not exist "%VIVALDI_DIR%%%d" (
-            echo       Removed %%d/
-            set /a REMOVED_COUNT+=1
-        ) else (
-            echo       [!] Could not fully remove %%d/ (files may be in use)
-        )
+        echo     Removed legacy %%d/
+        set /a LEGACY_COUNT+=1
     )
 )
-
-if %REMOVED_COUNT%==0 (
-    echo     No modular JS files found (already clean)
-) else (
-    echo     Removed %REMOVED_COUNT% items
-)
+if !LEGACY_COUNT! GTR 0 echo     Cleaned up !LEGACY_COUNT! legacy items
 echo.
 
 echo ========================================
