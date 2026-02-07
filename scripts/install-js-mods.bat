@@ -1,16 +1,27 @@
 @echo off
 REM ============================================================================
-REM Vivaldi Mods - JavaScript Mods Installer (Modular)
+REM Vivaldi Mods - JavaScript Mods Installer (Persistent Architecture)
 REM ============================================================================
-REM This script installs JavaScript mods using the MODULAR approach:
-REM   - Copies all JS files (preserving folder structure) to Vivaldi
-REM   - Replaces window.html with our commented/configurable version
-REM   - You can enable/disable mods by editing window.html (like core.css!)
+REM This script installs JavaScript mods using the PERSISTENT approach:
+REM   - JS files go to Application\javascript\ (survives Vivaldi updates!)
+REM   - ONE line is injected into Vivaldi's stock window.html to load custom.js
+REM   - custom.js dynamically loads all individual mods
+REM
+REM Architecture:
+REM   Application\
+REM   +-- javascript\               <-- JS mods live here (PERSISTENT)
+REM   |   +-- custom.js             <-- Loader (configure mods here)
+REM   |   +-- workspaceButtons.js
+REM   |   +-- Tam710562\
+REM   |   +-- ...
+REM   +-- 7.x.xxxx.x\
+REM       +-- resources\vivaldi\
+REM           +-- window.html       <-- ONE line injected before </body>
 REM
 REM What it does:
 REM   1. Backs up Vivaldi's original window.html
-REM   2. Copies entire Javascripts/ folder to Vivaldi's resources/vivaldi/
-REM   3. Copies our modular window.html (with comments for each mod)
+REM   2. Copies JS files + custom.js to Application\javascript\ (persistent)
+REM   3. Injects one script tag into Vivaldi's window.html
 REM   4. (Optional) Installs AutoHotkey watcher for auto-patching on updates
 REM
 REM Usage:
@@ -20,12 +31,12 @@ REM   install-js-mods.bat --ahk-path "C:\path\to\AutoHotkey"
 REM                                    - Custom AHK scripts folder
 REM
 REM To customize which mods are enabled:
-REM   1. Navigate to Vivaldi's resources/vivaldi/ folder
-REM   2. Open window.html in a text editor
-REM   3. Comment/uncomment <script> lines to disable/enable mods
-REM   4. Restart Vivaldi
+REM   1. Open Application\javascript\custom.js
+REM   2. Comment/uncomment lines in the mods array
+REM   3. Restart Vivaldi
 REM
-REM NOTE: You'll need to re-run this after Vivaldi updates (or use the watcher)!
+REM NOTE: After Vivaldi updates, only the one-liner injection is needed!
+REM       JS files + custom.js in Application\javascript\ persist automatically.
 REM ============================================================================
 
 setlocal EnableDelayedExpansion
@@ -45,9 +56,9 @@ goto :parse_args
 :done_args
 
 echo.
-echo ========================================
-echo  Vivaldi Mods - JS Installer (Modular)
-echo ========================================
+echo =============================================
+echo  Vivaldi Mods - JS Installer (Persistent)
+echo =============================================
 echo.
 
 REM === Get repo root (parent of scripts/) ===
@@ -57,7 +68,6 @@ set "REPO_ROOT=%CD%"
 popd
 
 set "JS_FOLDER=%REPO_ROOT%\Javascripts"
-set "WINDOW_HTML=%JS_FOLDER%\window.html"
 
 REM === Verify Javascripts folder exists ===
 if not exist "%JS_FOLDER%" (
@@ -69,17 +79,16 @@ if not exist "%JS_FOLDER%" (
     pause & exit /b 1
 )
 
-REM === Verify window.html template exists ===
-if not exist "%WINDOW_HTML%" (
-    echo [X] ERROR: Modular window.html not found at:
-    echo     %WINDOW_HTML%
+if not exist "%JS_FOLDER%\custom.js" (
+    echo [X] ERROR: custom.js not found at:
+    echo     %JS_FOLDER%\custom.js
     echo.
-    echo     This file should be in the Javascripts folder.
+    echo     This is the mod loader. It should be in the Javascripts folder.
     pause & exit /b 1
 )
 
 echo [OK] Found Javascripts folder: %JS_FOLDER%
-echo [OK] Found modular window.html template
+echo [OK] Found custom.js loader
 echo.
 
 REM === Find Vivaldi installation (get latest version) ===
@@ -106,7 +115,8 @@ if "%VIVALDI_VERSION_DIR%"=="" (
 )
 
 echo [OK] Found Vivaldi %LATEST_VERSION%
-echo     Location: %VIVALDI_VERSION_DIR%
+echo     Versioned dir: %VIVALDI_VERSION_DIR%
+echo     Persistent JS: %VIVALDI_BASE%\javascript\
 echo.
 
 REM === Check if Vivaldi is running ===
@@ -128,17 +138,18 @@ if not exist "%VIVALDI_VERSION_DIR%window.bak.html" (
 )
 echo.
 
-REM === Step 2: Copy JS files into javascript/ subfolder ===
-echo [2/3] Copying JavaScript mods into javascript/ subfolder...
+REM === Step 2: Copy JS files to PERSISTENT Application\javascript\ ===
+echo [2/3] Copying JavaScript mods to persistent location...
+echo     Target: %VIVALDI_BASE%\javascript\
 echo.
 
-set "JS_DEST=%VIVALDI_VERSION_DIR%javascript"
+set "JS_DEST=%VIVALDI_BASE%\javascript"
 if not exist "%JS_DEST%" mkdir "%JS_DEST%"
 
 set "MOD_COUNT=0"
 set "FOLDER_COUNT=0"
 
-REM Copy root-level JS files into javascript/
+REM Copy root-level JS files (including custom.js loader)
 echo     Copying root JS files...
 for %%f in ("%JS_FOLDER%\*.js") do (
     copy /y "%%f" "%JS_DEST%\" >nul 2>&1
@@ -148,7 +159,7 @@ for %%f in ("%JS_FOLDER%\*.js") do (
     )
 )
 
-REM Copy subfolders into javascript/ (Tam710562, luetage, Other, PageAction, aminought)
+REM Copy subfolders (Tam710562, luetage, Other, PageAction, aminought)
 for %%d in (Tam710562 luetage Other PageAction aminought) do (
     if exist "%JS_FOLDER%\%%d" (
         echo.
@@ -168,47 +179,76 @@ for %%d in (Tam710562 luetage Other PageAction aminought) do (
 )
 
 echo.
-echo     Copied %MOD_COUNT% JS files into javascript/ (%FOLDER_COUNT% subfolders)
+echo     Copied %MOD_COUNT% JS files to persistent location (%FOLDER_COUNT% subfolders)
 echo.
 
-REM === Step 3: Copy modular window.html ===
-echo [3/3] Installing modular window.html...
+REM === Step 3: Inject one-liner into Vivaldi's window.html ===
+echo [3/3] Injecting custom.js loader into window.html...
 
-copy /y "%WINDOW_HTML%" "%VIVALDI_VERSION_DIR%window.html" >nul
+set "INJECT_LINE=^<script src="../../../javascript/custom.js"^>^</script^>"
+set "WINDOW_TARGET=%VIVALDI_VERSION_DIR%window.html"
+
+REM Check if already injected
+findstr /C:"custom.js" "%WINDOW_TARGET%" >nul 2>&1
+if not errorlevel 1 (
+    echo     custom.js reference already present in window.html
+    echo.
+    goto :validate
+)
+
+REM Inject the script tag before </body> using PowerShell
+powershell -Command "(Get-Content '%WINDOW_TARGET%') -replace '</body>', '<script src=\"../../../javascript/custom.js\"></script>`r`n</body>' | Set-Content '%WINDOW_TARGET%'" 2>nul
 if errorlevel 1 goto :patch_failed
 
+echo     Injected: ^<script src="../../../javascript/custom.js"^>^</script^>
+echo.
+
+:validate
 REM === Validate installation ===
 echo     Validating...
 
-REM Check window.html exists and has our marker comment
-findstr /C:"VIVALDI MODS - MASTER JS CONFIGURATION" "%VIVALDI_VERSION_DIR%window.html" >nul
+REM Check window.html has our custom.js reference
+findstr /C:"custom.js" "%WINDOW_TARGET%" >nul
 if errorlevel 1 goto :patch_failed
 
-REM Check a few key JS files exist in javascript/ subfolder
-if not exist "%VIVALDI_VERSION_DIR%javascript\workspaceButtons.js" goto :patch_failed
-if not exist "%VIVALDI_VERSION_DIR%javascript\tidyTabs.js" goto :patch_failed
+REM Check key JS files exist in PERSISTENT location
+if not exist "%VIVALDI_BASE%\javascript\custom.js" goto :patch_failed
+if not exist "%VIVALDI_BASE%\javascript\workspaceButtons.js" goto :patch_failed
 
 echo     Validation passed.
 echo.
 
-echo ========================================
-echo  JS Installation Complete! (Modular)
-echo ========================================
+REM === Clean up old installs (versioned-dir JS files, old bundled custom.js) ===
+if exist "%VIVALDI_VERSION_DIR%javascript" (
+    echo [i] Cleaning up old JS files from versioned dir...
+    rmdir /s /q "%VIVALDI_VERSION_DIR%javascript" 2>nul
+    echo     Removed old %VIVALDI_VERSION_DIR%javascript\
+    echo.
+)
+
+echo =============================================
+echo  JS Installation Complete! (Persistent)
+echo =============================================
 echo.
-echo  Installed %MOD_COUNT% JavaScript mods.
+echo  Installed %MOD_COUNT% JS files to persistent location.
 echo.
-echo  Location: %VIVALDI_VERSION_DIR%
+echo  JS mods:    %VIVALDI_BASE%\javascript\  (PERSISTENT)
+echo  Config:     %VIVALDI_BASE%\javascript\custom.js
+echo  Injected:   window.html in %VIVALDI_VERSION_DIR%
 echo.
 echo  +---------------------------------------------------------+
-echo  ^|  HOW TO CUSTOMIZE:                                      ^|
+echo  ^|  HOW IT WORKS:                                          ^|
 echo  ^|                                                         ^|
-echo  ^|  1. Open: %VIVALDI_VERSION_DIR%window.html
-echo  ^|  2. Comment/uncomment ^<script^> lines to toggle mods   ^|
+echo  ^|  - JS files in Application\javascript\ survive updates  ^|
+echo  ^|  - One line in window.html loads custom.js              ^|
+echo  ^|  - custom.js loads all your enabled mods                ^|
+echo  ^|  - After updates, only the one-liner needs re-injecting ^|
+echo  ^|                                                         ^|
+echo  ^|  TO CUSTOMIZE MODS:                                     ^|
+echo  ^|                                                         ^|
+echo  ^|  1. Edit: Application\javascript\custom.js              ^|
+echo  ^|  2. Comment/uncomment lines in the mods array           ^|
 echo  ^|  3. Restart Vivaldi                                     ^|
-echo  ^|                                                         ^|
-echo  ^|  Example:                                                ^|
-echo  ^|    Enabled:  ^<script src="tidyTabs.js"^>^</script^>       ^|
-echo  ^|    Disabled: ^<!-- ^<script src="foo.js"^>^</script^> --^>  ^|
 echo  +---------------------------------------------------------+
 echo.
 
@@ -236,7 +276,8 @@ if not exist "%AHK_PATH%" (
 )
 
 echo  Would you like to install the AutoHotkey watcher?
-echo  This will auto-patch Vivaldi when it updates.
+echo  This will auto-patch window.html when Vivaldi updates.
+echo  (JS files persist automatically - no action needed for them!)
 echo.
 echo  Install location: %WATCHER_DST%
 echo.
@@ -258,7 +299,8 @@ if "%VIVALDI_RUNNING%"=="1" (
     echo  IMPORTANT: RESTART VIVALDI to apply changes!
     echo.
 )
-echo  NOTE: Re-run this script after Vivaldi updates!
+echo  NOTE: After Vivaldi updates, only window.html needs re-placing!
+echo        JS files in Application\javascript\ persist automatically.
 echo.
 echo  TIP: Install the AutoHotkey watcher to auto-patch on updates:
 echo       run: install-js-mods.bat (without --silent)

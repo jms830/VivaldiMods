@@ -15,7 +15,7 @@
    ============================================================================ */
 
 /* Main Arc-style layout (vertical tabs, sidebar) - FOUNDATION */
-@import "Layout/main.css";
+/*@import "Layout/main.css";*/
 
 /* Address bar styling (Zen-inspired pill shape) */
 /*@import "Layout/addressbar.css"; */
@@ -24,7 +24,10 @@
 /*@import "Layout/addressfieldexpand.css";*/
 
 /* Better auto-hide animations (smoother Arc/Zen style) */
-@import "Layout/betterautohide.css";
+/* @import "Layout/betterautohide.css"; */ /* DISABLED: conflicts with airzenify */
+
+/* Native auto-hide polish (improved easing + OmniDropdown clipping fix) */
+/* @import "Layout/nativeautohidepolish.css"; */ /* DISABLED: conflicts with airzenify */
 
 /* Compact tab styling */
 /* @import "Layout/compact-tab.css"; */
@@ -39,10 +42,10 @@
 @import "Layout/favouritetabs.css";
 
 /* Zen Browser-style tabs - opacity-based hierarchy (inactive=muted, active=bright) */
-@import "Layout/zentabs.css";
+/*@import "Layout/zentabs.css";*/
 
 /* Floating find-in-page bar */
-@import "Layout/findinpage.css";
+/*@import "Layout/findinpage.css";*/
 
 /* Toolbar line break helper (for custom toolbar layouts) */
 /*@import "Layout/linebreak.css";*/
@@ -88,7 +91,7 @@
    ============================================================================ */
 
 /* Air/Zen-ify styling (minimal, airy look) */
-/* @import "EnhancedUX/airzenify.css"; */
+@import "EnhancedUX/airzenify.css";
 
 /* Better 2-level tab stack (peek main tabs on hover) */
 @import "EnhancedUX/bettert2leveltabstack.css";
@@ -97,10 +100,10 @@
 /*@import "EnhancedUX/bravestyletabs.css";*/
 
 /* Button hover animations */
-@import "EnhancedUX/btnhoveranime.css";
+/*@import "EnhancedUX/btnhoveranime.css";*/
 
 /* Dynamic neon tab accents */
-/* @import "EnhancedUX/dynamicneontab.css"; */
+@import "EnhancedUX/dynamicneontab.css";
 
 /* SuperPins - alternative pinned tabs grid (ELGUAPOLIFE, broken on 7.8+) */
 /* @import "EnhancedUX/superpins.css"; */

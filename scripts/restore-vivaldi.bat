@@ -2,8 +2,13 @@
 REM ============================================================================
 REM Vivaldi Mods - Restore Original
 REM ============================================================================
-REM Restores Vivaldi's original window.html and removes all JS mods
-REM (both bundled custom.js and modular individual files)
+REM Restores Vivaldi's original window.html and removes all JS mods.
+REM
+REM Cleans up:
+REM   - Persistent JS files in Application\javascript\ (new architecture)
+REM   - Versioned JS files in resources\vivaldi\javascript\ (old architecture)
+REM   - Bundled custom.js (legacy approach)
+REM   - Legacy root-level JS files (oldest approach)
 REM
 REM CSS mods can be disabled in Vivaldi Settings or vivaldi://experiments
 REM ============================================================================
@@ -50,7 +55,7 @@ if not exist "%VIVALDI_DIR%window.bak.html" (
 )
 
 REM === Restore window.html ===
-echo [1/3] Restoring original window.html from backup...
+echo [1/4] Restoring original window.html from backup...
 copy /y "%VIVALDI_DIR%window.bak.html" "%VIVALDI_DIR%window.html" >nul
 if errorlevel 1 (
     echo [X] ERROR: Failed to restore window.html
@@ -60,7 +65,7 @@ echo     Done.
 echo.
 
 REM === Remove bundled custom.js (old approach) ===
-echo [2/3] Removing bundled JS (custom.js)...
+echo [2/4] Removing bundled JS (custom.js)...
 if exist "%VIVALDI_DIR%custom.js" (
     del "%VIVALDI_DIR%custom.js" 2>nul
     echo     Removed custom.js
@@ -69,18 +74,34 @@ if exist "%VIVALDI_DIR%custom.js" (
 )
 echo.
 
-REM === Remove javascript/ subfolder (current approach) ===
-echo [3/3] Removing javascript/ subfolder...
+REM === Remove persistent Application\javascript\ (current architecture) ===
+echo [3/4] Removing persistent javascript/ folder...
+
+set "PERSISTENT_JS=%VIVALDI_BASE%\javascript"
+if exist "%PERSISTENT_JS%" (
+    rmdir /s /q "%PERSISTENT_JS%" 2>nul
+    if not exist "%PERSISTENT_JS%" (
+        echo     Removed %PERSISTENT_JS%\
+    ) else (
+        echo     [!] Could not fully remove %PERSISTENT_JS%\ (files may be in use)
+    )
+) else (
+    echo     No persistent javascript/ folder found (already clean)
+)
+echo.
+
+REM === Remove versioned javascript/ subfolder (old architecture) ===
+echo [4/4] Cleaning up old versioned javascript/ folder...
 
 if exist "%VIVALDI_DIR%javascript" (
     rmdir /s /q "%VIVALDI_DIR%javascript" 2>nul
     if not exist "%VIVALDI_DIR%javascript" (
-        echo     Removed javascript/ folder
+        echo     Removed %VIVALDI_DIR%javascript\
     ) else (
         echo     [!] Could not fully remove javascript/ (files may be in use)
     )
 ) else (
-    echo     No javascript/ folder found (already clean)
+    echo     No versioned javascript/ folder found (already clean)
 )
 
 REM Also clean up legacy root-level JS files from older installs

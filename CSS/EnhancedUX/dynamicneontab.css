@@ -35,13 +35,16 @@
     100% { background-position: 100% 50%; }
 }
 
-.tab.active {
-    background: linear-gradient(270deg, #00fff7, #ff00f7);
-    background-size: 200% 200%;
-    animation: activeTabGradient 3s linear infinite;
+.tab.active,
+.tab-wrapper.accordion .tab.active,
+.tab-wrapper.in-accordion .tab.active,
+.tab-wrapper.extended.in-accordion .tab.active {
+    background: linear-gradient(270deg, #00fff7, #ff00f7) !important;
+    background-size: 200% 200% !important;
+    animation: activeTabGradient 3s linear infinite !important;
     color: white !important;
     text-shadow: 0 0 6px #00fff7, 0 0 10px #ff00f7;
-    box-shadow: 0 0 15px rgba(255, 0, 247, 0.9), 0 0 25px rgba(0, 255, 247, 0.7);
+    box-shadow: 0 0 15px rgba(255, 0, 247, 0.9), 0 0 25px rgba(0, 255, 247, 0.7) !important;
 }
 
 /* Click bounce effect */
