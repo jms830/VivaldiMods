@@ -181,10 +181,10 @@ Visual hierarchy through CONTRAST + minimal accent, not background fills
   opacity: 1 !important;
 }
 
-/* Pinned active - subtle ring instead of fill */
+/* Pinned active - clean, no ring or fill */
 .tab-position.is-pinned .tab.active .tab-wrapper {
-  background-color: transparent !important;
-  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
 }
 
 /* ============================================ */
@@ -289,4 +289,22 @@ Visual hierarchy through CONTRAST + minimal accent, not background fills
 .tab-position .tab .tab-header {
   border: none !important;
   outline: none !important;
+}
+
+/* Suppress TabsTrail pseudo-elements on pinned grid tabs */
+.tab-position.is-pinned .tab .tab-header::before,
+.tab-position.is-pinned .tab .tab-header::after {
+  display: none !important;
+}
+
+/* Remove colored inline styles Vivaldi injects on tab stacks */
+.tab-position .tab[style*="--colorAccentBg"],
+.tab-position .tab-wrapper[style*="--colorAccentBg"] {
+  border-color: transparent !important;
+}
+
+/* Kill SVG selection frame artifacts */
+.tab-position .svg-tab-selection .stack-frame {
+  stroke: none !important;
+  fill: none !important;
 }

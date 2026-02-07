@@ -67,7 +67,7 @@ Currently only support 3x3 tabs grid.
     > span:has(.is-pinned):nth-child(n + 7):nth-child(-n + 9)
     .is-pinned
     .tab-wrapper {
-    margin-bottom: var(--pinned-gap) !important;
+    margin-bottom: 2px !important;
   }
 
   #tabs-container
@@ -159,13 +159,13 @@ Currently only support 3x3 tabs grid.
     display: none !important;
   }
 
-  /* Active tab outline */
+  /* Active tab - subtle ring (zentabs.css handles the accent bar) */
   #tabs-container
     .tab-strip
     > span:has(.is-pinned)
     .is-pinned.active
     .tab-wrapper {
-    outline: 2px solid var(--colorAccentBg, #4a90e2);
+    outline: none !important;
   }
 
   /* Regular style for pinned tabs after 9th */
@@ -285,8 +285,7 @@ Currently only support 3x3 tabs grid.
     grid-column: 1 / -1 !important;
   }
 
-  /* Separator block disabled: expands infinitely when unpinned tabs are present. */
-  /*
+  /* Separator: constrained height to prevent infinite expansion */
   #tabs-container .tab-strip .separator {
     grid-column: 1 / -1 !important;
     position: relative !important;
@@ -296,16 +295,23 @@ Currently only support 3x3 tabs grid.
     justify-content: center !important;
     align-items: center !important;
     transform: none !important;
+    /* Strict height constraints to prevent infinite expansion */
+    height: 24px !important;
+    max-height: 24px !important;
+    min-height: 24px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    overflow: hidden !important;
   }
 
   #tabs-container .tab-strip .separator hr {
     width: 100% !important;
     margin: 0 !important;
-    height: 1.2px !important;
+    height: 1px !important;
     border: none !important;
     background-color: var(--colorFg) !important;
+    opacity: 0.12;
   }
-  */
 
   .tab-wrapper {
     position: relative;
