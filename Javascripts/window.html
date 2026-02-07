@@ -5,21 +5,31 @@
      This file is NOT copied to Vivaldi directly. It's a reference showing
      what the install scripts inject into Vivaldi's stock window.html.
 
-     ARCHITECTURE:
+     ARCHITECTURE (NTFS Junction):
        Application/
-       +-- javascript/                    (PERSISTENT - survives updates)
+       +-- javascript/                    (PERSISTENT - real JS files live here)
        |   +-- custom.js                  (Loader - configure mods here)
        |   +-- workspaceButtons.js
+       |   +-- Tam710562/
        |   +-- ...
        +-- <version>/resources/vivaldi/
            +-- window.html                (ONE line injected before </body>)
+           +-- javascript/                (NTFS JUNCTION -> Application/javascript/)
 
-     The install script adds this ONE line before </body> in Vivaldi's window.html:
+     Why junctions?
+       Vivaldi loads window.html as chrome-extension://mpognobbkildjkofajifpdfhcoklimli/
+       Chrome extensions CANNOT use ../ to traverse above their resource root.
+       NTFS junctions are resolved at the filesystem level (transparent to Chrome).
+       No admin privileges required (unlike symlinks).
 
-       <script src="../../../javascript/custom.js"></script>
+     The install script:
+       1. Copies JS files to Application/javascript/ (persistent)
+       2. Creates junction: resources/vivaldi/javascript/ -> Application/javascript/
+       3. Injects ONE line before </body>:
+            <script src="javascript/custom.js"></script>
 
-     custom.js handles loading all individual mods.
-     To enable/disable mods, edit custom.js (not window.html).
+     After Vivaldi updates: only junction + one-liner need re-creating.
+     JS files + custom.js config persist automatically.
 
      ============================================================================ -->
 
@@ -35,7 +45,7 @@
 </head>
 <body>
 
-<!-- INJECTED BY install-js-mods.bat: -->
-<script src="../../../javascript/custom.js"></script>
+<!-- INJECTED BY install-js-mods.bat (loads via NTFS junction): -->
+<script src="javascript/custom.js"></script>
 </body>
 </html>

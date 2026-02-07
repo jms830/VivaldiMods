@@ -1,9 +1,10 @@
 @echo off
 REM ============================================================================
-REM Vivaldi Mods - JavaScript Mods Installer (Persistent Architecture)
+REM Vivaldi Mods - JavaScript Mods Installer (Junction Architecture)
 REM ============================================================================
-REM This script installs JavaScript mods using the PERSISTENT approach:
+REM This script installs JavaScript mods using the JUNCTION approach:
 REM   - JS files go to Application\javascript\ (survives Vivaldi updates!)
+REM   - NTFS junction makes them visible as resources\vivaldi\javascript\
 REM   - ONE line is injected into Vivaldi's stock window.html to load custom.js
 REM   - custom.js dynamically loads all individual mods
 REM
@@ -16,13 +17,15 @@ REM   |   +-- Tam710562\
 REM   |   +-- ...
 REM   +-- 7.x.xxxx.x\
 REM       +-- resources\vivaldi\
+REM           +-- javascript\       <-- NTFS JUNCTION pointing to Application\javascript\
 REM           +-- window.html       <-- ONE line injected before </body>
 REM
 REM What it does:
 REM   1. Backs up Vivaldi's original window.html
 REM   2. Copies JS files + custom.js to Application\javascript\ (persistent)
-REM   3. Injects one script tag into Vivaldi's window.html
-REM   4. (Optional) Installs AutoHotkey watcher for auto-patching on updates
+REM   3. Creates NTFS junction: resources\vivaldi\javascript\ -> Application\javascript\
+REM   4. Injects one script tag into Vivaldi's window.html
+REM   5. (Optional) Installs AutoHotkey watcher for auto-patching on updates
 REM
 REM Usage:
 REM   install-js-mods.bat              - Normal install with watcher prompt
@@ -57,7 +60,7 @@ goto :parse_args
 
 echo.
 echo =============================================
-echo  Vivaldi Mods - JS Installer (Persistent)
+echo  Vivaldi Mods - JS Installer (Junction)
 echo =============================================
 echo.
 
@@ -129,7 +132,7 @@ if not errorlevel 1 (
 )
 
 REM === Step 1: Backup stock window.html ===
-echo [1/3] Creating backup of stock window.html...
+echo [1/4] Creating backup of stock window.html...
 
 REM If backup exists but contains our mods, it's stale (from old-template era) - replace it
 if exist "%VIVALDI_VERSION_DIR%window.bak.html" (
@@ -156,7 +159,7 @@ if not exist "%VIVALDI_VERSION_DIR%window.bak.html" (
 echo.
 
 REM === Step 2: Copy JS files to PERSISTENT Application\javascript\ ===
-echo [2/3] Copying JavaScript mods to persistent location...
+echo [2/4] Copying JavaScript mods to persistent location...
 echo     Target: %VIVALDI_BASE%\javascript\
 echo.
 
@@ -199,10 +202,35 @@ echo.
 echo     Copied %MOD_COUNT% JS files to persistent location (%FOLDER_COUNT% subfolders)
 echo.
 
-REM === Step 3: Inject one-liner into Vivaldi's window.html ===
-echo [3/3] Injecting custom.js loader into window.html...
+REM === Step 3: Create NTFS junction ===
+echo [3/4] Creating NTFS junction...
 
-set "INJECT_LINE=^<script src="../../../javascript/custom.js"^>^</script^>"
+set "JUNCTION_PATH=%VIVALDI_VERSION_DIR%javascript"
+
+REM Remove existing junction or directory
+if exist "%JUNCTION_PATH%" (
+    rmdir "%JUNCTION_PATH%" >nul 2>&1
+    if exist "%JUNCTION_PATH%" (
+        echo     Removing old directory (not a junction)...
+        rmdir /s /q "%JUNCTION_PATH%" >nul 2>&1
+    )
+)
+
+REM Create the junction
+mklink /J "%JUNCTION_PATH%" "%VIVALDI_BASE%\javascript" >nul 2>&1
+if errorlevel 1 goto :patch_failed
+
+REM Verify junction was created and target is accessible
+if not exist "%JUNCTION_PATH%\custom.js" goto :patch_failed
+
+echo     Created junction: %JUNCTION_PATH%
+echo     Points to: %VIVALDI_BASE%\javascript\
+echo.
+
+REM === Step 4: Inject one-liner into Vivaldi's window.html ===
+echo [4/4] Injecting custom.js loader into window.html...
+
+set "INJECT_LINE=^<script src="javascript/custom.js"^>^</script^>"
 set "WINDOW_TARGET=%VIVALDI_VERSION_DIR%window.html"
 
 REM Check if already injected
@@ -214,10 +242,10 @@ if not errorlevel 1 (
 )
 
 REM Inject the script tag before </body> using PowerShell
-powershell -Command "$f='%WINDOW_TARGET%'; $c=Get-Content $f -Raw; $c=$c.Replace('</body>','<script src=\"../../../javascript/custom.js\"></script>' + [char]13 + [char]10 + '</body>'); Set-Content $f $c -NoNewline" 2>nul
+powershell -Command "$f='%WINDOW_TARGET%'; $c=Get-Content $f -Raw; $c=$c.Replace('</body>','<script src=\"javascript/custom.js\"></script>' + [char]13 + [char]10 + '</body>'); Set-Content $f $c -NoNewline" 2>nul
 if errorlevel 1 goto :patch_failed
 
-echo     Injected: ^<script src="../../../javascript/custom.js"^>^</script^>
+echo     Injected: ^<script src="javascript/custom.js"^>^</script^>
 echo.
 
 :validate
@@ -232,31 +260,44 @@ REM Check key JS files exist in PERSISTENT location
 if not exist "%VIVALDI_BASE%\javascript\custom.js" goto :patch_failed
 if not exist "%VIVALDI_BASE%\javascript\workspaceButtons.js" goto :patch_failed
 
+REM Check junction is accessible
+if not exist "%JUNCTION_PATH%\custom.js" goto :patch_failed
+
 echo     Validation passed.
 echo.
 
-REM === Clean up old installs (versioned-dir JS files, old bundled custom.js) ===
-if exist "%VIVALDI_VERSION_DIR%javascript" (
-    echo [i] Cleaning up old JS files from versioned dir...
-    rmdir /s /q "%VIVALDI_VERSION_DIR%javascript" 2>nul
-    echo     Removed old %VIVALDI_VERSION_DIR%javascript\
+REM === Clean up old bundled custom.js (if it exists from old installs) ===
+if exist "%VIVALDI_VERSION_DIR%custom.js" (
+    echo [i] Cleaning up old bundled custom.js...
+    del "%VIVALDI_VERSION_DIR%custom.js" >nul 2>&1
+    echo     Removed old custom.js
+)
+
+if exist "%VIVALDI_VERSION_DIR%custom.js.bak" (
+    del "%VIVALDI_VERSION_DIR%custom.js.bak" >nul 2>&1
+    echo     Removed old custom.js.bak
+)
+
+if exist "%VIVALDI_VERSION_DIR%custom.js" (
     echo.
 )
 
 echo =============================================
-echo  JS Installation Complete! (Persistent)
+echo  JS Installation Complete! (Junction)
 echo =============================================
 echo.
 echo  Installed %MOD_COUNT% JS files to persistent location.
 echo.
 echo  JS mods:    %VIVALDI_BASE%\javascript\  (PERSISTENT)
 echo  Config:     %VIVALDI_BASE%\javascript\custom.js
+echo  Junction:   %JUNCTION_PATH%
 echo  Injected:   window.html in %VIVALDI_VERSION_DIR%
 echo.
 echo  +---------------------------------------------------------+
 echo  ^|  HOW IT WORKS:                                          ^|
 echo  ^|                                                         ^|
 echo  ^|  - JS files in Application\javascript\ survive updates  ^|
+echo  ^|  - NTFS junction makes them visible inside resources\   ^|
 echo  ^|  - One line in window.html loads custom.js              ^|
 echo  ^|  - custom.js loads all your enabled mods                ^|
 echo  ^|  - After updates, only the one-liner needs re-injecting ^|
@@ -342,6 +383,13 @@ echo [X] ERROR: Installation validation failed!
 echo.
 echo     Attempting automatic rollback...
 echo.
+
+REM Remove junction on failure (plain rmdir, NOT /s /q)
+if defined JUNCTION_PATH (
+    if exist "%JUNCTION_PATH%" (
+        rmdir "%JUNCTION_PATH%" >nul 2>&1
+    )
+)
 
 if exist "%VIVALDI_VERSION_DIR%window.bak.html" (
     copy /y "%VIVALDI_VERSION_DIR%window.bak.html" "%VIVALDI_VERSION_DIR%window.html" >nul

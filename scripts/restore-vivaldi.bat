@@ -5,11 +5,13 @@ REM ============================================================================
 REM Restores Vivaldi's original window.html and removes all JS mods.
 REM
 REM Cleans up:
+REM   - NTFS junction at resources\vivaldi\javascript\ (points to Application\javascript\)
 REM   - Persistent JS files in Application\javascript\ (new architecture)
 REM   - Versioned JS files in resources\vivaldi\javascript\ (old architecture)
 REM   - Bundled custom.js (legacy approach)
 REM   - Legacy root-level JS files (oldest approach)
 REM
+REM Junction removal uses plain rmdir (safe) before attempting recursive delete.
 REM CSS mods can be disabled in Vivaldi Settings or vivaldi://experiments
 REM ============================================================================
 
@@ -55,7 +57,7 @@ if not exist "%VIVALDI_DIR%window.bak.html" (
 )
 
 REM === Restore window.html ===
-echo [1/4] Restoring original window.html from backup...
+echo [1/5] Restoring original window.html from backup...
 copy /y "%VIVALDI_DIR%window.bak.html" "%VIVALDI_DIR%window.html" >nul
 if errorlevel 1 (
     echo [X] ERROR: Failed to restore window.html
@@ -64,8 +66,28 @@ if errorlevel 1 (
 echo     Done.
 echo.
 
+REM === Remove NTFS junction (safe removal without deleting target) ===
+echo [2/5] Removing NTFS junction...
+if exist "%VIVALDI_DIR%javascript" (
+    rmdir "%VIVALDI_DIR%javascript" 2>nul
+    if not exist "%VIVALDI_DIR%javascript" (
+        echo     Removed junction at %VIVALDI_DIR%javascript\
+    ) else (
+        echo     [!] Not a junction or in use. Attempting recursive delete...
+        rmdir /s /q "%VIVALDI_DIR%javascript" 2>nul
+        if not exist "%VIVALDI_DIR%javascript" (
+            echo     Removed %VIVALDI_DIR%javascript\
+        ) else (
+            echo     [!] Could not remove javascript/ (files may be in use)
+        )
+    )
+) else (
+    echo     No junction found (already clean)
+)
+echo.
+
 REM === Remove bundled custom.js (old approach) ===
-echo [2/4] Removing bundled JS (custom.js)...
+echo [3/5] Removing bundled JS (custom.js)...
 if exist "%VIVALDI_DIR%custom.js" (
     del "%VIVALDI_DIR%custom.js" 2>nul
     echo     Removed custom.js
@@ -75,7 +97,7 @@ if exist "%VIVALDI_DIR%custom.js" (
 echo.
 
 REM === Remove persistent Application\javascript\ (current architecture) ===
-echo [3/4] Removing persistent javascript/ folder...
+echo [4/5] Removing persistent javascript/ folder...
 
 set "PERSISTENT_JS=%VIVALDI_BASE%\javascript"
 if exist "%PERSISTENT_JS%" (
@@ -91,7 +113,8 @@ if exist "%PERSISTENT_JS%" (
 echo.
 
 REM === Remove versioned javascript/ subfolder (old architecture) ===
-echo [4/4] Cleaning up old versioned javascript/ folder...
+REM Note: Junction was already safely removed in Step 2. This handles any real directories.
+echo [5/5] Cleaning up old versioned javascript/ folder...
 
 if exist "%VIVALDI_DIR%javascript" (
     rmdir /s /q "%VIVALDI_DIR%javascript" 2>nul

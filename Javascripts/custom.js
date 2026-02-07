@@ -20,7 +20,7 @@
   // Resolve base path from this script's location
   // (works regardless of Vivaldi version folder depth)
   var currentScript = document.currentScript;
-  var base = currentScript ? currentScript.src.substring(0, currentScript.src.lastIndexOf('/') + 1) : '../../../javascript/';
+  var base = currentScript ? currentScript.src.substring(0, currentScript.src.lastIndexOf('/') + 1) : 'javascript/';
 
   // ========================================================================
   // ENABLED MODS - Comment out a line to disable that mod
