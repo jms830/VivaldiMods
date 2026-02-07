@@ -1283,3 +1283,16 @@ button.vivaldi {
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
 }
+
+/* Resize the window button group when Auto-hide UI enabled */
+.auto-hide
+.window-buttongroup {
+    height: 31px !important;
+}
+
+.auto-hide
+.window-buttongroup button {
+    width: 32px !important;
+    height: 31px !important;
+    padding: 0 !important;
+}

@@ -102,6 +102,9 @@
 /* Dynamic neon tab accents */
 /* @import "EnhancedUX/dynamicneontab.css"; */
 
+/* SuperPins - alternative pinned tabs grid (ELGUAPOLIFE, broken on 7.8+) */
+/* @import "EnhancedUX/superpins.css"; */
+
 /* Quietify - hide audio/media icons on tabs */
 @import "EnhancedUX/quietify.css";
 
