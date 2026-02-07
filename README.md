@@ -40,17 +40,23 @@ Arc-style theming for Vivaldi Browser. This repo is a fork of [Awesome-Vivaldi](
 ```
 revivarc-vivaldi/
 ├── CSS/                    # CSS mods (point Vivaldi here)
-│   ├── core.css            # Entry point - imports all modules
+│   ├── core.css            # Entry point - comment/uncomment @imports to toggle
 │   ├── AutoHide/           # Auto-hide features
 │   ├── Layout/             # Core layouts
 │   ├── EnhancedUX/         # Visual enhancements
 │   └── JSIntegration/      # CSS for JS-dependent features
-├── Javascripts/            # JS mods (require patching Vivaldi)
+├── Javascripts/            # JS mods
+│   ├── custom.js           # JS loader - comment/uncomment lines to toggle mods
+│   ├── Tam710562/          # Tam's mods (media controls, notes, etc.)
+│   ├── luetage/            # Luetage's mods (accent, hover, theme, etc.)
+│   ├── aminought/          # Aminought's mods (colorTabs, addressBar)
+│   ├── Other/              # Misc mods (PiP, dashboard, hibernate)
+│   └── PageAction/         # Page action mods (follower tabs, tab lock)
 ├── scripts/                # Installation scripts
 │   ├── install.bat         # CSS setup (Windows)
 │   ├── install-js-mods.bat # JS setup (Windows)
 │   ├── restore-vivaldi.bat # Remove JS mods
-│   ├── auto-patch-vivaldi.bat   # Re-apply JS mods if missing
+│   ├── auto-patch-vivaldi.bat   # Re-apply JS after Vivaldi updates
 │   ├── setup-auto-patch.bat     # Schedule auto-patch on login
 │   └── vivaldi-watcher.ahk      # Auto-apply JS mods on Vivaldi update
 ├── configurator/           # Web-based configuration tool
@@ -96,36 +102,39 @@ The configurator offers these presets:
 | colorTabs.js | Color tab borders by favicon |
 | mdNotes.js | Markdown notes in sidebar |
 | workspaceButtons.js | Quick workspace switching buttons in tabbar |
+| commandChainIcons.js | Custom SVG icons for command chains |
+| workspaceColors.js | Per-workspace accent colors |
 
-**Note:** JS mods require patching Vivaldi's `window.html`. Run `scripts/install-js-mods.bat` on Windows, or see [docs](docs/) for manual instructions on macOS/Linux.
+### How JS Mods Work
 
-### JS Mods - Manual Modular Install
+JS mods use a **one-liner injection** approach:
 
-For more control over which JS mods are loaded (like `core.css` for CSS), use the modular `window.html`:
+1. `install-js-mods.bat` copies all JS files to a **persistent** location: `Application/javascript/`
+2. It injects a single `<script>` tag into Vivaldi's `window.html` that loads `custom.js`
+3. `custom.js` dynamically loads all enabled mod scripts
 
-1. Copy `Javascripts/window.html` to `<VIVALDI>/Application/<VERSION>/resources/vivaldi/`
-2. Copy all JS files from `Javascripts/` (including subfolders) to the same location
-3. Edit `window.html` - comment/uncomment `<script>` lines to enable/disable mods:
-   ```html
-   <!-- Enabled: -->
-   <script src="tidyTabs.js"></script>
-   
-   <!-- Disabled (commented out): -->
-   <!-- <script src="colorTabs.js.disabled"></script> -->
-   ```
-4. Restart Vivaldi
+**To configure which JS mods are active**, edit `Javascripts/custom.js` (or `Application/javascript/custom.js` after install). Comment/uncomment lines in the `enabledMods` array:
 
-Each script has a comment explaining what it does. This approach is easier to customize than the bundled `custom.js`.
+```javascript
+var enabledMods = [
+  'workspaceButtons.js',
+  'tidyTabs.js',
+  // 'colorTabs.js',        ← disabled (commented out)
+  'Tam710562/globalMediaControls.js',
+];
+```
+
+This is the JS equivalent of `CSS/core.css` — one config file controls everything.
 
 ### JS Mod Persistence (Vivaldi Updates)
 
-JS mods are injected into Vivaldi's versioned `Application/<version>/resources/vivaldi/` folder. **When Vivaldi updates, this folder is replaced and JS mods are lost.** CSS mods persist because their path is stored in user preferences.
+JS files live in `Application/javascript/` which is **outside** the versioned folder. When Vivaldi updates, only the versioned `window.html` is replaced — your JS files and `custom.js` config survive. The only thing that needs re-applying is the one-liner `<script>` injection.
 
 **Solutions for Windows:**
 
 | Script | Description |
 |--------|-------------|
-| `scripts/auto-patch-vivaldi.bat` | Checks if latest Vivaldi version has custom.js, re-applies if missing. Run manually or on schedule. |
+| `scripts/auto-patch-vivaldi.bat` | Detects if the latest Vivaldi version needs the one-liner injected. If `custom.js` already exists in the persistent location, it just injects the script tag (<1 second). |
 | `scripts/setup-auto-patch.bat` | Creates a Windows scheduled task to run auto-patch on login. |
 | `scripts/vivaldi-watcher.ahk` | AutoHotkey v2 script that monitors Vivaldi's folder and auto-applies JS mods when a new version is detected. **Recommended** - set it to run at startup. |
 
