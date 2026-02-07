@@ -128,13 +128,30 @@ if not errorlevel 1 (
     echo.
 )
 
-REM === Step 1: Backup window.html ===
-echo [1/3] Creating backup...
+REM === Step 1: Backup stock window.html ===
+echo [1/3] Creating backup of stock window.html...
+
+REM If backup exists but contains our mods, it's stale (from old-template era) - replace it
+if exist "%VIVALDI_VERSION_DIR%window.bak.html" (
+    findstr /C:"custom.js" "%VIVALDI_VERSION_DIR%window.bak.html" >nul 2>&1
+    if not errorlevel 1 (
+        echo     Existing backup contains mods (stale^) - will recreate from stock
+        del "%VIVALDI_VERSION_DIR%window.bak.html" >nul 2>&1
+    )
+)
+
 if not exist "%VIVALDI_VERSION_DIR%window.bak.html" (
-    copy "%VIVALDI_VERSION_DIR%window.html" "%VIVALDI_VERSION_DIR%window.bak.html" >nul
-    echo     Created backup: window.bak.html
+    REM Only backup if current window.html is stock (no custom.js reference)
+    findstr /C:"custom.js" "%VIVALDI_VERSION_DIR%window.html" >nul 2>&1
+    if errorlevel 1 (
+        copy "%VIVALDI_VERSION_DIR%window.html" "%VIVALDI_VERSION_DIR%window.bak.html" >nul
+        echo     Created backup: window.bak.html (stock Vivaldi)
+    ) else (
+        echo     [!] Current window.html already modded, no stock backup available
+        echo     [!] Proceeding anyway - injection will be idempotent
+    )
 ) else (
-    echo     Backup already exists: window.bak.html
+    echo     Backup already exists: window.bak.html (stock Vivaldi)
 )
 echo.
 
@@ -197,7 +214,7 @@ if not errorlevel 1 (
 )
 
 REM Inject the script tag before </body> using PowerShell
-powershell -Command "(Get-Content '%WINDOW_TARGET%') -replace '</body>', '<script src=\"../../../javascript/custom.js\"></script>`r`n</body>' | Set-Content '%WINDOW_TARGET%'" 2>nul
+powershell -Command "$f='%WINDOW_TARGET%'; $c=Get-Content $f -Raw; $c=$c.Replace('</body>','<script src=\"../../../javascript/custom.js\"></script>' + [char]13 + [char]10 + '</body>'); Set-Content $f $c -NoNewline" 2>nul
 if errorlevel 1 goto :patch_failed
 
 echo     Injected: ^<script src="../../../javascript/custom.js"^>^</script^>

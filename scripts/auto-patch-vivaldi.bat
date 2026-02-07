@@ -101,7 +101,7 @@ if exist "%JS_PERSISTENT%\custom.js" (
     )
 
     REM Inject the one-liner before </body>
-    powershell -Command "(Get-Content '%LATEST_DIR%\window.html') -replace '</body>', '<script src=\"../../../javascript/custom.js\"></script>`r`n</body>' | Set-Content '%LATEST_DIR%\window.html'" 2>nul
+    powershell -Command "$f='%LATEST_DIR%\window.html'; $c=Get-Content $f -Raw; $c=$c.Replace('</body>','<script src=\"../../../javascript/custom.js\"></script>' + [char]13 + [char]10 + '</body>'); Set-Content $f $c -NoNewline" 2>nul
     if errorlevel 1 (
         echo [%DATE% %TIME%] ERROR: Failed to inject into window.html >> "%LOG_FILE%"
         if "%SILENT_MODE%"=="0" (
