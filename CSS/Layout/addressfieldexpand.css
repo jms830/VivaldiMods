@@ -12,7 +12,7 @@
     margin: -3px -20px -25px !important; */
     padding: 23px 10px !important;
     margin: 6px -75px !important;
-    z-index: 99999999 !important;
+    z-index: var(--z-overlay) !important;
 }
 
 /* Block Button */
@@ -57,17 +57,8 @@ button[title="显示输入记录"] {
     border: unset;
 }
 
-/* .OmniDropdown{
-    transform: scale(1);
-    transition: transform 300ms cubic-bezier(.25,.8,.25,1.03) !important;
-} */
-/* .UrlBar-UrlFieldWrapper {
-    position: relative;
-    z-index: 1;
-} */
-
 .toolbar.toolbar-insideinput {
-    z-index: 3;
+    z-index: var(--z-base);
 }
 
 @keyframes expand {
@@ -102,5 +93,5 @@ button[title="显示输入记录"] {
 
 .UrlBar-AddressField:focus-within {
     position: relative;
-    z-index: 9999;
+    z-index: var(--z-overlay);
 }
