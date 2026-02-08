@@ -65,7 +65,7 @@ goto :parse_args
 
 echo.
 echo =============================================
-echo  Vivaldi Mods - JS Installer (Junction)
+echo  Vivaldi Mods - JS Installer (Hardlinks)
 echo =============================================
 echo.
 
@@ -133,8 +133,17 @@ set "VIVALDI_RUNNING=0"
 tasklist /FI "IMAGENAME eq vivaldi.exe" 2>nul | find /I "vivaldi.exe" >nul
 if not errorlevel 1 (
     set "VIVALDI_RUNNING=1"
-    echo [!] Vivaldi is currently running - will need restart after install.
+    echo [!] WARNING: Vivaldi is currently running.
+    echo     File locks may cause hardlink creation to fail.
+    echo     Close Vivaldi for best results, or continue at your own risk.
     echo.
+    if "%SILENT_MODE%"=="0" (
+        choice /C YN /M "Continue anyway"
+        if errorlevel 2 (
+            echo     Aborting. Please close Vivaldi and run again.
+            pause ^& exit /b 0
+        )
+    )
 )
 
 REM === Step 1: Backup stock window.html ===

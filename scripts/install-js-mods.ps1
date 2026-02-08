@@ -2,7 +2,7 @@
 # Vivaldi Mods - JavaScript Mods Installer (PowerShell)
 # ============================================================================
 # This script patches Vivaldi to load JavaScript mods from THIS repository.
-# Works from both Windows native paths and WSL paths.
+# Windows only. For WSL, use the batch script: install-js-mods.bat
 #
 # Usage:
 #   .\install-js-mods.ps1              - Normal install with watcher prompt
