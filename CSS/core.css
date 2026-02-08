@@ -7,7 +7,32 @@
    
    TIP: Ctrl+F to search for specific features.
    
-   ============================================================================ */
+    ============================================================================ */
+
+
+/* KNOWN CONFLICTS - Enable only one from each group:
+   Group A (Auto-hide behavior):
+   - Layout/nativeautohidepolish.css (recommended for 7.8+)
+   - Layout/betterautohide.css (legacy alternative)
+   - EnhancedUX/airzenify.css overrides both when enabled
+   
+   Group B (Address bar styling):
+   - Layout/addressbar.css (Zen-inspired pill shape)
+   - Layout/addressfieldexpand.css (spotlight-style expand)
+   - Enable only ONE, or neither (Vivaldi default)
+   
+   Group C (Tab styling):
+   - Layout/zentabs.css (opacity-based hierarchy)
+   - EnhancedUX/bravestyletabs.css (rounded, shadowed)
+   - Enable only ONE, or neither
+*/
+
+
+/* RECOMMENDED VARIABLES - Add to your Vivaldi theme's custom CSS or :root:
+   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+   --ease-overshoot: cubic-bezier(.25, .8, .25, 1.03);
+   --ease-decelerate: cubic-bezier(.4, 0, .6, 1);
+*/
 
 
 /* ============================================================================

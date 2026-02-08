@@ -109,43 +109,30 @@ The configurator offers these presets:
 
 JS mods use **NTFS hardlinks** to survive Vivaldi updates:
 
-1. `install-js-mods.bat` copies all JS files to a **persistent** location: `Application/javascript/`
-2. It creates **hardlinks** so Vivaldi can see the files inside its versioned directory:
-   each file in `resources/vivaldi/javascript/` is hardlinked to `Application/javascript/`
-3. It injects a single `<script>` tag into Vivaldi's `window.html` that loads `custom.js`
-4. `custom.js` dynamically loads all enabled mod scripts
+1. JS files persist in `Application/javascript/` (outside the versioned folder).
+2. `install-js-mods.bat` creates **hardlinks** so Vivaldi can see the files inside its versioned directory: `resources/vivaldi/javascript/`.
+3. It injects a single `<script>` tag into Vivaldi's `window.html` that loads `custom.js`.
+4. `custom.js` dynamically loads all enabled mods.
 
-**Why hardlinks?** Vivaldi loads `window.html` as a Chrome extension (`chrome-extension://...`). Chrome's security resolves junctions/symlinks to their real target path and rejects files outside the extension root. Hardlinks are the *same NTFS data object* with two directory entries — Chrome sees a real file at the expected path. No admin privileges required, zero extra disk space.
+**To customize:** Edit `Application/javascript/custom.js` and comment/uncomment lines in the `enabledMods` array.
 
-**To configure which JS mods are active**, edit `Javascripts/custom.js` (or `Application/javascript/custom.js` after install). Comment/uncomment lines in the `enabledMods` array:
+**After Vivaldi updates:** Only the hardlinks and the `window.html` one-liner need re-creating. Run `auto-patch-vivaldi.bat` to fix it in under a second.
 
-```javascript
-var enabledMods = [
-  'workspaceButtons.js',
-  'tidyTabs.js',
-  // 'colorTabs.js',        ← disabled (commented out)
-  'Tam710562/globalMediaControls.js',
-];
-```
-
-This is the JS equivalent of `CSS/core.css` — one config file controls everything.
+**Why hardlinks?** Vivaldi loads `window.html` as a Chrome extension. Chrome's security rejects symlinks to files outside the extension root. Hardlinks are the *same NTFS data object* with two directory entries — Chrome sees a real file at the expected path. No admin privileges required, zero extra disk space.
 
 ### JS Mod Persistence (Vivaldi Updates)
 
-JS files live in `Application/javascript/` which is **outside** the versioned folder. When Vivaldi updates, only the versioned folder is replaced — your JS files and `custom.js` config survive automatically (hardlink ref count drops from 2 to 1, data intact). The only things that need re-creating are:
-
-1. **Hardlinks** — link each JS file from the new version folder to the persistent copies
-2. **Script injection** — the one-liner `<script>` tag in the new `window.html`
-
-Both are handled automatically by the auto-patch script (<1 second).
+JS files live in `Application/javascript/` which is **outside** the versioned folder. When Vivaldi updates, only the versioned folder is replaced — your JS files and `custom.js` config survive automatically.
 
 **Solutions for Windows:**
 
 | Script | Description |
 |--------|-------------|
-| `scripts/auto-patch-vivaldi.bat` | Detects if the latest Vivaldi version needs patching. If JS files already exist in the persistent location, it creates hardlinks + injects the script tag (<1 second). |
+| `scripts/install-js-mods.bat` | **Full install.** Copies JS files to the persistent location, creates hardlinks, and injects the script tag. |
+| `scripts/auto-patch-vivaldi.bat` | **Fast re-patch.** Use after Vivaldi updates. Re-creates hardlinks and injects the script tag (<1 second). |
+| `scripts/restore-vivaldi.bat` | **Complete uninstall.** Removes script injection and hardlinks. |
 | `scripts/setup-auto-patch.bat` | Creates a Windows scheduled task to run auto-patch on login. |
-| `scripts/vivaldi-watcher.ahk` | AutoHotkey v2 script that monitors Vivaldi's folder and auto-applies JS mods when a new version is detected. **Recommended** - set it to run at startup. |
+| `scripts/vivaldi-watcher.ahk` | **Recommended.** AutoHotkey v2 script that monitors Vivaldi and auto-applies mods on update. |
 
 To use the watcher:
 1. Install [AutoHotkey v2](https://www.autohotkey.com/)
