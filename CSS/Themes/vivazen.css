@@ -70,7 +70,7 @@
 
 #main {
     overflow: visible;
-    z-index: 8;
+    z-index: var(--z-hover);
     display: grid;
 }
 
@@ -83,7 +83,7 @@
 .mainbar,
 .bookmark-bar {
     transition: var(--transition-main);
-    z-index: 10;
+    z-index: var(--z-hover);
 }
 
 .inner {
@@ -98,18 +98,18 @@
     border: none !important;
 
     > .toolbar-statusbar {
-        z-index: 12;
+        z-index: var(--z-hover);
         background-color: var(--colorWindowBg);
     }
 }
 #panels-container {
-    z-index: 8 !important;
+    z-index: var(--z-hover) !important;
 }
 .extension-popup,
 .tooltip,
 .mainbar:has(.OmniDropdown),
 .StatusInfo {
-    z-index: 100 !important;
+    z-index: var(--z-dropdown) !important;
 }
 
 .tabbar-wrapper:empty {
@@ -279,7 +279,7 @@
     content: "";
     width: 100%;
     position: absolute;
-    z-index: 9;
+    z-index: var(--z-hover);
     background: transparent;
     transition: var(--transition-main);
 }
@@ -292,7 +292,7 @@
 }
 #header:empty {
     display: block !important;
-    z-index: 9;
+    z-index: var(--z-hover);
 }
 #header::before {
     height: var(--header-hover-height);
@@ -333,7 +333,7 @@
 
 footer#footer {
     display: block !important;
-    z-index: 8;
+    z-index: var(--z-hover);
     flex: 0 0 auto;
 }
 
@@ -351,7 +351,7 @@ footer#footer {
             width: 100vw;
             position: absolute;
             transform: translateY(var(--tab-Y-top));
-            z-index: 9 !important;
+            z-index: var(--z-hover) !important;
         }
     }
     #browser.tabs-bottom {
@@ -359,7 +359,7 @@ footer#footer {
             width: 100vw;
             position: absolute;
             transform: translateY(calc(var(--tab-Y-bottom) + 0px));
-            z-index: 9;
+            z-index: var(--z-hover);
             transition: var(--transition-main);
         }
     }
@@ -368,7 +368,7 @@ footer#footer {
     #browser.tabs-right {
         .inner .tabbar-wrapper {
             width: 10px;
-            z-index: 7;
+            z-index: var(--z-hover);
 
             #tabs-tabbar-container {
                 &.left {
@@ -418,7 +418,7 @@ footer#footer {
 
             &:has(.button-popup),
             &:has(:is(.inner .tabbar-wrapper):hover) .inner {
-                z-index: 100;
+                z-index: var(--z-dropdown);
             }
         }
     }
@@ -482,13 +482,13 @@ footer#footer {
 }
 @container style(--auto-hide-address_bar: true) {
     .mainbar {
-        z-index: 9;
+        z-index: var(--z-hover);
     }
 }
 
 @container style(--auto-hide-address_bar: false) {
     .mainbar {
-        z-index: 10;
+        z-index: var(--z-hover);
     }
 }
 
@@ -508,13 +508,13 @@ footer#footer {
 }
 @container style(--auto-hide-bookmark_bar: true) {
     .bookmark-bar {
-        z-index: 9;
+        z-index: var(--z-hover);
     }
 }
 
 @container style(--auto-hide-bookmark_bar: false) {
     .bookmark-bar {
-        z-index: 10;
+        z-index: var(--z-hover);
     }
 }
 

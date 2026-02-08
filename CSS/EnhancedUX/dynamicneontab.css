@@ -15,7 +15,7 @@
 .tab {
     transition:
         background 0.4s ease,
-        transform 0.2s ease,
+        transform var(--animation-speed, 260ms) ease,
         box-shadow 0.4s ease;
 }
 
@@ -50,13 +50,13 @@
 /* Click bounce effect */
 .tab:active {
     transform: scale(0.95);
-    transition: transform 0.1s ease;
+    transition: transform var(--fast-animation-speed, 140ms) ease;
 }
 
 /* Slight lift when hovering over buttons */
 .button-toolbar:hover {
     transform: translateY(-1px);
-    transition: transform 0.2s ease;
+    transition: transform var(--animation-speed, 260ms) ease;
 }
 
 /* Neon glow on button hover */

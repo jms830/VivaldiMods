@@ -1,5 +1,4 @@
 /* Vivaldi Air v.25
-TODO: Suggestions?
 Fix sorting in panels
 Fix checkboxes
 Do translate menu
@@ -541,7 +540,7 @@ footer .toolbar-statusbar {
     border-radius: var(--radius) !important;
 }
 .mainbar{
-    z-index: 2; /* keep reasonable */
+    z-index: var(--z-base); /* keep reasonable */
 }
 
 /* ========================================================= */
@@ -929,18 +928,18 @@ button.button-startpage:after { content: unset; }
 
 /* Ensure tab bar has proper stacking */
 #tabs-tabbar-container {
-    z-index: 1 !important;
+    z-index: var(--z-base) !important;
     position: relative !important;
 }
 
 /* Force window controls to appear above tab bar */
 .window-buttongroup {
-    z-index: 1000 !important;
+    z-index: var(--z-overlay) !important;
 }
 
 /* Force settings button to appear above tab bar */
 .vivaldi, .sidebar .button-toolbar.settings, .button-settings {
-    z-index: 1001 !important;
+    z-index: var(--z-overlay) !important;
 }
 
 /* Ensure inner panel content respects sidebar radius */
@@ -949,10 +948,6 @@ button.button-startpage:after { content: unset; }
     border-radius: var(--radius) !important;
     overflow: hidden; 
 }
-
-
-
-
 
 
 

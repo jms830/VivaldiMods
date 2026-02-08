@@ -193,7 +193,7 @@
     display: flex !important;
     justify-content: center !important;
     position: relative !important;
-    z-index: 50 !important;
+    z-index: var(--z-dropdown) !important;
     margin-top: 10px !important;
     transform: none !important;
     height: 34px !important;
@@ -226,7 +226,7 @@
 
 .auto-hide-wrapper.left {
     position: fixed !important;
-    z-index: 5000 !important;
+    z-index: var(--z-overlay) !important;
     left: 0 !important;
     top: 50% !important;
     transform: translateY(-50%) translateX(-95%) !important;
@@ -304,7 +304,7 @@ button[name="NewTab"],
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    z-index: 9000 !important;
+    z-index: var(--z-overlay) !important;
     opacity: 0 !important;
     transform: translateY(-100%) !important;
     pointer-events: none !important;
@@ -350,7 +350,7 @@ button[name="NewTab"],
     backdrop-filter: blur(8px) !important;
     box-shadow: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-    z-index: 10 !important;
+    z-index: var(--z-hover) !important;
 }
 
 .webpanel-header * {

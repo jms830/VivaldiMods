@@ -122,26 +122,26 @@ body.transparent-tabbar .auto-hide-wrapper.top #header,
 /* Hide state: smooth deceleration */
 .auto-hide-wrapper {
   transition: 
-    transform 300ms cubic-bezier(.4, 0, .6, 1),
+    transform var(--animation-speed, 260ms) cubic-bezier(.4, 0, .6, 1),
     opacity var(--animation-speed, 260ms) ease-out,
     background-color var(--animation-speed, 260ms) ease-out !important;
 }
 
 /* Show state: slight overshoot for snappy feel */
 .auto-hide-wrapper.left.show {
-  transition: transform 300ms cubic-bezier(.25, .8, .25, 1.03) !important;
+  transition: transform var(--animation-speed, 260ms) cubic-bezier(.25, .8, .25, 1.03) !important;
 }
 
 .auto-hide-wrapper.right.show {
-  transition: transform 300ms cubic-bezier(.25, .8, .25, 1.03) !important;
+  transition: transform var(--animation-speed, 260ms) cubic-bezier(.25, .8, .25, 1.03) !important;
 }
 
 .auto-hide-wrapper.top.show {
-  transition: transform 300ms cubic-bezier(.25, .8, .25, 1.02) !important;
+  transition: transform var(--animation-speed, 260ms) cubic-bezier(.25, .8, .25, 1.02) !important;
 }
 
 .auto-hide-wrapper.bottom.show {
-  transition: transform 300ms cubic-bezier(.25, .8, .25, 1.02) !important;
+  transition: transform var(--animation-speed, 260ms) cubic-bezier(.25, .8, .25, 1.02) !important;
 }
 
 /* ============================================ */

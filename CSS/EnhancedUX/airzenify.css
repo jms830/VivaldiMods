@@ -298,7 +298,6 @@ footer#footer {
 }
 
 footer .toolbar-statusbar {
-    background-color: var(--bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     background-color: var(--bg);
@@ -312,7 +311,6 @@ footer .toolbar-statusbar {
     -webkit-backdrop-filter: var(--blurLow) !important;
     border-radius: var(--radius) !important;
     padding-bottom: 5px !important;
-    background-color: var(--bg);
     margin: 0 5px 4px 5px !important;
     border: none !important;
 }
@@ -509,7 +507,7 @@ footer .toolbar-statusbar {
     background-color: var(--bg) !important;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    transition: background-color 0.2s ease;
+    transition: background-color var(--animation-speed, 260ms) ease;
 }
 */
 .tab.active::after { background: transparent !important; }
@@ -543,7 +541,7 @@ footer .toolbar-statusbar {
     padding: 0 8px !important;
     display: inline-flex !important;
     align-items: center !important;
-    transition: background-color 0.2s ease, backdrop-filter 0.2s ease, color 0.2s ease;
+    transition: background-color var(--animation-speed, 260ms) ease, backdrop-filter var(--animation-speed, 260ms) ease, color var(--animation-speed, 260ms) ease;
 }
 
 .bookmark-bar .button-title,
@@ -588,7 +586,7 @@ footer .toolbar-statusbar {
     -webkit-backdrop-filter: var(--blurMed) !important;
     border-radius: var(--radius) !important;
     box-shadow: none !important;
-    transition: background-color 0.18s ease, backdrop-filter 0.18s ease;
+    transition: background-color var(--fast-animation-speed, 140ms) ease, backdrop-filter var(--fast-animation-speed, 140ms) ease;
 }
 
 /* Stronger blur when hovered/focused */
@@ -617,7 +615,7 @@ footer .toolbar-statusbar {
 }
 .mainbar,
 .bookmark-bar {
-    z-index: 10; /* keep reasonable */
+    z-index: var(--z-hover); /* keep reasonable */
 }
 
 /* ========================================================= */
@@ -675,7 +673,7 @@ footer .toolbar-statusbar {
     margin: 0 var(--startpageNavBtnMargin) !important;
     text-shadow: var(--startpageNavTextShadow);
     box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
-    transition: 0.2s ease;
+    transition: var(--animation-speed, 260ms) ease;
     font-size: 11px;
     font-weight: 500;
 }
@@ -749,7 +747,7 @@ button.button-startpage:after { content: unset; }
     margin: 0 var(--startpageNavBtnMargin) !important;
     text-shadow: var(--startpageNavTextShadow);
     box-shadow: 0 0 2px 1px rgba(0,0,0,0.2);
-    transition: 0.2s ease;
+    transition: var(--animation-speed, 260ms) ease;
 }
 
 /* Center the SVG inside the add button */
@@ -934,7 +932,7 @@ button.button-startpage:after { content: unset; }
     background: transparent !important;
     border-radius: var(--radius);
     padding: 0 10px !important;
-    transition: background-color 0.2s ease, backdrop-filter 0.2s ease;
+    transition: background-color var(--animation-speed, 260ms) ease, backdrop-filter var(--animation-speed, 260ms) ease;
 }
 
 /* Hover */
@@ -963,7 +961,7 @@ button.button-startpage:after { content: unset; }
 
 /* === Fix: Bookmark bar to appear below the suggestions === */
 .bookmark-bar {
-    z-index: 5 !important;
+    z-index: var(--z-base) !important;
 }
 
 /* =============================*/
@@ -1035,7 +1033,7 @@ button.button-startpage:after { content: unset; }
     -webkit-backdrop-filter: var(--blurMed) !important;
     border-radius: var(--radius) !important;
     box-shadow: none !important;
-    transition: background-color 0.18s ease, backdrop-filter 0.18s ease;
+    transition: background-color var(--fast-animation-speed, 140ms) ease, backdrop-filter var(--fast-animation-speed, 140ms) ease;
     border: none !important;
 }
 
@@ -1061,18 +1059,18 @@ button.button-startpage:after { content: unset; }
 
 /* Ensure tab bar has proper stacking */
 #tabs-tabbar-container {
-    z-index: 1 !important;
+    z-index: var(--z-base) !important;
     position: relative !important;
 }
 
 /* Force window controls to appear above tab bar */
 .window-buttongroup {
-    z-index: 1000 !important;
+    z-index: var(--z-overlay) !important;
 }
 
 /* Force settings button to appear above tab bar */
 .vivaldi, .sidebar .button-toolbar.settings, .button-settings {
-    z-index: 1001 !important;
+    z-index: var(--z-overlay) !important;
 }
 
 /* Ensure inner panel content respects sidebar radius */
@@ -1170,8 +1168,8 @@ display: none !important;
     min-height: 8px !important;
     opacity: 0;
     overflow: hidden;
-    transition: height 0.3s ease, opacity 0.3s ease;
-    z-index: 9999;
+    transition: height var(--animation-speed, 260ms) ease, opacity var(--animation-speed, 260ms) ease;
+    z-index: var(--z-overlay);
     pointer-events: none;
     margin: 0px !important;
 

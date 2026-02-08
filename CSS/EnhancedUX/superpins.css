@@ -102,7 +102,7 @@
   height: var(--pinned-icon-size) !important;
   margin: auto !important;
   justify-self: flex-start;
-  transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: margin var(--animation-speed, 260ms) cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 #tabs-container
@@ -119,8 +119,8 @@
 #tabs-container .tab-strip > span:has(.is-pinned) .is-pinned .tab-wrapper {
   overflow: hidden;
   isolation: isolate;
-  z-index: 1000000;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: var(--z-overlay);
+  transition: all var(--animation-speed, 260ms) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #tabs-container
@@ -132,7 +132,7 @@
   background-color: var(--colorAccentBg, rgba(255, 255, 255, 0.2)) !important;
   overflow: hidden;
   position: relative !important;
-  z-index: 100000000;
+  z-index: var(--z-overlay);
 
   /* 展开到整行宽度 */
   width: calc(
@@ -140,7 +140,7 @@
       var(--pinned-gap)
   ) !important;
   min-height: calc(var(--pinned-tab-height) + var(--pinned-gap)) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.8s;
+  transition: all var(--animation-speed, 260ms) cubic-bezier(0.4, 0, 0.2, 1) 0.8s;
 }
 
 /* left column */
@@ -203,7 +203,7 @@
   max-width: 0 !important;
   min-width: 0 !important;
   opacity: 0 !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--animation-speed, 260ms) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #tabs-container

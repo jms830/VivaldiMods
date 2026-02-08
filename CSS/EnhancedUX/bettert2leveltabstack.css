@@ -1,13 +1,13 @@
 body:has(#tabs-subcontainer) #tabs-container{
   max-width:18%;
   min-width:18%;
-  transition: min-width 200ms ease-in, max-width 200ms ease-in;
+  transition: min-width var(--animation-speed, 260ms) ease-in, max-width var(--animation-speed, 260ms) ease-in;
 }
 
 body:has(#tabs-container) #tabs-subcontainer{
   max-width:82%;
   min-width:82%;
-  transition: min-width 200ms ease-in, max-width 200ms ease-in;
+  transition: min-width var(--animation-speed, 260ms) ease-in, max-width var(--animation-speed, 260ms) ease-in;
   transform-origin: left center !important;
 }
 
@@ -15,13 +15,13 @@ body:has(#tabs-subcontainer) #tabs-container:hover
 {
   max-width:82% !important;
   min-width:82% !important;
-  transition: min-width 200ms ease-out 300ms, max-width 200ms ease-out 300ms;
+  transition: min-width var(--animation-speed, 260ms) ease-out 300ms, max-width var(--animation-speed, 260ms) ease-out 300ms;
 }
 
 body:has(#tabs-container:hover) #tabs-subcontainer{
   max-width:18% !important;
   min-width:18% !important;
-  transition: min-width 200ms ease-out 300ms, max-width 200ms ease-out 300ms;
+  transition: min-width var(--animation-speed, 260ms) ease-out 300ms, max-width var(--animation-speed, 260ms) ease-out 300ms;
 }
 
 #tabs-container{

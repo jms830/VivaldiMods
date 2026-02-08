@@ -48,7 +48,7 @@ Stack Unpinned Tabs with AI, must install with TidyTabs.js
   right: 80px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 100;
+  z-index: var(--z-dropdown);
   pointer-events: none;
 }
 
