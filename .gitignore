@@ -78,3 +78,16 @@ yarn-error.log*
 # ===================
 *ses_*.md
 
+# ===================
+# ARCHIVED / LEGACY
+# ===================
+archived/
+
+# ===================
+# BINARIES & PACKAGES
+# ===================
+*.zip
+*.exe
+._*
+node_modules/
+
