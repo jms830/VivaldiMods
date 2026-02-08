@@ -1,10 +1,10 @@
 @echo off
 REM ============================================================================
-REM Vivaldi Mods - JavaScript Mods Installer (Junction Architecture)
+REM Vivaldi Mods - JavaScript Mods Installer (Hardlink Architecture)
 REM ============================================================================
-REM This script installs JavaScript mods using the JUNCTION approach:
+REM This script installs JavaScript mods using NTFS HARDLINKS:
 REM   - JS files go to Application\javascript\ (survives Vivaldi updates!)
-REM   - NTFS junction makes them visible as resources\vivaldi\javascript\
+REM   - Hardlinks make them visible as resources\vivaldi\javascript\
 REM   - ONE line is injected into Vivaldi's stock window.html to load custom.js
 REM   - custom.js dynamically loads all individual mods
 REM
@@ -17,13 +17,17 @@ REM   |   +-- Tam710562\
 REM   |   +-- ...
 REM   +-- 7.x.xxxx.x\
 REM       +-- resources\vivaldi\
-REM           +-- javascript\       <-- NTFS JUNCTION pointing to Application\javascript\
+REM           +-- javascript\       <-- HARDLINKS to Application\javascript\ files
 REM           +-- window.html       <-- ONE line injected before </body>
+REM
+REM Why hardlinks? Chrome-extension:// security blocks junctions/symlinks because
+REM it resolves the real path and checks it's inside the extension root. Hardlinks
+REM ARE the file (same NTFS data object, two names) so security checks pass.
 REM
 REM What it does:
 REM   1. Backs up Vivaldi's original window.html
 REM   2. Copies JS files + custom.js to Application\javascript\ (persistent)
-REM   3. Creates NTFS junction: resources\vivaldi\javascript\ -> Application\javascript\
+REM   3. Creates hardlinks in resources\vivaldi\javascript\ -> persistent files
 REM   4. Injects one script tag into Vivaldi's window.html
 REM   5. (Optional) Installs AutoHotkey watcher for auto-patching on updates
 REM
@@ -38,8 +42,9 @@ REM   1. Open Application\javascript\custom.js
 REM   2. Comment/uncomment lines in the mods array
 REM   3. Restart Vivaldi
 REM
-REM NOTE: After Vivaldi updates, only the one-liner injection is needed!
+REM NOTE: After Vivaldi updates, only hardlinks + one-liner need re-creating!
 REM       JS files + custom.js in Application\javascript\ persist automatically.
+REM       Hardlinks are same-volume NTFS file links (no admin required).
 REM ============================================================================
 
 setlocal EnableDelayedExpansion
@@ -119,7 +124,8 @@ if "%VIVALDI_VERSION_DIR%"=="" (
 
 echo [OK] Found Vivaldi %LATEST_VERSION%
 echo     Versioned dir: %VIVALDI_VERSION_DIR%
-echo     Persistent JS: %VIVALDI_BASE%\javascript\
+echo     Persistent JS: %VIVALDI_BASE%\javascript\  (survives updates)
+echo     Hardlinks in:  %VIVALDI_VERSION_DIR%javascript\
 echo.
 
 REM === Check if Vivaldi is running ===
@@ -202,29 +208,47 @@ echo.
 echo     Copied %MOD_COUNT% JS files to persistent location (%FOLDER_COUNT% subfolders)
 echo.
 
-REM === Step 3: Create NTFS junction ===
-echo [3/4] Creating NTFS junction...
+REM === Step 3: Create hardlinks in versioned directory ===
+echo [3/4] Creating hardlinks to persistent JS files...
 
-set "JUNCTION_PATH=%VIVALDI_VERSION_DIR%javascript"
+set "LINK_DIR=%VIVALDI_VERSION_DIR%javascript"
 
-REM Remove existing junction or directory
-if exist "%JUNCTION_PATH%" (
-    rmdir "%JUNCTION_PATH%" >nul 2>&1
-    if exist "%JUNCTION_PATH%" (
-        echo     Removing old directory (not a junction)...
-        rmdir /s /q "%JUNCTION_PATH%" >nul 2>&1
+REM Remove existing directory (junction from old installs, or previous hardlinks)
+if exist "%LINK_DIR%" (
+    rmdir "%LINK_DIR%" >nul 2>&1
+    if exist "%LINK_DIR%" rmdir /s /q "%LINK_DIR%" >nul 2>&1
+)
+
+REM Create directory structure
+mkdir "%LINK_DIR%" 2>nul
+if errorlevel 1 goto :patch_failed
+
+for %%d in (Tam710562 luetage Other PageAction aminought) do (
+    if exist "%JS_DEST%\%%d" mkdir "%LINK_DIR%\%%d" >nul 2>&1
+)
+
+REM Hardlink root-level JS files
+set "LINK_COUNT=0"
+for %%f in ("%JS_DEST%\*.js") do (
+    mklink /H "%LINK_DIR%\%%~nxf" "%%f" >nul 2>&1
+    if not errorlevel 1 set /a LINK_COUNT+=1
+)
+
+REM Hardlink subdirectory JS files
+for %%d in (Tam710562 luetage Other PageAction aminought) do (
+    if exist "%JS_DEST%\%%d" (
+        for %%f in ("%JS_DEST%\%%d\*.js") do (
+            mklink /H "%LINK_DIR%\%%d\%%~nxf" "%%f" >nul 2>&1
+            if not errorlevel 1 set /a LINK_COUNT+=1
+        )
     )
 )
 
-REM Create the junction
-mklink /J "%JUNCTION_PATH%" "%VIVALDI_BASE%\javascript" >nul 2>&1
-if errorlevel 1 goto :patch_failed
+REM Verify hardlinks created and accessible
+if not exist "%LINK_DIR%\custom.js" goto :patch_failed
 
-REM Verify junction was created and target is accessible
-if not exist "%JUNCTION_PATH%\custom.js" goto :patch_failed
-
-echo     Created junction: %JUNCTION_PATH%
-echo     Points to: %VIVALDI_BASE%\javascript\
+echo     Created %LINK_COUNT% hardlinks in: %LINK_DIR%
+echo     Linked to persistent files in: %JS_DEST%\
 echo.
 
 REM === Step 4: Inject one-liner into Vivaldi's window.html ===
@@ -260,8 +284,8 @@ REM Check key JS files exist in PERSISTENT location
 if not exist "%VIVALDI_BASE%\javascript\custom.js" goto :patch_failed
 if not exist "%VIVALDI_BASE%\javascript\workspaceButtons.js" goto :patch_failed
 
-REM Check junction is accessible
-if not exist "%JUNCTION_PATH%\custom.js" goto :patch_failed
+REM Check hardlinks are accessible
+if not exist "%LINK_DIR%\custom.js" goto :patch_failed
 
 echo     Validation passed.
 echo.
@@ -283,24 +307,24 @@ if exist "%VIVALDI_VERSION_DIR%custom.js" (
 )
 
 echo =============================================
-echo  JS Installation Complete! (Junction)
+echo  JS Installation Complete! (Hardlinks)
 echo =============================================
 echo.
-echo  Installed %MOD_COUNT% JS files to persistent location.
+echo  Installed %MOD_COUNT% JS files, created %LINK_COUNT% hardlinks.
 echo.
 echo  JS mods:    %VIVALDI_BASE%\javascript\  (PERSISTENT)
 echo  Config:     %VIVALDI_BASE%\javascript\custom.js
-echo  Junction:   %JUNCTION_PATH%
+echo  Hardlinks:  %LINK_DIR%\
 echo  Injected:   window.html in %VIVALDI_VERSION_DIR%
 echo.
 echo  +---------------------------------------------------------+
 echo  ^|  HOW IT WORKS:                                          ^|
 echo  ^|                                                         ^|
 echo  ^|  - JS files in Application\javascript\ survive updates  ^|
-echo  ^|  - NTFS junction makes them visible inside resources\   ^|
+echo  ^|  - NTFS hardlinks make them visible inside resources\   ^|
 echo  ^|  - One line in window.html loads custom.js              ^|
 echo  ^|  - custom.js loads all your enabled mods                ^|
-echo  ^|  - After updates, only the one-liner needs re-injecting ^|
+echo  ^|  - After updates: re-create hardlinks + one-liner       ^|
 echo  ^|                                                         ^|
 echo  ^|  TO CUSTOMIZE MODS:                                     ^|
 echo  ^|                                                         ^|
@@ -357,7 +381,7 @@ if "%VIVALDI_RUNNING%"=="1" (
     echo  IMPORTANT: RESTART VIVALDI to apply changes!
     echo.
 )
-echo  NOTE: After Vivaldi updates, only window.html needs re-placing!
+echo  NOTE: After Vivaldi updates, hardlinks + one-liner need re-creating!
 echo        JS files in Application\javascript\ persist automatically.
 echo.
 echo  TIP: Install the AutoHotkey watcher to auto-patch on updates:
@@ -384,10 +408,10 @@ echo.
 echo     Attempting automatic rollback...
 echo.
 
-REM Remove junction on failure (plain rmdir, NOT /s /q)
-if defined JUNCTION_PATH (
-    if exist "%JUNCTION_PATH%" (
-        rmdir "%JUNCTION_PATH%" >nul 2>&1
+REM Remove hardlinks directory on failure
+if defined LINK_DIR (
+    if exist "%LINK_DIR%" (
+        rmdir /s /q "%LINK_DIR%" >nul 2>&1
     )
 )
 

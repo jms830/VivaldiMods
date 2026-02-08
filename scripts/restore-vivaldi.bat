@@ -5,13 +5,14 @@ REM ============================================================================
 REM Restores Vivaldi's original window.html and removes all JS mods.
 REM
 REM Cleans up:
-REM   - NTFS junction at resources\vivaldi\javascript\ (points to Application\javascript\)
-REM   - Persistent JS files in Application\javascript\ (new architecture)
-REM   - Versioned JS files in resources\vivaldi\javascript\ (old architecture)
+REM   - Hardlinks at resources\vivaldi\javascript\ (current architecture)
+REM   - NTFS junction at resources\vivaldi\javascript\ (old architecture)
+REM   - Persistent JS files in Application\javascript\
 REM   - Bundled custom.js (legacy approach)
 REM   - Legacy root-level JS files (oldest approach)
 REM
-REM Junction removal uses plain rmdir (safe) before attempting recursive delete.
+REM Deleting hardlinks is safe - persistent files keep ref count >= 1.
+REM Plain rmdir tried first to safely handle old junction installs.
 REM CSS mods can be disabled in Vivaldi Settings or vivaldi://experiments
 REM ============================================================================
 
@@ -66,23 +67,25 @@ if errorlevel 1 (
 echo     Done.
 echo.
 
-REM === Remove NTFS junction (safe removal without deleting target) ===
-echo [2/5] Removing NTFS junction...
+REM === Remove hardlinks/junction in versioned directory ===
+echo [2/5] Removing javascript/ from versioned directory...
 if exist "%VIVALDI_DIR%javascript" (
+    REM Try plain rmdir first (handles old junction installs safely)
     rmdir "%VIVALDI_DIR%javascript" 2>nul
     if not exist "%VIVALDI_DIR%javascript" (
         echo     Removed junction at %VIVALDI_DIR%javascript\
     ) else (
-        echo     [!] Not a junction or in use. Attempting recursive delete...
+        REM Contains hardlinks or real files - recursive delete is safe
+        REM (hardlink deletion just decrements ref count, persistent files survive)
         rmdir /s /q "%VIVALDI_DIR%javascript" 2>nul
         if not exist "%VIVALDI_DIR%javascript" (
-            echo     Removed %VIVALDI_DIR%javascript\
+            echo     Removed hardlinks at %VIVALDI_DIR%javascript\
         ) else (
             echo     [!] Could not remove javascript/ (files may be in use)
         )
     )
 ) else (
-    echo     No junction found (already clean)
+    echo     No javascript/ found (already clean)
 )
 echo.
 

@@ -5,7 +5,7 @@
      This file is NOT copied to Vivaldi directly. It's a reference showing
      what the install scripts inject into Vivaldi's stock window.html.
 
-     ARCHITECTURE (NTFS Junction):
+     ARCHITECTURE (NTFS Hardlinks):
        Application/
        +-- javascript/                    (PERSISTENT - real JS files live here)
        |   +-- custom.js                  (Loader - configure mods here)
@@ -14,22 +14,23 @@
        |   +-- ...
        +-- <version>/resources/vivaldi/
            +-- window.html                (ONE line injected before </body>)
-           +-- javascript/                (NTFS JUNCTION -> Application/javascript/)
+           +-- javascript/                (HARDLINKS to Application/javascript/ files)
 
-     Why junctions?
+     Why hardlinks (not junctions/symlinks)?
        Vivaldi loads window.html as chrome-extension://mpognobbkildjkofajifpdfhcoklimli/
-       Chrome extensions CANNOT use ../ to traverse above their resource root.
-       NTFS junctions are resolved at the filesystem level (transparent to Chrome).
-       No admin privileges required (unlike symlinks).
+       Chrome's extension security resolves junctions/symlinks to their real target
+       path, then rejects resources outside the extension root. Hardlinks are the
+       SAME NTFS data object with two names - Chrome sees a real file at the
+       expected path. No admin privileges required.
 
      The install script:
        1. Copies JS files to Application/javascript/ (persistent)
-       2. Creates junction: resources/vivaldi/javascript/ -> Application/javascript/
+       2. Creates hardlinks: resources/vivaldi/javascript/*.js -> persistent files
        3. Injects ONE line before </body>:
             <script src="javascript/custom.js"></script>
 
-     After Vivaldi updates: only junction + one-liner need re-creating.
-     JS files + custom.js config persist automatically.
+     After Vivaldi updates: only hardlinks + one-liner need re-creating.
+     JS files + custom.js config persist automatically (ref count stays >= 1).
 
      ============================================================================ -->
 

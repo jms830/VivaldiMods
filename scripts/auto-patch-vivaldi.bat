@@ -1,18 +1,18 @@
 @echo off
 REM ============================================================================
-REM Vivaldi Mods - Auto-Patch on Update (NTFS Junction Architecture)
+REM Vivaldi Mods - Auto-Patch on Update (Hardlink Architecture)
 REM ============================================================================
-REM This script checks if Vivaldi was updated and re-applies window.html.
+REM This script checks if Vivaldi was updated and re-applies JS mods.
 REM 
-REM With the junction architecture, JS files live in Application\javascript\
-REM and survive updates. Only window.html (in the versioned dir) gets wiped.
-REM A junction link in the versioned folder points to the persistent JS location.
+REM With the hardlink architecture, JS files live in Application\javascript\
+REM and survive updates. After an update, the versioned directory is fresh -
+REM we re-create hardlinks to the persistent JS files and inject the one-liner.
 REM
 REM How it works:
 REM   1. Finds the latest Vivaldi version folder
-REM   2. Checks if our modular window.html already exists there
+REM   2. Checks if hardlinks + injection already exist there
 REM   3. If JS files exist in Application\javascript\, does a FAST patch
-REM      (creates junction + injects one-liner - takes <1 second)
+REM      (creates hardlinks + injects one-liner - takes <1 second)
 REM   4. If JS files are also missing, runs the full installer
 REM
 REM Usage options:
@@ -63,7 +63,7 @@ REM Check for custom.js one-liner injection in window.html
 findstr /C:"custom.js" "%LATEST_DIR%\window.html" >nul 2>&1
 if not errorlevel 1 set "IS_PATCHED=1"
 
-REM Also check if junction exists (both conditions must be true)
+REM Also check if hardlinks exist (both conditions must be true)
 if not exist "%LATEST_DIR%\javascript\custom.js" set "IS_PATCHED=0"
 
 if "%IS_PATCHED%"=="1" (
@@ -83,8 +83,8 @@ echo [%DATE% %TIME%] New Vivaldi version detected: %LATEST_VERSION% >> "%LOG_FIL
 REM Check if JS files already exist in persistent location
 set "JS_PERSISTENT=%VIVALDI_PATH%\javascript"
 if exist "%JS_PERSISTENT%\custom.js" (
-    REM custom.js exists! Create junction + inject the one-liner into window.html (fast path)
-    echo [%DATE% %TIME%] custom.js found in persistent location, creating junction and injecting one-liner >> "%LOG_FILE%"
+    REM custom.js exists! Create hardlinks + inject the one-liner into window.html (fast path)
+    echo [%DATE% %TIME%] custom.js found in persistent location, creating hardlinks and injecting one-liner >> "%LOG_FILE%"
 
     if "%SILENT_MODE%"=="0" (
         echo.
@@ -95,7 +95,7 @@ if exist "%JS_PERSISTENT%\custom.js" (
         echo Version: %LATEST_VERSION%
         echo.
         echo JS files already in place at: %JS_PERSISTENT%\
-        echo Creating junction and injecting custom.js loader into window.html...
+        echo Creating hardlinks and injecting custom.js loader...
         echo.
     )
 
@@ -104,20 +104,35 @@ if exist "%JS_PERSISTENT%\custom.js" (
         copy "%LATEST_DIR%\window.html" "%LATEST_DIR%\window.bak.html" >nul
     )
 
-    REM Remove existing junction or directory (if any)
-    if exist "%LATEST_DIR%\javascript" rmdir "%LATEST_DIR%\javascript" >nul 2>&1
-
-    REM Create junction to persistent JS location
-    mklink /J "%LATEST_DIR%\javascript" "%JS_PERSISTENT%" >nul 2>&1
-    if errorlevel 1 (
-        echo [%DATE% %TIME%] ERROR: Failed to create junction >> "%LOG_FILE%"
-        if "%SILENT_MODE%"=="0" (
-            echo [X] ERROR: Failed to create junction
-            pause
-        )
-        exit /b 1
+    REM Remove existing directory (junction from old installs, or previous hardlinks)
+    if exist "%LATEST_DIR%\javascript" (
+        rmdir "%LATEST_DIR%\javascript" >nul 2>&1
+        if exist "%LATEST_DIR%\javascript" rmdir /s /q "%LATEST_DIR%\javascript" >nul 2>&1
     )
-    echo [%DATE% %TIME%] Junction created: %LATEST_DIR%\javascript -^> %JS_PERSISTENT% >> "%LOG_FILE%"
+
+    REM Create directory structure
+    mkdir "%LATEST_DIR%\javascript" 2>nul
+    for %%d in (Tam710562 luetage Other PageAction aminought) do (
+        if exist "%JS_PERSISTENT%\%%d" mkdir "%LATEST_DIR%\javascript\%%d" >nul 2>&1
+    )
+
+    REM Hardlink root-level JS files
+    set "LINK_COUNT=0"
+    for %%f in ("%JS_PERSISTENT%\*.js") do (
+        mklink /H "%LATEST_DIR%\javascript\%%~nxf" "%%f" >nul 2>&1
+        if not errorlevel 1 set /a LINK_COUNT+=1
+    )
+
+    REM Hardlink subdirectory JS files
+    for %%d in (Tam710562 luetage Other PageAction aminought) do (
+        if exist "%JS_PERSISTENT%\%%d" (
+            for %%f in ("%JS_PERSISTENT%\%%d\*.js") do (
+                mklink /H "%LATEST_DIR%\javascript\%%d\%%~nxf" "%%f" >nul 2>&1
+                if not errorlevel 1 set /a LINK_COUNT+=1
+            )
+        )
+    )
+    echo [%DATE% %TIME%] Created %LINK_COUNT% hardlinks in %LATEST_DIR%\javascript\ >> "%LOG_FILE%"
 
     REM Inject the one-liner before </body>
     powershell -Command "$f='%LATEST_DIR%\window.html'; $c=Get-Content $f -Raw; $c=$c.Replace('</body>','<script src=\"javascript/custom.js\"></script>' + [char]13 + [char]10 + '</body>'); Set-Content $f $c -NoNewline" 2>nul
@@ -141,20 +156,20 @@ if exist "%JS_PERSISTENT%\custom.js" (
         exit /b 1
     )
 
-    REM Verify junction exists
+    REM Verify hardlinks exist
     if not exist "%LATEST_DIR%\javascript\custom.js" (
-        echo [%DATE% %TIME%] ERROR: Junction verification failed >> "%LOG_FILE%"
+        echo [%DATE% %TIME%] ERROR: Hardlink verification failed >> "%LOG_FILE%"
         if "%SILENT_MODE%"=="0" (
-            echo [X] ERROR: Junction verification failed
+            echo [X] ERROR: Hardlink verification failed
             pause
         )
         exit /b 1
     )
 
-    echo [%DATE% %TIME%] Fast-patched window.html and created junction successfully >> "%LOG_FILE%"
+    echo [%DATE% %TIME%] Fast-patched: %LINK_COUNT% hardlinks + window.html injection >> "%LOG_FILE%"
 
     if "%SILENT_MODE%"=="0" (
-        echo [OK] Junction created and custom.js loader injected into window.html!
+        echo [OK] Created %LINK_COUNT% hardlinks and injected custom.js loader!
         echo.
         echo Restart Vivaldi to apply changes.
         echo.
@@ -162,7 +177,7 @@ if exist "%JS_PERSISTENT%\custom.js" (
     )
 
     if "%SILENT_MODE%"=="1" (
-        powershell -Command "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Vivaldi updated to %LATEST_VERSION%.`n`nJunction created and custom.js loader injected (JS mods persisted).`nPlease restart Vivaldi.', 'Vivaldi Mods', 'OK', 'Information')" >nul 2>&1
+        powershell -Command "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Vivaldi updated to %LATEST_VERSION%.`n`nCreated hardlinks and injected custom.js loader (JS mods persisted).`nPlease restart Vivaldi.', 'Vivaldi Mods', 'OK', 'Information')" >nul 2>&1
     )
     exit /b 0
 )

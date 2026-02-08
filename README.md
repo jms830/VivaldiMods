@@ -107,15 +107,15 @@ The configurator offers these presets:
 
 ### How JS Mods Work
 
-JS mods use an **NTFS junction** approach to survive Vivaldi updates:
+JS mods use **NTFS hardlinks** to survive Vivaldi updates:
 
 1. `install-js-mods.bat` copies all JS files to a **persistent** location: `Application/javascript/`
-2. It creates an **NTFS junction** (directory link) so Vivaldi can see the files:
-   `Application/<version>/resources/vivaldi/javascript/` → `Application/javascript/`
+2. It creates **hardlinks** so Vivaldi can see the files inside its versioned directory:
+   each file in `resources/vivaldi/javascript/` is hardlinked to `Application/javascript/`
 3. It injects a single `<script>` tag into Vivaldi's `window.html` that loads `custom.js`
 4. `custom.js` dynamically loads all enabled mod scripts
 
-**Why junctions?** Vivaldi loads `window.html` as a Chrome extension (`chrome-extension://...`). Chrome's security blocks `../` traversal above the resource root, so scripts must appear *inside* `resources/vivaldi/`. NTFS junctions are resolved at the filesystem level — completely transparent to Chrome, no admin privileges required.
+**Why hardlinks?** Vivaldi loads `window.html` as a Chrome extension (`chrome-extension://...`). Chrome's security resolves junctions/symlinks to their real target path and rejects files outside the extension root. Hardlinks are the *same NTFS data object* with two directory entries — Chrome sees a real file at the expected path. No admin privileges required, zero extra disk space.
 
 **To configure which JS mods are active**, edit `Javascripts/custom.js` (or `Application/javascript/custom.js` after install). Comment/uncomment lines in the `enabledMods` array:
 
@@ -132,9 +132,9 @@ This is the JS equivalent of `CSS/core.css` — one config file controls everyth
 
 ### JS Mod Persistence (Vivaldi Updates)
 
-JS files live in `Application/javascript/` which is **outside** the versioned folder. When Vivaldi updates, only the versioned folder is replaced — your JS files and `custom.js` config survive automatically. The only things that need re-creating are:
+JS files live in `Application/javascript/` which is **outside** the versioned folder. When Vivaldi updates, only the versioned folder is replaced — your JS files and `custom.js` config survive automatically (hardlink ref count drops from 2 to 1, data intact). The only things that need re-creating are:
 
-1. **NTFS junction** — the link inside the new version folder pointing to `Application/javascript/`
+1. **Hardlinks** — link each JS file from the new version folder to the persistent copies
 2. **Script injection** — the one-liner `<script>` tag in the new `window.html`
 
 Both are handled automatically by the auto-patch script (<1 second).
@@ -143,7 +143,7 @@ Both are handled automatically by the auto-patch script (<1 second).
 
 | Script | Description |
 |--------|-------------|
-| `scripts/auto-patch-vivaldi.bat` | Detects if the latest Vivaldi version needs patching. If JS files already exist in the persistent location, it creates the junction + injects the script tag (<1 second). |
+| `scripts/auto-patch-vivaldi.bat` | Detects if the latest Vivaldi version needs patching. If JS files already exist in the persistent location, it creates hardlinks + injects the script tag (<1 second). |
 | `scripts/setup-auto-patch.bat` | Creates a Windows scheduled task to run auto-patch on login. |
 | `scripts/vivaldi-watcher.ahk` | AutoHotkey v2 script that monitors Vivaldi's folder and auto-applies JS mods when a new version is detected. **Recommended** - set it to run at startup. |
 
