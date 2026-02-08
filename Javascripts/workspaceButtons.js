@@ -3,6 +3,8 @@
   
   try {
 
+  const DEBUG = false;
+
   const modState = {
     listeners: [],
     observers: [],
@@ -49,9 +51,15 @@
       this.listeners.forEach(({ target, event, handler, options }) => {
         target.removeEventListener(event, handler, options);
       });
-      this.observers.forEach(obs => obs.disconnect());
-      this.timeouts.forEach(id => clearTimeout(id));
-      this.intervals.forEach(id => clearInterval(id));
+      this.observers.forEach(obs => {
+        obs.disconnect();
+      });
+      this.timeouts.forEach(id => {
+        clearTimeout(id);
+      });
+      this.intervals.forEach(id => {
+        clearInterval(id);
+      });
       this.chromeListeners.forEach(({ api, event, handler }) => {
         api[event].removeListener(handler);
       });
@@ -64,7 +72,7 @@
       this.intervals = [];
       this.chromeListeners = [];
       this.vivaldiListeners = [];
-      console.log('[WorkspaceButtons] Cleanup complete');
+      DEBUG && console.log('[WorkspaceButtons] Cleanup complete');
     }
   };
 
@@ -89,7 +97,7 @@
       element = document.querySelector(element);
     }
     if (!element) {
-      console.log('[WorkspaceButtons] simulateButtonClick: element not found');
+      DEBUG && console.log('[WorkspaceButtons] simulateButtonClick: element not found');
       return false;
     }
     
@@ -104,7 +112,7 @@
     
     const reactProps = getReactProps(element);
     if (reactProps?.onPointerDown) {
-      console.log('[WorkspaceButtons] Triggering onPointerDown via React props');
+      DEBUG && console.log('[WorkspaceButtons] Triggering onPointerDown via React props');
       reactProps.onPointerDown(pointerDown);
       
       element.dispatchEvent(new PointerEvent('pointerup', {
@@ -116,7 +124,7 @@
       }));
       return true;
     } else {
-      console.log('[WorkspaceButtons] No onPointerDown found in React props');
+      DEBUG && console.log('[WorkspaceButtons] No onPointerDown found in React props');
       return false;
     }
   };
@@ -175,7 +183,7 @@
 
   const switchWorkspace = async (workspaceId, index) => {
     if (isSwitching) {
-      console.log('[WorkspaceButtons] Already switching, ignoring');
+      DEBUG && console.log('[WorkspaceButtons] Already switching, ignoring');
       return;
     }
     isSwitching = true;
@@ -185,7 +193,7 @@
 
     const workspacePopupButton = document.querySelector('.button-toolbar.workspace-popup > button');
     if (!workspacePopupButton) {
-      console.log('[WorkspaceButtons] Workspace popup button not found');
+      DEBUG && console.log('[WorkspaceButtons] Workspace popup button not found');
       isSwitching = false;
       return;
     }
@@ -193,7 +201,7 @@
     const popupOpened = simulateButtonClick(workspacePopupButton);
     
     if (!popupOpened) {
-      console.log('[WorkspaceButtons] Failed to trigger popup button');
+      DEBUG && console.log('[WorkspaceButtons] Failed to trigger popup button');
       isSwitching = false;
       modState.setTimeout(updateActiveState, 100);
       return;
@@ -247,7 +255,7 @@
       }
       
       if (!popup) {
-        console.log('[WorkspaceButtons] Popup menu did not appear');
+        DEBUG && console.log('[WorkspaceButtons] Popup menu did not appear');
         isSwitching = false;
         modState.setTimeout(updateActiveState, 100);
         return;
@@ -266,7 +274,7 @@
       if (index === -1) {
         targetItem = popup.querySelector('button.this-window, .this-window');
         if (targetItem) {
-          console.log('[WorkspaceButtons] Found this-window item for Default workspace');
+          DEBUG && console.log('[WorkspaceButtons] Found this-window item for Default workspace');
         }
       } else {
         // For named workspaces, find by name match
@@ -275,7 +283,7 @@
           if (item.classList.contains('workspace-item-wrapper') && 
               itemText.toLowerCase().includes(targetName.toLowerCase())) {
             targetItem = item;
-            console.log('[WorkspaceButtons] Found workspace item by name match:', itemText);
+            DEBUG && console.log('[WorkspaceButtons] Found workspace item by name match:', itemText);
             break;
           }
         }
@@ -289,7 +297,7 @@
         modState.setTimeout(updateActiveState, 200);
         modState.setTimeout(updateActiveState, 500);
       } else {
-        console.log('[WorkspaceButtons] Could not find target workspace item');
+        DEBUG && console.log('[WorkspaceButtons] Could not find target workspace item');
         simulateButtonClick(workspacePopupButton);
         isSwitching = false;
         modState.setTimeout(updateActiveState, 200);
@@ -313,7 +321,7 @@
     }
 
     const clickHandler = (e) => {
-      console.log('[WorkspaceButtons] DEBUG: Button clicked for workspace:', workspace.name, 'index:', index);
+      DEBUG && console.log('[WorkspaceButtons] DEBUG: Button clicked for workspace:', workspace.name, 'index:', index);
       e.preventDefault();
       e.stopPropagation();
       modState.setTimeout(() => switchWorkspace(workspace.id, index), 0);
@@ -475,7 +483,7 @@
     for (const selector of targets) {
       const el = document.querySelector(selector);
       if (el) {
-        console.log('[WorkspaceButtons] Fallback insertion point:', selector);
+        DEBUG && console.log('[WorkspaceButtons] Fallback insertion point:', selector);
         return el;
       }
     }
@@ -517,7 +525,7 @@
   };
 
   const openNewWorkspaceDialog = () => {
-    console.log('[WorkspaceButtons] Opening new workspace dialog');
+    DEBUG && console.log('[WorkspaceButtons] Opening new workspace dialog');
     const workspaceButton = document.querySelector(
       '.WorkspaceButton, button.WorkspaceButton, [class*="WorkspaceButton"], button[title*="orkspace"]'
     );
@@ -529,14 +537,14 @@
           '[class*="NewWorkspace"], button[title*="New"], [class*="add-workspace"], .WorkspacePopup button:last-child'
         );
         if (newButton) {
-          console.log('[WorkspaceButtons] Clicking new workspace button');
+          DEBUG && console.log('[WorkspaceButtons] Clicking new workspace button');
           newButton.click();
         } else {
-          console.log('[WorkspaceButtons] New workspace button not found in popup');
+          DEBUG && console.log('[WorkspaceButtons] New workspace button not found in popup');
         }
       }, 150);
     } else {
-      console.log('[WorkspaceButtons] No workspace button found for new workspace');
+      DEBUG && console.log('[WorkspaceButtons] No workspace button found for new workspace');
     }
   };
 
@@ -560,15 +568,15 @@
     container.appendChild(addButton);
 
     if (workspaceList.length > CONFIG.maxVisible - 1) {
-      console.log('[WorkspaceButtons] Truncated to', CONFIG.maxVisible - 1, 'of', workspaceList.length);
+      DEBUG && console.log('[WorkspaceButtons] Truncated to', CONFIG.maxVisible - 1, 'of', workspaceList.length);
     }
 
     const insertionPoint = findInsertionPoint();
     if (insertionPoint) {
       insertionPoint.appendChild(container);
-      console.log('[WorkspaceButtons] Rendered', visibleWorkspaces.length + 2, 'buttons (default + workspaces + add)');
+      DEBUG && console.log('[WorkspaceButtons] Rendered', visibleWorkspaces.length + 2, 'buttons (default + workspaces + add)');
     } else {
-      console.log('[WorkspaceButtons] No insertion point found');
+      DEBUG && console.log('[WorkspaceButtons] No insertion point found');
       return;
     }
 
@@ -577,7 +585,7 @@
 
   const onWorkspacePrefsChanged = (change) => {
     if (change.path === 'vivaldi.workspaces.list') {
-      console.log('[WorkspaceButtons] Workspace list changed, re-rendering');
+      DEBUG && console.log('[WorkspaceButtons] Workspace list changed, re-rendering');
       modState.setTimeout(render, 100);
     }
   };
@@ -592,7 +600,7 @@
     }
 
     isInitialized = true;
-    console.log('[WorkspaceButtons] Initializing...');
+    DEBUG && console.log('[WorkspaceButtons] Initializing...');
 
     render();
 

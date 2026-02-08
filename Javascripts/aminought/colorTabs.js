@@ -30,6 +30,60 @@
   const INIT_DELAY = 1000;
   const INIT_CHECK_INTERVAL = 100;
 
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => {
+        obs.disconnect();
+      });
+      this.timeouts.forEach(id => {
+        clearTimeout(id);
+      });
+      this.intervals.forEach(id => {
+        clearInterval(id);
+      });
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+    }
+  };
+
   class ColorTabs {
     #observer = null;
 
@@ -54,13 +108,13 @@
 
     // Set up event listeners for tab and theme changes
     #addListeners() {
-      chrome.tabs.onCreated.addListener(() => this.#colorTabsDelayed());
-      chrome.tabs.onActivated.addListener(() => this.#colorTabsDelayed());
-      vivaldi.tabsPrivate.onThemeColorChanged.addListener(() =>
+      modState.addChromeListener(chrome.tabs, 'onCreated', () => this.#colorTabsDelayed());
+      modState.addChromeListener(chrome.tabs, 'onActivated', () => this.#colorTabsDelayed());
+      modState.addChromeListener(vivaldi.tabsPrivate, 'onThemeColorChanged', () =>
         this.#colorTabsDelayed(),
       );
 
-      vivaldi.prefs.onChanged.addListener((info) => {
+      modState.addChromeListener(vivaldi.prefs, 'onChanged', (info) => {
         if (info.path.startsWith("vivaldi.themes")) {
           this.#colorTabsDelayed();
         }
@@ -70,7 +124,7 @@
     // Delay tab coloring to ensure DOM is ready
     #colorTabsDelayed() {
       this.#colorTabs();
-      setTimeout(() => this.#colorTabs(), COLOR_DELAY);
+      modState.setTimeout(() => this.#colorTabs(), COLOR_DELAY);
     }
 
     // Apply colors to pinned tabs based on their favicon
@@ -101,18 +155,18 @@
 
       if (accentFromPage) {
         const accentColor = chroma(colorAccentBg);
-        pinnedTabWrappers.forEach((tabWrapper) =>
+        pinnedTabWrappers.forEach((tabWrapper) => {
           this.#setTabBorder(
             tabWrapper,
             accentOnWindow,
             accentColor,
             accentSaturationLimit,
-          ),
-        );
+          );
+        });
       } else {
-        pinnedTabWrappers.forEach((tabWrapper) =>
-          this.#resetTabBorder(tabWrapper),
-        );
+        pinnedTabWrappers.forEach((tabWrapper) => {
+          this.#resetTabBorder(tabWrapper);
+        });
       }
     }
 
@@ -373,8 +427,8 @@
   }
 
   // Initialize when browser element is available
-  setTimeout(() => {
-    const interval = setInterval(() => {
+  modState.setTimeout(() => {
+    const interval = modState.setInterval(() => {
       if (document.querySelector("#browser")) {
         console.log("Initializing ColorTabs...");
         window.colorTabs = new ColorTabs();
@@ -383,4 +437,5 @@
       }
     }, INIT_CHECK_INTERVAL);
   }, INIT_DELAY);
+  window.addEventListener('beforeunload', () => modState.cleanup());
 })();

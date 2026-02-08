@@ -68,9 +68,15 @@
       this.listeners.forEach(({ target, event, handler, options }) => {
         target.removeEventListener(event, handler, options);
       });
-      this.observers.forEach(obs => obs.disconnect());
-      this.timeouts.forEach(id => clearTimeout(id));
-      this.intervals.forEach(id => clearInterval(id));
+      this.observers.forEach(obs => {
+        obs.disconnect();
+      });
+      this.timeouts.forEach(id => {
+        clearTimeout(id);
+      });
+      this.intervals.forEach(id => {
+        clearInterval(id);
+      });
       this.chromeListeners.forEach(({ api, event, handler }) => {
         api[event].removeListener(handler);
       });
@@ -83,10 +89,19 @@
     }
   };
 
+  const safeStorage = {
+    getItem(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
+    },
+    setItem(key, value) {
+      try { localStorage.setItem(key, value); } catch (e) { }
+    }
+  };
+
   // Load saved colors from localStorage
   const loadColors = () => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = safeStorage.getItem(STORAGE_KEY);
       if (saved) {
         workspaceColors = JSON.parse(saved);
       }
@@ -98,7 +113,7 @@
   // Save colors to localStorage
   const saveColors = () => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(workspaceColors));
+      safeStorage.setItem(STORAGE_KEY, JSON.stringify(workspaceColors));
     } catch (e) {
       console.warn('[WorkspaceColors] Failed to save colors:', e);
     }
@@ -222,7 +237,9 @@
     // Swatch click handlers
     picker.querySelectorAll('.wcp-swatch').forEach(swatch => {
       swatch.addEventListener('click', (e) => {
-        picker.querySelectorAll('.wcp-swatch').forEach(s => s.removeAttribute('data-selected'));
+        picker.querySelectorAll('.wcp-swatch').forEach(s => {
+          s.removeAttribute('data-selected');
+        });
         swatch.setAttribute('data-selected', 'true');
         selectedColor = swatch.dataset.color;
         picker.querySelector('.wcp-custom-input').value = selectedColor;
@@ -232,7 +249,9 @@
     // Custom color input
     picker.querySelector('.wcp-custom-input').addEventListener('input', (e) => {
       selectedColor = e.target.value;
-      picker.querySelectorAll('.wcp-swatch').forEach(s => s.removeAttribute('data-selected'));
+      picker.querySelectorAll('.wcp-swatch').forEach(s => {
+        s.removeAttribute('data-selected');
+      });
     });
 
     // Cancel button

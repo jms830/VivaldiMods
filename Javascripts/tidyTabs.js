@@ -4,7 +4,69 @@
 	// ==================== Configuration ====================
 	// Right-click the TidyTabs button → Settings to configure API provider and key
 	
+	const DEBUG = false;
 	const STORAGE_KEY = 'tidyTabs_config';
+	const safeStorage = {
+		getItem(key) {
+			try { return localStorage.getItem(key); } catch (e) { return null; }
+		},
+		setItem(key, value) {
+			try { localStorage.setItem(key, value); } catch (e) { }
+		}
+	};
+	const modState = {
+		listeners: [],
+		observers: [],
+		timeouts: [],
+		intervals: [],
+		chromeListeners: [],
+		addEventListener(target, event, handler, options) {
+			target.addEventListener(event, handler, options);
+			this.listeners.push({ target, event, handler, options });
+		},
+		addObserver(target, callback, options) {
+			const observer = new MutationObserver(callback);
+			observer.observe(target, options);
+			this.observers.push(observer);
+			return observer;
+		},
+		setTimeout(callback, delay) {
+			const id = setTimeout(callback, delay);
+			this.timeouts.push(id);
+			return id;
+		},
+		setInterval(callback, delay) {
+			const id = setInterval(callback, delay);
+			this.intervals.push(id);
+			return id;
+		},
+		addChromeListener(api, event, handler) {
+			api[event].addListener(handler);
+			this.chromeListeners.push({ api, event, handler });
+		},
+		cleanup() {
+			this.listeners.forEach(({ target, event, handler, options }) => {
+				target.removeEventListener(event, handler, options);
+			});
+			this.observers.forEach(obs => {
+				obs.disconnect();
+			});
+			this.timeouts.forEach(id => {
+				clearTimeout(id);
+			});
+			this.intervals.forEach(id => {
+				clearInterval(id);
+			});
+			this.chromeListeners.forEach(({ api, event, handler }) => {
+				api[event].removeListener(handler);
+			});
+			this.listeners = [];
+			this.observers = [];
+			this.timeouts = [];
+			this.intervals = [];
+			this.chromeListeners = [];
+		}
+	};
 	
 	// ==================== Prompt Templates ====================
 	// Variables: {TAB_DATA_LIST}, {EXISTING_STACKS_LIST}, {LANGUAGE}, {OTHERS_NAME}
@@ -250,7 +312,7 @@ Tabs to categorize:
 	// Load config from localStorage or use defaults
 	const loadConfig = () => {
 		try {
-			const saved = localStorage.getItem(STORAGE_KEY);
+			const saved = safeStorage.getItem(STORAGE_KEY);
 			if (saved) {
 				const parsed = JSON.parse(saved);
 				return { ...DEFAULT_CONFIG, ...parsed, api: { ...DEFAULT_CONFIG.api, ...parsed.api } };
@@ -264,7 +326,7 @@ Tabs to categorize:
 	// Save config to localStorage
 	const saveConfig = (config) => {
 		try {
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+			safeStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 		} catch (e) {
 			console.error('TidyTabs: Error saving config', e);
 		}
@@ -536,9 +598,13 @@ Tabs to categorize:
 		
 		// Tab switching
 		dialog.querySelectorAll('.tab-btn').forEach(btn => {
-			btn.addEventListener('click', () => {
-				dialog.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-				dialog.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+			modState.addEventListener(btn, 'click', () => {
+				dialog.querySelectorAll('.tab-btn').forEach(b => {
+					b.classList.remove('active');
+				});
+				dialog.querySelectorAll('.tab-content').forEach(c => {
+					c.classList.remove('active');
+				});
 				btn.classList.add('active');
 				document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
 			});
@@ -556,7 +622,7 @@ Tabs to categorize:
 		const templateDesc = document.getElementById('tt-template-desc');
 		const promptContent = document.getElementById('tt-prompt-content');
 		
-		providerSelect.addEventListener('change', () => {
+		modState.addEventListener(providerSelect, 'change', () => {
 			const provider = providerSelect.value;
 			customUrlDiv.style.display = provider === 'custom' ? 'block' : 'none';
 			const providerConfig = CONFIG.api[provider] || DEFAULT_CONFIG.api[provider];
@@ -565,7 +631,7 @@ Tabs to categorize:
 			if (urlInput) urlInput.value = providerConfig.url || '';
 		});
 		
-		templateSelect.addEventListener('change', () => {
+		modState.addEventListener(templateSelect, 'change', () => {
 			const key = templateSelect.value;
 			const tmpl = PROMPT_TEMPLATES[key];
 			templateDesc.textContent = tmpl?.description || '';
@@ -579,14 +645,14 @@ Tabs to categorize:
 			}
 		});
 		
-		document.getElementById('tt-copy-to-custom').addEventListener('click', () => {
+		modState.addEventListener(document.getElementById('tt-copy-to-custom'), 'click', () => {
 			CONFIG.customPrompt = promptContent.value;
 			templateSelect.value = 'custom';
 			templateSelect.dispatchEvent(new Event('change'));
 			promptContent.removeAttribute('readonly');
 		});
 		
-		document.getElementById('tt-reset-prompt').addEventListener('click', () => {
+		modState.addEventListener(document.getElementById('tt-reset-prompt'), 'click', () => {
 			const key = templateSelect.value;
 			if (key === 'custom') {
 				CONFIG.customPrompt = '';
@@ -596,13 +662,13 @@ Tabs to categorize:
 			}
 		});
 		
-		document.getElementById('tt-import-rules').addEventListener('click', () => {
+		modState.addEventListener(document.getElementById('tt-import-rules'), 'click', () => {
 			showImportRulesDialog();
 		});
 		
-		document.getElementById('tt-cancel').addEventListener('click', () => dialog.remove());
+		modState.addEventListener(document.getElementById('tt-cancel'), 'click', () => dialog.remove());
 		
-		document.getElementById('tt-save').addEventListener('click', () => {
+		modState.addEventListener(document.getElementById('tt-save'), 'click', () => {
 			const provider = providerSelect.value;
 			CONFIG.provider = provider;
 			CONFIG.api[provider] = {
@@ -703,9 +769,9 @@ Tabs to categorize:
 		
 		document.body.appendChild(dialog);
 		
-		document.getElementById('tt-import-cancel').addEventListener('click', () => dialog.remove());
+		modState.addEventListener(document.getElementById('tt-import-cancel'), 'click', () => dialog.remove());
 		
-		document.getElementById('tt-import-convert').addEventListener('click', () => {
+		modState.addEventListener(document.getElementById('tt-import-convert'), 'click', () => {
 			const rulesJson = document.getElementById('tt-rules-json').value.trim();
 			if (!rulesJson) {
 				showNotification('Please paste your Tab Groups rules JSON', 'error');
@@ -1019,7 +1085,7 @@ ${categoryList}
 				if (chrome.runtime.lastError) {
 					console.error('Error updating tab:', chrome.runtime.lastError);
 				} else {
-					console.log(`Added tab ${tabId} to stack ${stackId} (${stackName})`);
+			DEBUG && console.log(`Added tab ${tabId} to stack ${stackId} (${stackName})`);
 				}
 				resolve();
 			});
@@ -1190,7 +1256,7 @@ Avoid the following:
 	};
 
 	const parseJSONResponse = (content) => {
-		console.log('Raw AI response:', content);
+	DEBUG && console.log('Raw AI response:', content);
 		
 		let jsonStr = content.trim();
 		
@@ -1225,7 +1291,7 @@ Avoid the following:
 		// Quote unquoted keys: {foo: or , bar: patterns (but NOT {"foo": which is already valid)
 		jsonStr = jsonStr.replace(/([{,]\s*)([a-zA-Z_]\w*)(\s*:)/g, '$1"$2"$3');
 		
-		console.log('Cleaned JSON string:', jsonStr);
+	DEBUG && console.log('Cleaned JSON string:', jsonStr);
 		
 		try {
 			return JSON.parse(jsonStr);
@@ -1238,7 +1304,7 @@ Avoid the following:
 			if (groupsMatch) {
 				try {
 					const fixedJson = '{"groups":[' + groupsMatch[1] + ']}';
-					console.log('Attempting manual fix:', fixedJson);
+		DEBUG && console.log('Attempting manual fix:', fixedJson);
 					return JSON.parse(fixedJson);
 				} catch (e) {
 					console.error('Manual fix also failed:', e);
@@ -1253,7 +1319,7 @@ Avoid the following:
 	const parseZenStyleResponse = (content, tabs) => {
 		const lines = content.trim().split('\n').map(line => line.trim()).filter(Boolean);
 		
-		console.log('Zen-style response lines:', lines);
+	DEBUG && console.log('Zen-style response lines:', lines);
 		
 		if (lines.length !== tabs.length) {
 			console.warn(`Zen parser: Expected ${tabs.length} categories, got ${lines.length}`);
@@ -1283,7 +1349,7 @@ Avoid the following:
 			});
 		});
 		
-		console.log('Zen-style parsed groups:', groups);
+	DEBUG && console.log('Zen-style parsed groups:', groups);
 		return { groups };
 	};
 
@@ -1339,7 +1405,7 @@ Avoid the following:
 			return group.tabs.length > 1;
 		});
 
-		console.log('AI grouping result after smart filtering:', filteredGroups);
+	DEBUG && console.log('AI grouping result after smart filtering:', filteredGroups);
 		return filteredGroups;
 	};
 
@@ -1347,31 +1413,33 @@ Avoid the following:
 	const handleOrphanTabs = (groupedTabs, tabs, existingStacks, languageName) => {
 		const groupedTabIds = new Set();
 		groupedTabs.forEach(group => {
-			group.tabs.forEach(tab => groupedTabIds.add(tab.id));
+			group.tabs.forEach(tab => {
+				groupedTabIds.add(tab.id);
+			});
 		});
 
 		const orphanTabs = tabs.filter(tab => !groupedTabIds.has(tab.id));
 
 		if (orphanTabs.length === 0) {
-			console.log('No orphan tabs found, all tabs are grouped');
+			DEBUG && console.log('No orphan tabs found, all tabs are grouped');
 			return;
 		}
 
-		console.log(`Found ${orphanTabs.length} orphan tabs:`, orphanTabs.map(t => t.title));
+		DEBUG && console.log(`Found ${orphanTabs.length} orphan tabs:`, orphanTabs.map(t => t.title));
 		
 		// Check if "Others" group exists in AI results
 		let othersGroup = groupedTabs.find(g => OTHERS_NAMES.includes(g.name));
 		
 		if (othersGroup) {
 			// Case A: AI successfully created a multi-tab "Others" group
-			console.log('Adding orphan tabs to existing "Others" group from AI result');
+			DEBUG && console.log('Adding orphan tabs to existing "Others" group from AI result');
 			othersGroup.tabs.push(...orphanTabs);
 		} else {
 			// Case B: Check original existing stacks for "Others"
 			const existingOthersStack = existingStacks.find(s => OTHERS_NAMES.includes(s.name));
 			
 			if (existingOthersStack) {
-				console.log('Adding orphan tabs to EXISTING "Others" stack from original list');
+				DEBUG && console.log('Adding orphan tabs to EXISTING "Others" stack from original list');
 				groupedTabs.push({
 					name: existingOthersStack.name,
 					tabs: orphanTabs,
@@ -1381,7 +1449,7 @@ Avoid the following:
 			} else if (orphanTabs.length > 1) {
 				// No "Others" found and multiple orphans, create new
 				const othersName = getOthersName();
-				console.log(`Creating new "Others" group with ${orphanTabs.length} tabs`);
+				DEBUG && console.log(`Creating new "Others" group with ${orphanTabs.length} tabs`);
 				groupedTabs.push({
 					name: othersName,
 					tabs: orphanTabs,
@@ -1390,7 +1458,7 @@ Avoid the following:
 				});
 			} else {
 				// Only 1 orphan and no "Others" stack, don't create
-				console.log('Only 1 orphan tab found and no "Others" stack, not creating group');
+				DEBUG && console.log('Only 1 orphan tab found and no "Others" stack, not creating group');
 			}
 		}
 	};
@@ -1412,12 +1480,12 @@ Avoid the following:
 		const browserLang = getBrowserLanguage();
 		const languageName = getLanguageName(browserLang);
 		
-		console.log(`Browser language: ${browserLang} (${languageName})`);
+	DEBUG && console.log(`Browser language: ${browserLang} (${languageName})`);
 		
 		const prompt = buildAIPrompt(tabs, existingStacks, languageName);
 
 		try {
-			console.log(`Calling ${CONFIG.provider} API for intelligent grouping...`);
+			DEBUG && console.log(`Calling ${CONFIG.provider} API for intelligent grouping...`);
 			
 			const response = await fetch(apiConfig.url, {
 				method: 'POST',
@@ -1441,10 +1509,10 @@ Avoid the following:
 			}
 			
 			const data = await response.json();
-			console.log('API full response:', data);
+			DEBUG && console.log('API full response:', data);
 			
 			const content = data.choices[0].message.content;
-			console.log('API content:', content);
+			DEBUG && console.log('API content:', content);
 			
 			const result = parseAIResponse(content, tabs);
 			if (!result) return null;
@@ -1455,7 +1523,7 @@ Avoid the following:
 			
 			handleOrphanTabs(groupedTabs, tabs, existingStacks, languageName);
 			
-			console.log('AI grouping result (final):', groupedTabs);
+			DEBUG && console.log('AI grouping result (final):', groupedTabs);
 			
 			if (groupedTabs.length === 0) {
 				console.warn('No valid groups created (all groups have less than 2 tabs)');
@@ -1509,7 +1577,7 @@ Avoid the following:
 			const stackId = group.stackId || crypto.randomUUID();
 			const stackName = group.name;
 			
-			console.log(`${group.isExisting ? 'Adding to existing' : 'Creating'} stack "${stackName}" with ${group.tabs.length} tabs`);
+			DEBUG && console.log(`${group.isExisting ? 'Adding to existing' : 'Creating'} stack "${stackName}" with ${group.tabs.length} tabs`);
 			
 			// Sort by index
 			group.tabs.sort((a, b) => a.index - b.index);
@@ -1554,7 +1622,7 @@ Avoid the following:
 				nextElement.querySelector(SELECTORS.SUBSTACK) !== null;
 
 			if (isStack) {
-				console.log('Found existing tab stack DOM:', nextElement.outerHTML.slice(0, 200));
+				DEBUG && console.log('Found existing tab stack DOM:', nextElement.outerHTML.slice(0, 200));
 
 				const stackWrapper = nextElement.querySelector(SELECTORS.TAB_WRAPPER);
 				const stackTabId = stackWrapper?.getAttribute('data-id')?.replace('tab-', '');
@@ -1580,7 +1648,7 @@ Avoid the following:
 							name: viv.fixedGroupTitle || stackTab.title || 'Unnamed stack',
 							tabId: stackTab.id
 						});
-						console.log(`Detected existing stack: ${viv.fixedGroupTitle || stackTab.title} (ID: ${viv.group})`);
+					DEBUG && console.log(`Detected existing stack: ${viv.fixedGroupTitle || stackTab.title} (ID: ${viv.group})`);
 					} else {
 						console.warn('No matching chrome tab found for DOM id:', stackTabId);
 					}
@@ -1665,7 +1733,7 @@ Avoid the following:
 			clearTimeout(debounceTimer);
 		}
 
-		debounceTimer = setTimeout(() => {
+		debounceTimer = modState.setTimeout(() => {
 			attachButtons();
 			debounceTimer = null;
 		}, delay);
@@ -1683,7 +1751,7 @@ Avoid the following:
 			const button = createTidyButton();
 			separator.appendChild(button);
 
-			button.addEventListener('click', function(e) {
+			modState.addEventListener(button, 'click', function(e) {
 				e.stopPropagation();
 				if (e.ctrlKey || e.metaKey) {
 					showSettingsDialog();
@@ -1692,7 +1760,7 @@ Avoid the following:
 				}
 			});
 			
-			button.addEventListener('contextmenu', function(e) {
+			modState.addEventListener(button, 'contextmenu', function(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				showContextMenu(e.clientX, e.clientY, separator);
@@ -1779,7 +1847,7 @@ Avoid the following:
 		const closeMenu = () => menu.remove();
 		
 		menu.querySelectorAll('.menu-item').forEach(item => {
-			item.addEventListener('click', () => {
+			modState.addEventListener(item, 'click', () => {
 				const action = item.dataset.action;
 				closeMenu();
 				
@@ -1793,8 +1861,8 @@ Avoid the following:
 			});
 		});
 		
-		setTimeout(() => {
-			document.addEventListener('click', closeMenu, { once: true });
+		modState.setTimeout(() => {
+			modState.addEventListener(document, 'click', closeMenu, { once: true });
 		}, 0);
 	};
 
@@ -1807,12 +1875,12 @@ Avoid the following:
 		if (!allowed) return;
 		
 		const workspaceName = await getWorkspaceName(workspaceId);
-		console.log(`Auto-stacking workspace: ${workspaceName}`);
+		DEBUG && console.log(`Auto-stacking workspace: ${workspaceName}`);
 		
 		const tabs = await getTabsByWorkspace(workspaceId);
 		
 		if (tabs.length < 2) {
-			console.log('Not enough tabs in workspace');
+			DEBUG && console.log('Not enough tabs in workspace');
 			return;
 		}
 		
@@ -1822,7 +1890,7 @@ Avoid the following:
 			groups = await getAIGrouping(tabs);
 			
 			if (!groups) {
-				console.log('AI grouping failed, falling back to domain grouping');
+				DEBUG && console.log('AI grouping failed, falling back to domain grouping');
 				groups = groupByDomain(tabs);
 			}
 		} else {
@@ -1830,23 +1898,23 @@ Avoid the following:
 		}
 		
 		if (groups.length === 0) {
-			console.log('No groups to create');
+			DEBUG && console.log('No groups to create');
 			return;
 		}
 		
 		await createTabStacks(groups);
-		console.log('Auto-stacking completed!');
+		DEBUG && console.log('Auto-stacking completed!');
 	};
 
 	const tidyTabsBelow = async (separator, forceAI = null) => {
 		const existingStacks = await detectExistingStacks(separator.nextElementSibling);
 		const tabsInfo = collectTabsFromSeparator(separator);
 
-		console.log('Tabs found:', tabsInfo.length);
-		console.log('Existing stacks found:', existingStacks.length);
+		DEBUG && console.log('Tabs found:', tabsInfo.length);
+		DEBUG && console.log('Existing stacks found:', existingStacks.length);
 
 		if (tabsInfo.length < 2 && existingStacks.length === 0) {
-			console.log('Not enough tabs to group (need at least 2) and no existing stacks');
+			DEBUG && console.log('Not enough tabs to group (need at least 2) and no existing stacks');
 			return;
 		}
 
@@ -1857,10 +1925,10 @@ Avoid the following:
 
 			const validTabs = tabs.filter(t => t !== null);
 			
-			console.log('Valid tabs:', validTabs.length);
+			DEBUG && console.log('Valid tabs:', validTabs.length);
 
 			if (validTabs.length < 1 && existingStacks.length === 0) {
-				console.log('No valid tabs or existing stacks');
+				DEBUG && console.log('No valid tabs or existing stacks');
 				return;
 			}
 
@@ -1868,28 +1936,28 @@ Avoid the following:
 			const useAI = forceAI !== null ? forceAI : (CONFIG.enableAIGrouping && getApiConfig().key);
 			
 			if (useAI && getApiConfig().key) {
-				console.log('Using AI grouping...');
+				DEBUG && console.log('Using AI grouping...');
 				groups = await getAIGrouping(validTabs, existingStacks);
 				
 				if (!groups) {
-					console.log('AI grouping failed, falling back to domain grouping');
+					DEBUG && console.log('AI grouping failed, falling back to domain grouping');
 					groups = groupByDomain(validTabs);
 				}
 			} else if (useAI && !getApiConfig().key) {
 				showNotification('AI requested but no API key configured. Right-click → Settings to add one.');
 				groups = groupByDomain(validTabs);
 			} else {
-				console.log('Using domain grouping...');
+				DEBUG && console.log('Using domain grouping...');
 				groups = groupByDomain(validTabs);
 			}
 
 			if (groups.length === 0) {
-				console.log('No groups to create');
+				DEBUG && console.log('No groups to create');
 				return;
 			}
 
 			await createTabStacks(groups);
-			console.log('Tab stacking completed!');
+			DEBUG && console.log('Tab stacking completed!');
 		} finally {
 			hideLoading(separator);
 			scheduleAttachButtons(CONFIG.delays.reattach);
@@ -1902,21 +1970,21 @@ Avoid the following:
 	const setupAutoStackListener = () => {
 		if (!chrome.webNavigation) return;
 
-		chrome.webNavigation.onCommitted.addListener(async (details) => {
+		modState.addChromeListener(chrome.webNavigation, 'onCommitted', async (details) => {
 			if (details.tabId !== -1 && details.frameType === 'outermost_frame') {
 				const tab = await getTab(details.tabId);
 				
 				if (tab && !tab.pinned && tab.vivExtData && !tab.vivExtData.panelId) {
 					const workspaceId = tab.vivExtData.workspaceId;
 					
-					setTimeout(() => {
+					modState.setTimeout(() => {
 						autoStackWorkspace(workspaceId);
 					}, CONFIG.delays.autoStack);
 				}
 			}
 		});
 		
-		console.log('Auto-stacking listener registered');
+		DEBUG && console.log('Auto-stacking listener registered');
 	};
 
 	// Setup mutation observer for tab strip changes
@@ -1924,11 +1992,11 @@ Avoid the following:
 		const tabStrip = document.querySelector(SELECTORS.TAB_STRIP);
 		
 		if (!tabStrip) {
-			setTimeout(observeTabStrip, CONFIG.delays.retry);
+			modState.setTimeout(observeTabStrip, CONFIG.delays.retry);
 			return;
 		}
 
-		const observer = new MutationObserver(function(mutations) {
+		modState.addObserver(tabStrip, function(mutations) {
 			let hasTabChange = false;
 			let hasWorkspaceSwitch = false;
 
@@ -1955,9 +2023,7 @@ Avoid the following:
 				const delay = hasWorkspaceSwitch ? CONFIG.delays.workspaceSwitch : CONFIG.delays.mutation;
 				scheduleAttachButtons(delay);
 			}
-		});
-
-		observer.observe(tabStrip, {
+		}, {
 			childList: true,
 			subtree: true,
 			attributes: true,
@@ -1968,19 +2034,21 @@ Avoid the following:
 	// ==================== Initialization ====================
 
 	const init = () => {
-		console.log('Initializing TidyTabs extension');
-		console.log('AI grouping:', CONFIG.enableAIGrouping ? 'enabled' : 'disabled');
-		console.log('Auto-stack workspaces:', CONFIG.autoStackWorkspaces);
+		DEBUG && console.log('Initializing TidyTabs extension');
+		DEBUG && console.log('AI grouping:', CONFIG.enableAIGrouping ? 'enabled' : 'disabled');
+		DEBUG && console.log('Auto-stack workspaces:', CONFIG.autoStackWorkspaces);
 
-		setTimeout(attachButtons, CONFIG.delays.init);
+		modState.setTimeout(attachButtons, CONFIG.delays.init);
 		observeTabStrip();
 		setupAutoStackListener();
 	};
 
 	// Start when DOM is ready
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', init);
+		modState.addEventListener(document, 'DOMContentLoaded', init);
 	} else {
 		init();
 	}
+
+	window.addEventListener('beforeunload', () => modState.cleanup());
 })();

@@ -26,6 +26,60 @@
 		DEBOUNCE: 150  // Debounce delay for rapid mutations
 	};
 
+	const modState = {
+		listeners: [],
+		observers: [],
+		timeouts: [],
+		intervals: [],
+		chromeListeners: [],
+		addEventListener(target, event, handler, options) {
+			target.addEventListener(event, handler, options);
+			this.listeners.push({ target, event, handler, options });
+		},
+		addObserver(target, callback, options) {
+			const observer = new MutationObserver(callback);
+			observer.observe(target, options);
+			this.observers.push(observer);
+			return observer;
+		},
+		setTimeout(callback, delay) {
+			const id = setTimeout(callback, delay);
+			this.timeouts.push(id);
+			return id;
+		},
+		setInterval(callback, delay) {
+			const id = setInterval(callback, delay);
+			this.intervals.push(id);
+			return id;
+		},
+		addChromeListener(api, event, handler) {
+			api[event].addListener(handler);
+			this.chromeListeners.push({ api, event, handler });
+		},
+		cleanup() {
+			this.listeners.forEach(({ target, event, handler, options }) => {
+				target.removeEventListener(event, handler, options);
+			});
+			this.observers.forEach(obs => {
+				obs.disconnect();
+			});
+			this.timeouts.forEach(id => {
+				clearTimeout(id);
+			});
+			this.intervals.forEach(id => {
+				clearInterval(id);
+			});
+			this.chromeListeners.forEach(({ api, event, handler }) => {
+				api[event].removeListener(handler);
+			});
+			this.listeners = [];
+			this.observers = [];
+			this.timeouts = [];
+			this.intervals = [];
+			this.chromeListeners = [];
+		}
+	};
+
 	// Debounce timer
 	let debounceTimer = null;
 
@@ -124,7 +178,7 @@
 			separator.appendChild(button);
 
 			// Handle click event
-			button.addEventListener('click', function(e) {
+			modState.addEventListener(button, 'click', function(e) {
 				e.stopPropagation();
 				closeTabsBelow(separator);
 			});
@@ -139,7 +193,7 @@
 		}
 
 		// Schedule new attachment
-		debounceTimer = setTimeout(() => {
+		debounceTimer = modState.setTimeout(() => {
 			attachButtons();
 			debounceTimer = null;
 		}, delay);
@@ -150,11 +204,11 @@
 		const tabStrip = document.querySelector(SELECTORS.TAB_STRIP);
 		
 		if (!tabStrip) {
-			setTimeout(observeTabStrip, DELAYS.RETRY);
+			modState.setTimeout(observeTabStrip, DELAYS.RETRY);
 			return;
 		}
 
-		const observer = new MutationObserver(function(mutations) {
+		modState.addObserver(tabStrip, function(mutations) {
 			let hasTabChange = false;
 			let hasWorkspaceSwitch = false;
 
@@ -183,9 +237,7 @@
 				const delay = hasWorkspaceSwitch ? DELAYS.WORKSPACE_SWITCH : DELAYS.MUTATION;
 				scheduleAttachButtons(delay);
 			}
-		});
-
-		observer.observe(tabStrip, {
+		}, {
 			childList: true,
 			subtree: true,
 			attributes: true,
@@ -195,14 +247,16 @@
 
 	// Initialize the extension
 	function init() {
-		setTimeout(attachButtons, DELAYS.INIT);
+		modState.setTimeout(attachButtons, DELAYS.INIT);
 		observeTabStrip();
 	}
 
 	// Start when DOM is ready
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', init);
+		modState.addEventListener(document, 'DOMContentLoaded', init);
 	} else {
 		init();
 	}
+
+	window.addEventListener('beforeunload', () => modState.cleanup());
 })();

@@ -12,6 +12,60 @@
     POLL_INTERVAL: 2000,
   };
 
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => {
+        obs.disconnect();
+      });
+      this.timeouts.forEach(id => {
+        clearTimeout(id);
+      });
+      this.intervals.forEach(id => {
+        clearInterval(id);
+      });
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+    }
+  };
+
   let mediaIndicator = null;
   let pollInterval = null;
 
@@ -22,7 +76,7 @@
       if (element) {
         callback(element);
       } else if (Date.now() - startTime < maxWait) {
-        setTimeout(check, 100);
+        modState.setTimeout(check, 100);
       }
     };
     check();
@@ -78,8 +132,12 @@
       font-size: 12px;
       opacity: 0.7;
     `;
-    muteBtn.onmouseenter = () => muteBtn.style.opacity = '1';
-    muteBtn.onmouseleave = () => muteBtn.style.opacity = '0.7';
+    muteBtn.onmouseenter = () => {
+      muteBtn.style.opacity = '1';
+    };
+    muteBtn.onmouseleave = () => {
+      muteBtn.style.opacity = '0.7';
+    };
 
     indicator.appendChild(icon);
     indicator.appendChild(info);
@@ -160,18 +218,19 @@
 
     updateMediaIndicator();
 
-    pollInterval = setInterval(updateMediaIndicator, CONFIG.POLL_INTERVAL);
+    pollInterval = modState.setInterval(updateMediaIndicator, CONFIG.POLL_INTERVAL);
 
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    modState.addChromeListener(chrome.tabs, 'onUpdated', (tabId, changeInfo) => {
       if ('audible' in changeInfo || 'mutedInfo' in changeInfo) {
         updateMediaIndicator();
       }
     });
 
-    chrome.tabs.onRemoved.addListener(updateMediaIndicator);
+    modState.addChromeListener(chrome.tabs, 'onRemoved', updateMediaIndicator);
 
     console.log('[TabPanelMediaControls] Initialized');
   }
 
   waitForElement('#tabs-tabbar-container', init);
+  window.addEventListener('beforeunload', () => modState.cleanup());
 })();

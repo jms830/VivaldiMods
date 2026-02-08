@@ -25,6 +25,60 @@
     close_delay: 280,
   };
 
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => {
+        obs.disconnect();
+      });
+      this.timeouts.forEach(id => {
+        clearTimeout(id);
+      });
+      this.intervals.forEach(id => {
+        clearInterval(id);
+      });
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+    }
+  };
+
   const addStyleSheet = (css) => {
     const styleSheet = new CSSStyleSheet();
     styleSheet.replaceSync(css);
@@ -41,7 +95,7 @@
 
   const waitForElement = (selector, startNode = document) => {
     return new Promise((resolve) => {
-      const timerId = setInterval(() => {
+      const timerId = modState.setInterval(() => {
         const elem = startNode.querySelector(selector);
 
         if (elem) {
@@ -79,7 +133,7 @@
       : 0;
 
     clearTimeout(showToken);
-    showToken = setTimeout(() => {
+    showToken = modState.setTimeout(() => {
       simulateClick(button);
     }, delay);
   };
@@ -91,7 +145,7 @@
     )
       return;
 
-    setTimeout(() => {
+    modState.setTimeout(() => {
       const activeButton = getActiveButton();
       if (activeButton) {
         simulateClick(activeButton);
@@ -129,12 +183,12 @@
     };
 
     if (config.auto_close) {
-      document
-        .querySelector("#webview-container")
-        .addEventListener("mouseenter", closePanel);
-      document
-        .querySelector("#webview-container")
-        .addEventListener("animationstart", (event) => {
+      modState.addEventListener(
+        document.querySelector("#webview-container"),
+        "mouseenter",
+        closePanel,
+      );
+      modState.addEventListener(document.querySelector("#webview-container"), "animationstart", (event) => {
           if (
             event.target.matches("webview") &&
             event.animationName === "delay_visibility"
@@ -145,12 +199,13 @@
     }
 
     const panels = document.querySelector("#panels");
-    panels.addEventListener("mouseenter", eventHandler, { capture: true });
-    panels.addEventListener("mouseleave", eventHandler, { capture: true });
-    panels.addEventListener("dragenter", eventHandler, { capture: true });
+    modState.addEventListener(panels, "mouseenter", eventHandler, { capture: true });
+    modState.addEventListener(panels, "mouseleave", eventHandler, { capture: true });
+    modState.addEventListener(panels, "dragenter", eventHandler, { capture: true });
   };
 
   await waitForElement("#browser");
   fixWebViewMouseEvent();
   panelMouseOver();
+  window.addEventListener('beforeunload', () => modState.cleanup());
 })();

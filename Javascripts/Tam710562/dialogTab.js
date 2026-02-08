@@ -25,6 +25,67 @@
   // Settings Manager - Persistent Configuration
   // ============================================
   const SETTINGS_KEY = 'vivaldi-peek-settings';
+  const safeStorage = {
+    getItem(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
+    },
+    setItem(key, value) {
+      try { localStorage.setItem(key, value); } catch (e) { }
+    }
+  };
+  const modState = {
+    listeners: [],
+    observers: [],
+    timeouts: [],
+    intervals: [],
+    chromeListeners: [],
+    addEventListener(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      this.listeners.push({ target, event, handler, options });
+    },
+    addObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      observer.observe(target, options);
+      this.observers.push(observer);
+      return observer;
+    },
+    setTimeout(callback, delay) {
+      const id = setTimeout(callback, delay);
+      this.timeouts.push(id);
+      return id;
+    },
+    setInterval(callback, delay) {
+      const id = setInterval(callback, delay);
+      this.intervals.push(id);
+      return id;
+    },
+    addChromeListener(api, event, handler) {
+      api[event].addListener(handler);
+      this.chromeListeners.push({ api, event, handler });
+    },
+    cleanup() {
+      this.listeners.forEach(({ target, event, handler, options }) => {
+        target.removeEventListener(event, handler, options);
+      });
+      this.observers.forEach(obs => {
+        obs.disconnect();
+      });
+      this.timeouts.forEach(id => {
+        clearTimeout(id);
+      });
+      this.intervals.forEach(id => {
+        clearInterval(id);
+      });
+      this.chromeListeners.forEach(({ api, event, handler }) => {
+        api[event].removeListener(handler);
+      });
+      this.listeners = [];
+      this.observers = [];
+      this.timeouts = [];
+      this.intervals = [];
+      this.chromeListeners = [];
+    }
+  };
   
   const DEFAULT_SETTINGS = {
     ctrlClickToPeek: false,
@@ -51,7 +112,7 @@
 
     load() {
       try {
-        const stored = localStorage.getItem(SETTINGS_KEY);
+        const stored = safeStorage.getItem(SETTINGS_KEY);
         this._settings = stored ? { ...DEFAULT_SETTINGS, ...JSON.parse(stored) } : { ...DEFAULT_SETTINGS };
       } catch (e) {
         console.warn('Failed to load peek settings:', e);
@@ -62,7 +123,7 @@
 
     save() {
       try {
-        localStorage.setItem(SETTINGS_KEY, JSON.stringify(this._settings));
+        safeStorage.setItem(SETTINGS_KEY, JSON.stringify(this._settings));
         this._notifyListeners();
       } catch (e) {
         console.warn('Failed to save peek settings:', e);
@@ -95,7 +156,9 @@
     },
 
     _notifyListeners() {
-      this._listeners.forEach(cb => cb(this._settings));
+      this._listeners.forEach(cb => {
+        cb(this._settings);
+      });
     }
   };
 
@@ -398,9 +461,11 @@
         const clearWebviews = (closedTabId) => {
           if (tabId === closedTabId) {
             this.webviews.forEach(
-              (view, key) =>
-                view.tabCloseListener === clearWebviews &&
-                this.closeLastDialog(),
+              (view, key) => {
+                if (view.tabCloseListener === clearWebviews) {
+                  this.closeLastDialog();
+                }
+              },
             );
             chrome.tabs.onRemoved.removeListener(clearWebviews);
           }
@@ -604,15 +669,15 @@
             },
           ];
 
-        buttons.forEach((button) =>
+        buttons.forEach((button) => {
           fragment.appendChild(
             this.createOptionsButton(
               button.content,
               button.action,
               button.cls || "",
             ),
-          ),
-        );
+          );
+        });
         fragment.appendChild(input);
 
         thisElement.append(fragment);
@@ -788,7 +853,7 @@
       this.isLongPress = false; // 标记是否是长按操作
       this.dialogTriggered = false; // 标志是否已触发 dialogTab
 
-      window.addEventListener("beforeunload", this.#cleanup.bind(this));
+      modState.addEventListener(window, "beforeunload", this.#cleanup.bind(this));
 
       this.#initialize();
 
@@ -2028,4 +2093,6 @@
       document.addEventListener('keydown', this.#escHandler);
     }
   }
+
+  window.addEventListener('beforeunload', () => modState.cleanup());
 })();
