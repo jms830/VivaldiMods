@@ -294,6 +294,41 @@ Both `transform` and `backdrop-filter` create **stacking contexts** and **contai
 - `CSS/Layout/nativeautohidepolish.css` (lines 157-167)
 - `Javascripts/Tam710562/selectSearch.js` (disable in custom.js)
 
+### Ghosted/Doubled URL Text with Toolbar AutoHide (Vivaldi 7.9+, Feb 2026)
+
+**Symptom**: URL text (e.g., "google.com") appears doubled/ghosted in the address bar — two overlapping copies of the same text, making it unreadable. Only occurs when `toolbarautohide.css` is enabled.
+
+**Root Cause**: The toolbar auto-hide rule at line 19 sets `opacity: 0` on all direct children of the toolbar. The `.UrlBar-AddressField` is correctly exempted with `opacity: 1`. However, a separate rule was also forcing `opacity: 1 !important` on internal address bar children (`.UrlBar-AddressField > *`, `.UrlBar-UrlFieldWrapper`, `.UrlBar-UrlField`). This made Vivaldi's normally-hidden page-title/hostname overlay visible alongside the editable URL input, creating the doubled text.
+
+**Fix**: Remove `opacity: 1 !important` from the URL bar internal elements rule. The parent `.UrlBar-AddressField` already has `opacity: 1`, so children inherit visibility naturally. Only `min-height`, `max-height`, and `overflow` overrides are needed on the internals.
+
+**Before** (broken):
+```css
+.toolbar.toolbar-tabbar-before .UrlBar-UrlFieldWrapper,
+.toolbar.toolbar-tabbar-before .UrlBar-UrlFieldWrapper > .observer,
+.toolbar.toolbar-tabbar-before .UrlBar-UrlField {
+  opacity: 1 !important;        /* CAUSES GHOSTING — remove */
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+```
+
+**After** (fixed):
+```css
+.toolbar.toolbar-tabbar-before .UrlBar-UrlFieldWrapper,
+.toolbar.toolbar-tabbar-before .UrlBar-UrlFieldWrapper > .observer,
+.toolbar.toolbar-tabbar-before .UrlBar-UrlField {
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+```
+
+**Key Insight**: When overriding toolbar auto-hide, only force sizing/overflow on address bar internals — never force `opacity`. Vivaldi uses internal opacity toggling to show/hide overlapping URL display layers (editable input vs formatted hostname). Forcing `opacity: 1` on all of them defeats that mechanism.
+
+**File**: `CSS/Layout/toolbarautohide.css` (lines 37-46)
+
 ### CSS @import Case Sensitivity on Linux/WSL (Jan 2026)
 
 **Symptom**: CSS files fail to load with `ERR_FAILED` in DevTools console. Example errors:

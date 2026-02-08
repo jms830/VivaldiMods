@@ -34,12 +34,12 @@ Granular controls for individual element visibility
   flex: 1 1 auto !important;
 }
 
-/* Ensure URL bar internal elements aren't collapsed and can overflow */
-.toolbar.toolbar-tabbar-before .UrlBar-AddressField > *,
+/* URL bar internals: only override sizing, not opacity.
+   The parent .UrlBar-AddressField already has opacity:1;
+   forcing opacity on children causes ghosted/doubled text. */
 .toolbar.toolbar-tabbar-before .UrlBar-UrlFieldWrapper,
 .toolbar.toolbar-tabbar-before .UrlBar-UrlFieldWrapper > .observer,
 .toolbar.toolbar-tabbar-before .UrlBar-UrlField {
-  opacity: 1 !important;
   min-height: auto !important;
   max-height: none !important;
   overflow: visible !important;

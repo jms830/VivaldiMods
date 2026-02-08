@@ -59,8 +59,8 @@
 /* Theme previewer panel */
 /* @import "Layout/themepreviewer.css"; */
 
-/* Toolbar auto-hide (granular control) */
-/* @import "Layout/toolbarautohide.css"; */
+/* Toolbar auto-hide - autohides buttons on tabbar */
+@import "Layout/toolbarautohide.css"; 
 
 /* Workspace buttons in toolbar (non-JS positioning) */
 @import "Layout/workspacebuttons.css";
