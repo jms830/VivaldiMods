@@ -1167,87 +1167,6 @@ ${categoryList}
 		return buildPromptFromTemplate(tabs, existingStacks, languageName);
 	};
 
-	const buildAIPromptLegacy = (tabs, existingStacks, languageName) => {
-		const tabsInfo = tabs.map((tab, index) => ({
-			id: index,
-			title: tab.title || 'Untitled',
-			domain: getHostname(tab.url),
-			url: tab.url
-		}));
-
-		const existingInfo = Array.isArray(existingStacks) && existingStacks.length > 0
-			? existingStacks.map((s, i) => `${i}. Stack title: ${s.name || 'Unnamed stack'} (ID: ${s.id})`).join('\n')
-			: 'None';
-
-		const othersName = getOthersName();
-
-		return `
-**Instructions:**
-
-Below are existing tab stack information and tabs to be grouped:
-
-Existing tab stacks (title and ID):
-${existingInfo}
-
-Tabs to be grouped (id, title, domain):
-${tabsInfo.map(t => `${t.id}. ${t.title} (${t.domain})`).join('\n')}
-
-**Follow these rules to group tabs:**
-
-# Priority: Assign tabs to existing stacks
-
-1. If a tab's information is semantically related to an existing stack's title, add it to that stack: In the JSON output, match the tab's (tab_ids) to the existing stack's title (name) [VERY IMPORTANT];
-
-If no semantically related existing stack is found, then consider creating a new stack
-
-# Requirements for creating new stacks:
-
-2. **Group by content theme**: When creating new stacks, categorize based on semantic similarity of tab titles.
-
-3. **Group names must be specific**:
-- Group names should be concise and specific, analyze tab titles and determine if they form a specific topic, group and name accordingly
-- Examples: "css overflow", "javascript async issues", "xxx API collection"
-- Avoid generic titles like "xxx tutorials", "xxx resources", "resource search"
-- Allow more generic grouping only when refined to a single remaining tab
-- **All group names must use ${languageName} language**
-
-4. **Each group must contain at least 2 tabs**. A single tab cannot form a group.
-
-5. Conditions for creating and adding to "Others" stack:
-	1. Tabs in stacks with only one tab should be added to the "Others" stack (${othersName})
-	2. Tabs that cannot be grouped with any other tabs should be added to "Others"
-	3. When existing stacks **do not contain** an "Others" stack, create one even if it has no tabs
-
-6. Each tab can only appear in one group.
-
-7. Output **strictly valid JSON format only**, nothing else:
-Avoid the following:
-* Empty elements (e.g. [5, , 7])
-* Missing quotes or commas
-* tab_ids containing only single tab groups (e.g. "tab_ids": [6]) [VERY IMPORTANT]
-* ***No additional explanatory text, comments, or extra content in output*** [VERY IMPORTANT]
-
-**Output example (must strictly follow):**
-
-{
-  "groups": [
-    {
-      "name": "Group name",
-      "tab_ids": [0, 1, 2]
-    },
-    {
-      "name": "Group name 2",
-      "tab_ids": [3, 4]
-    },
-    {
-      "name": "${othersName}",
-      "tab_ids": [5, 6]
-    }
-  ]
-}
-`;
-	};
-
 	const parseAIResponse = (content, tabs) => {
 		if (isZenStyleTemplate()) {
 			return parseZenStyleResponse(content, tabs);
@@ -1285,8 +1204,11 @@ Avoid the following:
 		// Fix common JSON issues
 		jsonStr = jsonStr
 			.replace(/,\s*]/g, ']')
-			.replace(/,\s*}/g, '}')
-			.replace(/'/g, '"');
+			.replace(/,\s*}/g, '}');
+		
+		// Replace single quotes used as JSON delimiters (not apostrophes in values)
+		jsonStr = jsonStr.replace(/'([^'\\]*(?:\\.[^'\\]*)*)'\s*:/g, '"$1":');
+		jsonStr = jsonStr.replace(/:\s*'([^'\\]*(?:\\.[^'\\]*)*)'/g, ': "$1"');
 		
 		// Quote unquoted keys: {foo: or , bar: patterns (but NOT {"foo": which is already valid)
 		jsonStr = jsonStr.replace(/([{,]\s*)([a-zA-Z_]\w*)(\s*:)/g, '$1"$2"$3');
@@ -1317,7 +1239,8 @@ Avoid the following:
 	};
 
 	const parseZenStyleResponse = (content, tabs) => {
-		const lines = content.trim().split('\n').map(line => line.trim()).filter(Boolean);
+		const rawLines = content.trim().split('\n').map(line => line.trim());
+		const lines = rawLines.filter(line => line.length > 0 && !/^(output|categories|---)/i.test(line));
 		
 	DEBUG && console.log('Zen-style response lines:', lines);
 		
@@ -1334,7 +1257,7 @@ Avoid the following:
 		
 		const categoryMap = new Map();
 		lines.forEach((category, index) => {
-			const normalizedCategory = category.replace(/^[\d.\-*]+\s*/, '').trim();
+			const normalizedCategory = category.replace(/^[\d.\-)\]]+\s*/, '').trim();
 			if (!categoryMap.has(normalizedCategory)) {
 				categoryMap.set(normalizedCategory, []);
 			}
@@ -1487,19 +1410,25 @@ Avoid the following:
 		try {
 			DEBUG && console.log(`Calling ${CONFIG.provider} API for intelligent grouping...`);
 			
+			const requestBody = {
+					model: apiConfig.model,
+					messages: [{ role: 'user', content: prompt }],
+					temperature: CONFIG.temperature,
+					max_tokens: CONFIG.maxTokens,
+					stream: false
+				};
+			
+			if (!isZenStyleTemplate()) {
+				requestBody.response_format = { type: 'json_object' };
+			}
+			
 			const response = await fetch(apiConfig.url, {
 				method: 'POST',
 				headers: {
 					'Authorization': `Bearer ${apiConfig.key}`,
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({
-					model: apiConfig.model,
-					messages: [{ role: 'user', content: prompt }],
-					temperature: CONFIG.temperature,
-					max_tokens: CONFIG.maxTokens,
-					stream: false
-				})
+				body: JSON.stringify(requestBody)
 			});
 			
 			if (!response.ok) {
@@ -1510,6 +1439,10 @@ Avoid the following:
 			
 			const data = await response.json();
 			DEBUG && console.log('API full response:', data);
+			
+			if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+				throw new Error('Unexpected API response: missing choices[0].message');
+			}
 			
 			const content = data.choices[0].message.content;
 			DEBUG && console.log('API content:', content);

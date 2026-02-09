@@ -955,6 +955,24 @@ This regex:
 
 **File**: `Javascripts/tidyTabs.js`, function `parseJSONResponse()` around line 1225
 
+### TidyTabs: AI Response Parsing Hardening (Feb 2026)
+
+**Issues found during audit and live API testing:**
+
+1. **Single-quote replacement corrupted apostrophes** — `.replace(/'/g, '"')` turned `"React's Hooks"` into `"React"s Hooks"` (broken JSON). Fixed with targeted regex that only replaces single quotes used as JSON delimiters, not apostrophes within string values.
+
+2. **No JSON response mode** — API calls didn't request structured JSON output. Gemini would sometimes wrap responses in markdown or truncate mid-JSON. Fixed by adding `response_format: { type: "json_object" }` for all non-zen templates.
+
+3. **No null checks on API response** — `data.choices[0].message.content` could crash if API returned unexpected structure. Added defensive checks.
+
+4. **Dead code: `buildAIPromptLegacy()`** — 80-line function never called by anything. Removed.
+
+5. **Zen parser fragility** — `.filter(Boolean)` could cause count mismatch. Improved to also strip common AI preamble lines ("Output:", "---") and handle more numbering formats.
+
+**Testing**: Verified all 4 templates (default, domain, semantic, zen) against live Gemini API with `gemini-3-flash-preview`. JSON mode confirmed to produce consistently valid output. Parse edge cases tested for apostrophes, markdown wrapping, unquoted keys, colons in values, and URLs.
+
+**Files**: `Javascripts/tidyTabs.js`, `tests/test-tidytabs-ai.js`
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc
