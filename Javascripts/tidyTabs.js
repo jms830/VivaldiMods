@@ -1386,6 +1386,94 @@ ${categoryList}
 		}
 	};
 
+	// Retry config for transient API errors
+	const RETRY_CONFIG = {
+		maxRetries: 2,
+		baseDelayMs: 1500,
+		retryableStatuses: [429, 500, 502, 503, 504],
+	};
+
+	// Human-readable API error messages
+	const getApiErrorMessage = (status, errorBody) => {
+		switch (status) {
+			case 401: return 'Invalid API key. Check your key in TidyTabs settings.';
+			case 403: return 'API key lacks permission. Check that the Gemini API is enabled for your key.';
+			case 404: return 'Model not found. Check your model name in settings (e.g. gemini-3-flash-preview).';
+			case 429: return 'Rate limited — too many requests. Wait a minute and try again.';
+			case 500: return 'Gemini server error. This is on Google\'s side — try again shortly.';
+			case 502: return 'Gemini gateway error. Google\'s servers are having issues — try again shortly.';
+			case 503: return 'Gemini is temporarily overloaded. This usually resolves in a few seconds — retrying automatically.';
+			case 504: return 'Gemini request timed out. Try again or use a smaller tab set.';
+			default: {
+				if (status >= 400 && status < 500) return `Client error (${status}). Check your API configuration.`;
+				if (status >= 500) return `Server error (${status}). Google's API is having issues — try again later.`;
+				return `Unexpected error (${status}).`;
+			}
+		}
+	};
+
+	const callApiWithRetry = async (apiConfig, requestBody) => {
+		let lastError = null;
+		const providerName = CONFIG.provider || 'AI';
+
+		for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
+			try {
+				if (attempt > 0) {
+					const delay = RETRY_CONFIG.baseDelayMs * Math.pow(2, attempt - 1);
+					DEBUG && console.log(`[TidyTabs] Retry ${attempt}/${RETRY_CONFIG.maxRetries} after ${delay}ms...`);
+					showNotification(`Retrying ${providerName} API (attempt ${attempt + 1}/${RETRY_CONFIG.maxRetries + 1})...`, 'info');
+					await new Promise(r => modState.setTimeout(r, delay));
+				}
+
+				const response = await fetch(apiConfig.url, {
+					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${apiConfig.key}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(requestBody)
+				});
+
+				if (!response.ok) {
+					const errorText = await response.text();
+					const friendlyMsg = getApiErrorMessage(response.status, errorText);
+					console.error(`[TidyTabs] API ${response.status}: ${friendlyMsg}`);
+					DEBUG && console.error('[TidyTabs] Raw error body:', errorText);
+
+					if (RETRY_CONFIG.retryableStatuses.includes(response.status) && attempt < RETRY_CONFIG.maxRetries) {
+						lastError = new Error(friendlyMsg);
+						continue;
+					}
+					throw new Error(friendlyMsg);
+				}
+
+				const data = await response.json();
+				DEBUG && console.log('[TidyTabs] API full response:', data);
+
+				if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+					throw new Error('Unexpected API response structure — missing choices[0].message');
+				}
+
+				if (attempt > 0) {
+					showNotification(`${providerName} API succeeded on retry ${attempt}.`, 'info');
+				}
+
+				return data.choices[0].message.content;
+
+			} catch (error) {
+				lastError = error;
+				// Network errors (fetch rejects) are retryable
+				if (error.name === 'TypeError' && attempt < RETRY_CONFIG.maxRetries) {
+					console.error(`[TidyTabs] Network error (attempt ${attempt + 1}):`, error.message);
+					continue;
+				}
+				if (attempt >= RETRY_CONFIG.maxRetries) break;
+			}
+		}
+
+		throw lastError || new Error(`${providerName} API failed after ${RETRY_CONFIG.maxRetries + 1} attempts`);
+	};
+
 	const getAIGrouping = async (tabs, existingStacks = []) => {
 		const apiConfig = getApiConfig();
 		
@@ -1403,48 +1491,27 @@ ${categoryList}
 		const browserLang = getBrowserLanguage();
 		const languageName = getLanguageName(browserLang);
 		
-	DEBUG && console.log(`Browser language: ${browserLang} (${languageName})`);
+		DEBUG && console.log(`Browser language: ${browserLang} (${languageName})`);
 		
 		const prompt = buildAIPrompt(tabs, existingStacks, languageName);
 
 		try {
-			DEBUG && console.log(`Calling ${CONFIG.provider} API for intelligent grouping...`);
+			const providerName = CONFIG.provider || 'AI';
+			DEBUG && console.log(`Calling ${providerName} API for intelligent grouping...`);
 			
 			const requestBody = {
-					model: apiConfig.model,
-					messages: [{ role: 'user', content: prompt }],
-					temperature: CONFIG.temperature,
-					max_tokens: CONFIG.maxTokens,
-					stream: false
-				};
+				model: apiConfig.model,
+				messages: [{ role: 'user', content: prompt }],
+				temperature: CONFIG.temperature,
+				max_tokens: CONFIG.maxTokens,
+				stream: false
+			};
 			
 			if (!isZenStyleTemplate()) {
 				requestBody.response_format = { type: 'json_object' };
 			}
 			
-			const response = await fetch(apiConfig.url, {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${apiConfig.key}`,
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(requestBody)
-			});
-			
-			if (!response.ok) {
-				const errorText = await response.text();
-				console.error('API error response:', errorText);
-				throw new Error(`API error: ${response.status} ${response.statusText}`);
-			}
-			
-			const data = await response.json();
-			DEBUG && console.log('API full response:', data);
-			
-			if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-				throw new Error('Unexpected API response: missing choices[0].message');
-			}
-			
-			const content = data.choices[0].message.content;
+			const content = await callApiWithRetry(apiConfig, requestBody);
 			DEBUG && console.log('API content:', content);
 			
 			const result = parseAIResponse(content, tabs);
@@ -1468,8 +1535,8 @@ ${categoryList}
 			
 		} catch (error) {
 			const providerName = CONFIG.provider || 'AI';
-			console.error(`Error calling ${providerName} API:`, error);
-			showNotification(`Error calling ${providerName} API: ${error.message}`);
+			console.error(`[TidyTabs] ${providerName} API failed:`, error);
+			showNotification(`${providerName}: ${error.message}`);
 			return null;
 		}
 	};
