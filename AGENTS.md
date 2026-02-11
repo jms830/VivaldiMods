@@ -973,6 +973,42 @@ This regex:
 
 **Files**: `Javascripts/tidyTabs.js`, `tests/test-tidytabs-ai.js`
 
+### EasyFiles: modState Not Defined in Injected Context (Feb 2026)
+
+**Symptom**: Chrome extensions (e.g., Sage sidepanel at `chrome-extension://...`) crash with `ReferenceError: modState is not defined` at easyFiles.js lines 570-571.
+
+**Root Cause**: The `inject()` function (lines 480-606) is passed to `chrome.scripting.executeScript()` which serializes it and executes it in a separate context (the target tab/frame). When JavaScript functions are serialized, they **lose closure access** to variables in their outer scope. The `inject()` function referenced `modState` (defined at line 9 in the outer IIFE), but `modState` doesn't exist in the target execution context.
+
+**What DOESN'T Work**:
+- `modState.addEventListener()` inside `inject()` — closure is lost during serialization
+- Any reference to outer-scope variables from functions passed to `executeScript()`
+
+**What WORKS**:
+```javascript
+function inject(nameKey) {
+  // Use direct DOM APIs, not modState wrappers
+  document.addEventListener('click', handleClick);
+  document.addEventListener('mousedown', handleMouseDown);
+  chrome.runtime.onMessage.addListener(messageHandler);
+}
+```
+
+**Key Insight**: Functions passed to `chrome.scripting.executeScript()` run in complete isolation. They can only access:
+1. Their own local variables
+2. Arguments passed via the `args` array
+3. Global browser APIs (`document`, `chrome`, `window`)
+
+Never reference outer-scope helpers like `modState` from these functions.
+
+**Files Audited** (all use direct APIs correctly except easyFiles.js which was fixed):
+- `globalMediaControls.js` — ✅ uses direct `chrome.runtime.onMessage.addListener()`
+- `importExportCommandChains.js` — ✅ uses inline arrow function with direct APIs
+- `immersiveAddressbar.js` — ✅ uses inline arrow function
+- `tidyTitles.js` — ✅ uses code string parameter (legacy API)
+- `tabScroll.js` — ✅ uses inline arrow function
+
+**File**: `Javascripts/Tam710562/easyFiles.js` (lines 570-571, 605)
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc

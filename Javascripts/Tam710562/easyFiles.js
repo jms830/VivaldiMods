@@ -567,8 +567,9 @@
       pointerPosition.y = event.clientY;
     }
 
-    modState.addEventListener(document, 'click', handleClick);
-    modState.addEventListener(document, 'mousedown', handleMouseDown);
+    // Injected context - no closure access to modState
+    document.addEventListener('click', handleClick);
+    document.addEventListener('mousedown', handleMouseDown);
 
     function changeFile(dataTransfer) {
       fileInput.files = dataTransfer.files;
@@ -602,7 +603,7 @@
         }
       }
     };
-    modState.addChromeListener(chrome.runtime, 'onMessage', messageHandler);
+    chrome.runtime.onMessage.addListener(messageHandler);
   }
 
   async function simulatePaste() {
