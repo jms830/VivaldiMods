@@ -125,10 +125,9 @@ CheckForNewVersion() {
     
     ; Check if version changed and we're ready to run
     if (currentVersion != lastKnownVersion && currentVersion != "" && isReady) {
-        ; Check if the new version is already patched
+        ; Check if the new version is already patched (hardlink architecture)
         versionPath := vivaldiPath "\" currentVersion "\resources\vivaldi"
-        if FileExist(versionPath "\custom.js") {
-            ; Already patched, just update our tracked version
+        if FileExist(versionPath "\javascript\custom.js") {
             lastKnownVersion := currentVersion
             return
         }

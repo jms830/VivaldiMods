@@ -291,7 +291,10 @@
     backdrop-filter: var(--blurMed);
 }
 
-/* STATUS BAR */
+/* STATUS BAR
+   NOTE: Only set APPEARANCE here (blur, color, radius).
+   Never set LAYOUT (margin, position, width, height) — those belong
+   to AutoHide/statusbar.css or Vivaldi defaults. */
 footer#footer {
     background: none !important;
     border-top: none !important;
@@ -302,7 +305,6 @@ footer .toolbar-statusbar {
     -webkit-backdrop-filter: blur(12px);
     background-color: var(--bg);
     border-radius: var(--radius);
-    /*margin: 0 4px 4px 4px;*/ margin: 0 5px 5px 5px;
 }
 
 .inner > .StatusInfo > .StatusInfo-Content {

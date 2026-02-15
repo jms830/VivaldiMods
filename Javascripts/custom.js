@@ -44,7 +44,7 @@
     'Tam710562/easyFiles.js',                   // Drag-and-drop file management
     'Tam710562/elementCapture.js',              // Screenshot element tool
     'Tam710562/mdNotes.js',                     // Markdown notes in sidebar panel
-    'Tam710562/adaptiveWebPanelHeaders.js',     // Panel headers match page colors
+    // 'Tam710562/adaptiveWebPanelHeaders.js',  // DISABLED: Monkey-patches Element.prototype.appendChild globally, causes panel reload loops
     'Tam710562/feedIcon.js',                    // RSS feed indicator in address bar
     'Tam710562/clickAddBlockList.js',           // Easy ad-block list management
     'Tam710562/importExportCommandChains.js',   // Backup command chains

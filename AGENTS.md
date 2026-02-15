@@ -1009,6 +1009,61 @@ Never reference outer-scope helpers like `modState` from these functions.
 
 **File**: `Javascripts/Tam710562/easyFiles.js` (lines 570-571, 605)
 
+### adaptiveWebPanelHeaders.js Causes Panel Reload Loops (Feb 2026)
+
+**Symptom**: Web panels and tabs reload themselves in a constant loop.
+
+**Root Cause**: `adaptiveWebPanelHeaders.js` (lines 234-242) monkey-patches `Element.prototype.appendChild` globally. Every DOM insertion in the entire browser UI gets intercepted. It adds `loadcommit` listeners to every webview, which triggers color extraction (creating `<img>` + `<canvas>` elements via `appendChild`), creating a feedback loop.
+
+**Fix**: Disabled in `Javascripts/custom.js`. The mod is now commented out in both `enabledMods` arrays (repo and installed).
+
+**Why it's dangerous**: Overriding `Element.prototype.appendChild` is prototype pollution — it affects all code in the process, not just the mod's own elements. Any other mod or Vivaldi internal code that appends elements triggers the interceptor, which appends more elements, which triggers it again.
+
+**File**: `Javascripts/Tam710562/adaptiveWebPanelHeaders.js`
+
+### Stale Bundled custom.js Loads All Mods Including Disabled Ones (Feb 2026)
+
+**Symptom**: Mods that are commented out in `custom.js` still appear active (e.g., monochromeIcons desaturating toolbar icons, follower-tabs replicating tab navigation).
+
+**Root Cause**: The old `install-js-mods.ps1` used a **bundling** architecture — it concatenated ALL `.js` files from the repo into a single monolithic `custom.js` (681KB) placed directly at `resources/vivaldi/custom.js`. This bundle contained every mod inlined and executing, regardless of the loader's enabled/disabled configuration. The `window.html` script tag pointed to `src="custom.js"` (loading the bundle) instead of `src="javascript/custom.js"` (loading the hardlink-based loader).
+
+**Fix**: 
+1. Rewrote `install-js-mods.ps1` to use the hardlink architecture (matching `.bat`)
+2. The PS1 now copies individual files to `Application/javascript/`, creates NTFS hardlinks in `resources/vivaldi/javascript/`, and injects `<script src="javascript/custom.js">` 
+3. Added cleanup logic to detect and remove old bundled files (>10KB at `resources/vivaldi/custom.js`)
+4. Added UNC path handling (`Set-Location $env:TEMP` before `cmd /c mklink`) so the PS1 works when invoked from WSL
+
+**How to detect**: If `resources/vivaldi/custom.js` exists and is >10KB, it's the old bundle. The correct architecture has individual files in `resources/vivaldi/javascript/` as hardlinks.
+
+**Prevention**: The AHK watcher's "already patched" check was updated to look for `javascript/custom.js` (hardlink dir) instead of `custom.js` (old bundle).
+
+**Files**: `scripts/install-js-mods.ps1`, `scripts/vivaldi-watcher.ahk`
+
+### disabledMods .filter(Boolean) Can Accidentally Load Mods (Feb 2026)
+
+**Symptom**: A mod listed in `disabledMods` array in `custom.js` loads and runs despite being in the "disabled" section.
+
+**Root Cause**: The loader (line 90) does `disabledMods.filter(Boolean)` to skip commented-out entries. But if a line in `disabledMods` is a bare string without the `//` comment prefix, `.filter(Boolean)` keeps it as truthy, and the loader loads it.
+
+**Example** (broken — missing `//`):
+```javascript
+var disabledMods = [
+     'PageAction/follower-tabs.js',           // Tab following behavior
+];
+```
+This loads `follower-tabs.js` because the string is truthy. The `//` comment that should disable it is only in the inline comment, not commenting out the string itself.
+
+**Correct**:
+```javascript
+var disabledMods = [
+    // 'PageAction/follower-tabs.js',           // Tab following behavior
+];
+```
+
+**Prevention**: Always verify that disabled mods have `//` before the string quote, not just as a trailing comment.
+
+**File**: `Javascripts/custom.js` (line 90, `disabledMods` array)
+
 ## Source Repos (Reference)
 
 - VivalArc: https://github.com/tovifun/VivalArc
